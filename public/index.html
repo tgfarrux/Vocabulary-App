@@ -420,21 +420,80 @@ const quizBody = document.getElementById('quizBody');
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
 
+function hasCloudStorage(){
+  return !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage);
+}
+function cloudGetItem(key){
+  return new Promise((resolve, reject) => {
+    window.Telegram.WebApp.CloudStorage.getItem(key, (err, value) => {
+      if(err) reject(err); else resolve(value);
+    });
+  });
+}
+function cloudSetItem(key, value){
+  return new Promise((resolve, reject) => {
+    window.Telegram.WebApp.CloudStorage.setItem(key, value, (err, success) => {
+      if(err) reject(err); else resolve(success);
+    });
+  });
+}
+function cloudGetItems(keys){
+  return new Promise((resolve, reject) => {
+    if(keys.length === 0){ resolve({}); return; }
+    window.Telegram.WebApp.CloudStorage.getItems(keys, (err, values) => {
+      if(err) reject(err); else resolve(values || {});
+    });
+  });
+}
+function cloudRemoveItem(key){
+  return new Promise((resolve, reject) => {
+    window.Telegram.WebApp.CloudStorage.removeItem(key, (err, success) => {
+      if(err) reject(err); else resolve(success);
+    });
+  });
+}
+
 async function loadWords(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    words = raw ? JSON.parse(raw) : [];
-  }catch(e){
-    words = [];
+  if(hasCloudStorage()){
+    try{
+      const idsRaw = await cloudGetItem('word_index');
+      const ids = idsRaw ? JSON.parse(idsRaw) : [];
+      if(ids.length === 0){ words = []; render(); return; }
+      const items = await cloudGetItems(ids.map(id => 'word_' + id));
+      words = ids
+        .map(id => items['word_' + id] ? JSON.parse(items['word_' + id]) : null)
+        .filter(Boolean);
+    }catch(e){
+      console.error('CloudStorage o\'qishda xato', e);
+      words = [];
+    }
+  } else {
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      words = raw ? JSON.parse(raw) : [];
+    }catch(e){
+      words = [];
+    }
   }
   render();
 }
 
 async function saveWords(){
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
-  }catch(e){
-    console.error('Saqlashda xatolik', e);
+  if(hasCloudStorage()){
+    try{
+      await cloudSetItem('word_index', JSON.stringify(words.map(w => w.id)));
+      for(const w of words){
+        await cloudSetItem('word_' + w.id, JSON.stringify(w));
+      }
+    }catch(e){
+      console.error('CloudStorage yozishda xato', e);
+    }
+  } else {
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+    }catch(e){
+      console.error('Saqlashda xatolik', e);
+    }
   }
 }
 
@@ -490,6 +549,9 @@ function deleteWord(id){
   words = words.filter(x => x.id !== id);
   render();
   saveWords();
+  if(hasCloudStorage()){
+    cloudRemoveItem('word_' + id).catch(e => console.error('CloudStorage\'dan o\'chirishda xato', e));
+  }
 }
 
 function retryWord(id){
@@ -660,22 +722,26 @@ function renderQuizQuestion(){
     <div class="quiz-progress">Savol ${quizState.index + 1} / ${quizState.questions.length} &nbsp;•&nbsp; Ball: ${quizState.score}</div>
     <div class="quiz-word">${escapeHtml(q.en)}</div>
     <div class="quiz-options" id="quizOptions">
-      ${q.options.map((opt, i) => `<button class="quiz-option" data-opt="${escapeHtml(opt)}" onclick="answerQuiz(this, '${escapeHtml(q.correct).replace(/'/g,"\\'")}')">${escapeHtml(opt)}</button>`).join('')}
+      ${q.options.map((opt) => `<button type="button" class="quiz-option">${escapeHtml(opt)}</button>`).join('')}
     </div>
     <div class="quiz-footer">
       <button class="next-btn" id="nextBtn" disabled>Keyingisi</button>
     </div>
   `;
+  const optionButtons = Array.from(document.querySelectorAll('#quizOptions .quiz-option'));
+  optionButtons.forEach((btn, i) => {
+    const opt = q.options[i];
+    btn.addEventListener('click', () => answerQuiz(btn, opt, q.correct, optionButtons, q.options));
+  });
   document.getElementById('nextBtn').addEventListener('click', nextQuestion);
 }
 
-function answerQuiz(btn, correct){
+function answerQuiz(btn, chosen, correct, optionButtons, options){
   if(quizState.answered) return;
   quizState.answered = true;
-  const chosen = btn.dataset.opt;
-  document.querySelectorAll('#quizOptions .quiz-option').forEach(b => {
+  optionButtons.forEach((b, i) => {
     b.disabled = true;
-    if(b.dataset.opt === correct) b.classList.add('correct');
+    if(options[i] === correct) b.classList.add('correct');
     else if(b === btn) b.classList.add('wrong');
   });
   if(chosen === correct) quizState.score++;
