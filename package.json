@@ -1,0 +1,16 @@
+{
+  "name": "lugat-daftarcha-mini-app",
+  "version": "1.0.0",
+  "description": "Shaxsiy ingliz tili lug'at daftarchasi — Telegram Mini App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}
