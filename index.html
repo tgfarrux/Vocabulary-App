@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lug'at daftarcham</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --paper: #F6F1E4;
+    --paper-dark: #ECE2C8;
+    --paper-line: #D8CBA8;
+    --ink: #24211B;
+    --ink-soft: #6b6455;
+    --red: #B23A2E;
+    --red-soft: #c9584c;
+    --gold: #C9971F;
+    --green: #4F7A5D;
+    --green-soft: #dbe7dd;
+    --navy: #2D3A55;
+    --card-shadow: 0 1px 0 rgba(36,33,27,0.06), 0 6px 16px -8px rgba(36,33,27,0.25);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 34px, var(--paper-line) 35px),
+      var(--paper);
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .app{
+    display:flex;
+    max-width:1180px;
+    margin:0 auto;
+    min-height:100vh;
+  }
+
+  /* ---------- Spiral binder sidebar ---------- */
+  .binder{
+    width:64px;
+    flex-shrink:0;
+    background:linear-gradient(180deg, #E9DFC4, #E2D6B4);
+    border-right:2px dashed #c8b98a;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 0;
+    position:relative;
+    gap:22px;
+  }
+  .ring{
+    width:20px;height:20px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff8e8, #cbb87e 55%, #9c8a54 100%);
+    box-shadow: inset 0 0 0 3px #efe6c9, 0 1px 2px rgba(0,0,0,0.25);
+    flex-shrink:0;
+  }
+  .binder-tabs{
+    position:absolute;
+    right:-1px;
+    top:120px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .tab-btn{
+    writing-mode:vertical-rl;
+    text-orientation:mixed;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    padding:14px 8px;
+    background:var(--navy);
+    color:#F6F1E4;
+    border:none;
+    border-radius:0 8px 8px 0;
+    cursor:pointer;
+    transform:translateX(0);
+    transition:transform .18s ease, background .18s ease;
+  }
+  .tab-btn:hover{transform:translateX(4px);}
+  .tab-btn.active{background:var(--red);}
+
+  main{flex:1; padding:34px 40px 60px; min-width:0;}
+
+  /* ---------- Header / cover ---------- */
+  .cover{margin-bottom:22px;}
+  .tape{
+    display:inline-block;
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:34px;
+    background: linear-gradient(180deg, rgba(201,151,31,0.18), rgba(201,151,31,0.18));
+    padding:6px 18px 8px;
+    transform:rotate(-1.2deg);
+    position:relative;
+    box-shadow: inset 0 -2px 0 rgba(178,58,46,0.35);
+  }
+  .tape::before, .tape::after{
+    content:"";
+    position:absolute;
+    top:-6px;
+    width:26px;height:14px;
+    background:rgba(255,255,255,0.55);
+    border:1px solid rgba(0,0,0,0.04);
+  }
+  .tape::before{left:-8px; transform:rotate(-8deg);}
+  .tape::after{right:-8px; transform:rotate(8deg);}
+
+  .stats{
+    margin-top:14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+  }
+  .stats b{color:var(--ink); font-weight:600;}
+  .stat-dot{color:var(--gold);}
+
+  /* ---------- Add row ---------- */
+  .add-row{
+    display:flex;
+    gap:10px;
+    margin:24px 0 8px;
+  }
+  .add-row input{
+    flex:1;
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+    padding:13px 16px;
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    background:#fffdf7;
+    outline:none;
+    transition:border-color .15s;
+  }
+  .add-row input:focus{border-color:var(--gold);}
+  .add-row button{
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    padding:0 22px;
+    border:none;
+    border-radius:10px;
+    background:var(--ink);
+    color:#F6F1E4;
+    cursor:pointer;
+    transition:background .15s, transform .1s;
+  }
+  .add-row button:hover{background:var(--navy);}
+  .add-row button:active{transform:scale(0.97);}
+  .add-row button:disabled{opacity:0.5; cursor:default;}
+  .hint{font-size:12.5px; color:var(--ink-soft); margin-bottom:18px;}
+
+  /* ---------- Quiz banner ---------- */
+  .quiz-banner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:var(--green-soft);
+    border:1.5px dashed var(--green);
+    border-radius:12px;
+    padding:14px 18px;
+    margin-bottom:20px;
+    font-size:14.5px;
+    color:#2f4f3a;
+  }
+  .quiz-banner.hidden{display:none;}
+  .quiz-banner button{
+    font-family:'Inter';
+    font-weight:700;
+    font-size:13.5px;
+    background:var(--green);
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+
+  /* ---------- Lists ---------- */
+  .lists{display:flex; gap:28px; align-items:flex-start;}
+  .col{flex:1; min-width:0;}
+  .col h2{
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    font-weight:600;
+    margin:0 0 12px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--ink);
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .col h2 span{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); font-weight:400;}
+  .cards{display:flex; flex-direction:column; gap:12px;}
+
+  .card{
+    background:#fffdf7;
+    border:1px solid var(--paper-line);
+    border-radius:10px;
+    padding:14px 16px;
+    box-shadow:var(--card-shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .card.pending{opacity:0.6;}
+  .card-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
+  .en-word{font-family:'Fraunces', serif; font-weight:600; font-size:19px;}
+  .card-actions{display:flex; gap:6px; flex-shrink:0;}
+  .icon-btn{
+    border:none; background:transparent; cursor:pointer;
+    width:26px; height:26px; border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink-soft); font-size:14px;
+    transition:background .15s, color .15s;
+  }
+  .icon-btn:hover{background:var(--paper-dark); color:var(--ink);}
+  .icon-btn.memorize:hover{color:var(--green);}
+  .icon-btn.del:hover{color:var(--red);}
+
+  .uz-word{color:var(--red); font-weight:600; font-size:14.5px; margin-top:4px;}
+  .example{
+    font-style:italic;
+    color:var(--ink-soft);
+    font-size:13.5px;
+    margin-top:6px;
+    line-height:1.45;
+    border-left:2px solid var(--gold);
+    padding-left:10px;
+  }
+  .loading-text{font-size:13px; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace;}
+  .error-text{font-size:12.5px; color:var(--red); margin-top:4px;}
+  .retry-link{color:var(--navy); cursor:pointer; text-decoration:underline; font-weight:600;}
+
+  .stamp{
+    position:absolute;
+    top:10px; right:-6px;
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:22px;
+    color:var(--green);
+    border:2.5px solid var(--green);
+    border-radius:8px;
+    padding:1px 10px 3px;
+    transform:rotate(8deg);
+    opacity:0.85;
+    letter-spacing:0.02em;
+  }
+  .empty{
+    color:var(--ink-soft);
+    font-size:13.5px;
+    padding:20px 10px;
+    text-align:center;
+    border:1.5px dashed var(--paper-line);
+    border-radius:10px;
+  }
+
+  /* ---------- Quiz overlay ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(36,33,27,0.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .overlay.hidden{display:none;}
+  .quiz-modal{
+    background:var(--paper);
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 30px, var(--paper-line) 31px);
+    width:100%; max-width:520px;
+    border-radius:16px;
+    padding:30px 32px 26px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.35);
+    position:relative;
+  }
+  .quiz-modal h3{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    margin:0 0 4px;
+  }
+  .quiz-progress{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-bottom:18px;
+  }
+  .quiz-word{
+    font-family:'Fraunces', serif;
+    font-size:28px;
+    font-weight:600;
+    text-align:center;
+    margin:18px 0 22px;
+    padding:18px;
+    background:#fffdf7;
+    border-radius:10px;
+    border:1px solid var(--paper-line);
+  }
+  .quiz-options{display:flex; flex-direction:column; gap:10px;}
+  .quiz-option{
+    font-family:'Inter';
+    font-size:14.5px;
+    text-align:left;
+    padding:12px 16px;
+    border:1.5px solid var(--paper-line);
+    background:#fffdf7;
+    border-radius:9px;
+    cursor:pointer;
+    transition:border-color .12s, background .12s;
+  }
+  .quiz-option:hover{border-color:var(--navy);}
+  .quiz-option.correct{border-color:var(--green); background:var(--green-soft);}
+  .quiz-option.wrong{border-color:var(--red); background:#f6e0dc;}
+  .quiz-option:disabled{cursor:default;}
+  .quiz-close{
+    position:absolute; top:16px; right:18px;
+    border:none; background:transparent; font-size:18px; cursor:pointer; color:var(--ink-soft);
+  }
+  .quiz-footer{margin-top:20px; display:flex; justify-content:flex-end;}
+  .next-btn{
+    font-family:'Inter'; font-weight:700; font-size:13.5px;
+    background:var(--ink); color:#F6F1E4;
+    border:none; padding:10px 20px; border-radius:8px; cursor:pointer;
+  }
+  .next-btn:disabled{opacity:0.35; cursor:default;}
+  .quiz-result{text-align:center;}
+  .quiz-result .big-stamp{
+    font-family:'Caveat', cursive;
+    font-size:52px;
+    color:var(--red);
+    border:4px solid var(--red);
+    border-radius:14px;
+    display:inline-block;
+    padding:6px 26px 10px;
+    transform:rotate(-4deg);
+    margin:10px 0 16px;
+  }
+  .quiz-score{font-family:'IBM Plex Mono', monospace; font-size:15px; color:var(--ink-soft);}
+
+  @media (max-width: 720px){
+    .binder{display:none;}
+    main{padding:24px 18px 50px;}
+    .lists{flex-direction:column;}
+    .tape{font-size:26px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="binder">
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="binder-tabs">
+      <button class="tab-btn active" data-view="all">SO'ZLAR</button>
+      <button class="tab-btn" data-view="quiz-tab">TEST</button>
+    </div>
+  </div>
+
+  <main>
+    <header class="cover">
+      <div class="tape">Lug'at daftarcham</div>
+      <div class="stats">
+        <span><span class="stat-dot">●</span> Jami so'z: <b id="statTotal">0</b></span>
+        <span><span class="stat-dot">●</span> Yodlangan: <b id="statMemorized">0</b></span>
+        <span><span class="stat-dot">●</span> Testga tayyor: <b id="statReady">0</b></span>
+      </div>
+    </header>
+
+    <div class="add-row">
+      <input id="wordInput" type="text" placeholder="Bilmagan inglizcha so'zingizni yozing va Enter bosing..." autocomplete="off">
+      <button id="addBtn">Qo'shish</button>
+    </div>
+    <div class="hint">Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.</div>
+
+    <div id="quizBanner" class="quiz-banner hidden">
+      <span>🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.</span>
+      <button id="startQuizBtn">Testni boshlash</button>
+    </div>
+
+    <div class="lists">
+      <section class="col">
+        <h2>O'rganilmoqda <span id="learningCount">(0)</span></h2>
+        <div id="learningList" class="cards"></div>
+      </section>
+      <section class="col">
+        <h2>Yodlangan <span id="memorizedCount">(0)</span></h2>
+        <div id="memorizedList" class="cards"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="quizOverlay" class="overlay hidden">
+  <div class="quiz-modal">
+    <button class="quiz-close" id="quizClose">✕</button>
+    <div id="quizBody"></div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'vocab-words-v1';
+let words = []; // {id, en, uz, example, status: 'loading'|'ready'|'error', memorized, quizzed}
+let quizState = null;
+
+const learningList = document.getElementById('learningList');
+const memorizedList = document.getElementById('memorizedList');
+const wordInput = document.getElementById('wordInput');
+const addBtn = document.getElementById('addBtn');
+const quizBanner = document.getElementById('quizBanner');
+const quizOverlay = document.getElementById('quizOverlay');
+const quizBody = document.getElementById('quizBody');
+
+function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+async function loadWords(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    words = raw ? JSON.parse(raw) : [];
+  }catch(e){
+    words = [];
+  }
+  render();
+}
+
+async function saveWords(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+  }catch(e){
+    console.error('Saqlashda xatolik', e);
+  }
+}
+
+async function fetchTranslation(word){
+  const response = await fetch("/api/translate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ word })
+  });
+  if(!response.ok){
+    throw new Error('So\'rov muvaffaqiyatsiz');
+  }
+  const data = await response.json();
+  if(!data.uzbek || !data.example) throw new Error('Noto\'g\'ri format');
+  return data;
+}
+
+async function addWord(rawWord){
+  const en = rawWord.trim();
+  if(!en) return;
+  const exists = words.some(w => w.en.toLowerCase() === en.toLowerCase());
+  if(exists){
+    wordInput.value = '';
+    return;
+  }
+  const w = { id: uid(), en, uz: '', example: '', status: 'loading', memorized: false, quizzed: false };
+  words.unshift(w);
+  render();
+  saveWords();
+
+  try{
+    const result = await fetchTranslation(en);
+    w.uz = result.uzbek;
+    w.example = result.example;
+    w.status = 'ready';
+  }catch(e){
+    w.status = 'error';
+  }
+  render();
+  saveWords();
+}
+
+function toggleMemorized(id){
+  const w = words.find(x => x.id === id);
+  if(!w) return;
+  w.memorized = !w.memorized;
+  render();
+  saveWords();
+  checkQuizReady();
+}
+
+function deleteWord(id){
+  words = words.filter(x => x.id !== id);
+  render();
+  saveWords();
+}
+
+function retryWord(id){
+  const w = words.find(x => x.id === id);
+  if(!w) return;
+  w.status = 'loading';
+  render();
+  fetchTranslation(w.en).then(result => {
+    w.uz = result.uzbek;
+    w.example = result.example;
+    w.status = 'ready';
+    render();
+    saveWords();
+  }).catch(() => {
+    w.status = 'error';
+    render();
+  });
+}
+
+function checkQuizReady(){
+  const ready = words.filter(w => w.memorized && !w.quizzed);
+  quizBanner.classList.toggle('hidden', ready.length < 10);
+}
+
+function cardHtml(w){
+  if(w.status === 'loading'){
+    return `<div class="card pending">
+      <div class="card-top">
+        <div class="en-word">${escapeHtml(w.en)}</div>
+        <div class="card-actions">
+          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="O'chirish">✕</button>
+        </div>
+      </div>
+      <div class="loading-text">tarjima qilinmoqda...</div>
+    </div>`;
+  }
+  if(w.status === 'error'){
+    return `<div class="card">
+      <div class="card-top">
+        <div class="en-word">${escapeHtml(w.en)}</div>
+        <div class="card-actions">
+          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="O'chirish">✕</button>
+        </div>
+      </div>
+      <div class="error-text">Tarjima olinmadi. <span class="retry-link" onclick="retryWord('${w.id}')">qayta urinish</span></div>
+    </div>`;
+  }
+  return `<div class="card">
+    ${w.memorized ? '<div class="stamp">yodlandi</div>' : ''}
+    <div class="card-top">
+      <div class="en-word">${escapeHtml(w.en)}</div>
+      <div class="card-actions">
+        <button class="icon-btn memorize" onclick="toggleMemorized('${w.id}')" title="${w.memorized ? 'Yodlanmagan deb belgilash' : 'Yodladim deb belgilash'}">${w.memorized ? '↺' : '✓'}</button>
+        <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="O'chirish">✕</button>
+      </div>
+    </div>
+    <div class="uz-word">${escapeHtml(w.uz)}</div>
+    <div class="example">${escapeHtml(w.example)}</div>
+  </div>`;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function render(){
+  const learning = words.filter(w => !w.memorized);
+  const memorized = words.filter(w => w.memorized);
+
+  learningList.innerHTML = learning.length
+    ? learning.map(cardHtml).join('')
+    : '<div class="empty">Hozircha bo\'sh. Yangi so\'z qo\'shing.</div>';
+
+  memorizedList.innerHTML = memorized.length
+    ? memorized.map(cardHtml).join('')
+    : '<div class="empty">Yodlagan so\'zlaringiz shu yerda to\'planadi.</div>';
+
+  document.getElementById('learningCount').textContent = `(${learning.length})`;
+  document.getElementById('memorizedCount').textContent = `(${memorized.length})`;
+  document.getElementById('statTotal').textContent = words.length;
+  document.getElementById('statMemorized').textContent = memorized.length;
+  document.getElementById('statReady').textContent = words.filter(w => w.memorized && !w.quizzed).length;
+
+  checkQuizReady();
+}
+
+addBtn.addEventListener('click', () => {
+  const v = wordInput.value;
+  wordInput.value = '';
+  addWord(v);
+});
+wordInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter'){
+    const v = wordInput.value;
+    wordInput.value = '';
+    addWord(v);
+  }
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if(btn.dataset.view === 'quiz-tab'){
+      openQuizIfPossible();
+    }
+  });
+});
+
+document.getElementById('startQuizBtn').addEventListener('click', openQuizIfPossible);
+document.getElementById('quizClose').addEventListener('click', closeQuiz);
+
+const FALLBACK_DISTRACTORS = ["kitob","stol","osmon","daryo","tog'","gul","quyosh","uy","yo'l","olma","non","suv","daraxt","yulduz","shahar","qishloq","mashina","oyna","eshik","bola"];
+
+function buildQuizQuestions(){
+  const pool = words.filter(w => w.memorized && !w.quizzed && w.status === 'ready').slice(0, 10);
+  const allUz = words.filter(w => w.status === 'ready').map(w => w.uz);
+  return pool.map(w => {
+    let distractorPool = allUz.filter(u => u !== w.uz);
+    let distractors = [];
+    while(distractors.length < 3){
+      if(distractorPool.length){
+        const idx = Math.floor(Math.random() * distractorPool.length);
+        const pick = distractorPool.splice(idx,1)[0];
+        if(!distractors.includes(pick)) distractors.push(pick);
+      } else {
+        const idx = Math.floor(Math.random() * FALLBACK_DISTRACTORS.length);
+        const pick = FALLBACK_DISTRACTORS[idx];
+        if(!distractors.includes(pick) && pick !== w.uz) distractors.push(pick);
+      }
+    }
+    const options = [...distractors, w.uz].sort(() => Math.random() - 0.5);
+    return { id: w.id, en: w.en, correct: w.uz, options };
+  });
+}
+
+function openQuizIfPossible(){
+  const eligible = words.filter(w => w.memorized && !w.quizzed && w.status === 'ready');
+  if(eligible.length < 10){
+    quizBody.innerHTML = `<h3>Test hali tayyor emas</h3>
+      <p style="color:var(--ink-soft); font-size:14px; line-height:1.5;">
+      Test boshlash uchun kamida 10 ta so'zni "yodladim" deb belgilashingiz kerak.
+      Hozircha: <b>${eligible.length}/10</b>.
+      </p>`;
+    quizOverlay.classList.remove('hidden');
+    return;
+  }
+  quizState = {
+    questions: buildQuizQuestions(),
+    index: 0,
+    score: 0,
+    answered: false
+  };
+  quizOverlay.classList.remove('hidden');
+  renderQuizQuestion();
+}
+
+function closeQuiz(){
+  quizOverlay.classList.add('hidden');
+  quizState = null;
+}
+
+function renderQuizQuestion(){
+  const q = quizState.questions[quizState.index];
+  quizState.answered = false;
+  quizBody.innerHTML = `
+    <h3>So'z testi</h3>
+    <div class="quiz-progress">Savol ${quizState.index + 1} / ${quizState.questions.length} &nbsp;•&nbsp; Ball: ${quizState.score}</div>
+    <div class="quiz-word">${escapeHtml(q.en)}</div>
+    <div class="quiz-options" id="quizOptions">
+      ${q.options.map((opt, i) => `<button class="quiz-option" data-opt="${escapeHtml(opt)}" onclick="answerQuiz(this, '${escapeHtml(q.correct).replace(/'/g,"\\'")}')">${escapeHtml(opt)}</button>`).join('')}
+    </div>
+    <div class="quiz-footer">
+      <button class="next-btn" id="nextBtn" disabled>Keyingisi</button>
+    </div>
+  `;
+  document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+}
+
+function answerQuiz(btn, correct){
+  if(quizState.answered) return;
+  quizState.answered = true;
+  const chosen = btn.dataset.opt;
+  document.querySelectorAll('#quizOptions .quiz-option').forEach(b => {
+    b.disabled = true;
+    if(b.dataset.opt === correct) b.classList.add('correct');
+    else if(b === btn) b.classList.add('wrong');
+  });
+  if(chosen === correct) quizState.score++;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function nextQuestion(){
+  quizState.index++;
+  if(quizState.index >= quizState.questions.length){
+    finishQuiz();
+  } else {
+    renderQuizQuestion();
+  }
+}
+
+function finishQuiz(){
+  quizState.questions.forEach(q => {
+    const w = words.find(x => x.id === q.id);
+    if(w) w.quizzed = true;
+  });
+  render();
+  saveWords();
+  const score = quizState.score;
+  const total = quizState.questions.length;
+  const pct = Math.round((score/total)*100);
+  const label = pct === 100 ? "A'LO!" : pct >= 70 ? "ZO'R!" : pct >= 40 ? "YAXSHI" : "YANA URINING";
+  quizBody.innerHTML = `
+    <div class="quiz-result">
+      <h3>Test yakunlandi</h3>
+      <div class="big-stamp">${label}</div>
+      <div class="quiz-score">${score} / ${total} to'g'ri javob (${pct}%)</div>
+      <div class="quiz-footer" style="justify-content:center; margin-top:22px;">
+        <button class="next-btn" onclick="closeQuiz()">Yopish</button>
+      </div>
+    </div>
+  `;
+}
+
+if(window.Telegram && window.Telegram.WebApp){
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
+}
+
+loadWords();
+</script>
+</body>
+</html>
