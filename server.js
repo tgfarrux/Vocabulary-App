@@ -129,6 +129,32 @@ if (BOT_TOKEN) {
   console.log('BOT_TOKEN topilmadi — faqat veb-sahifa ishlaydi, bot ishga tushmadi');
 }
 
+app.get('/api/speak', async (req, res) => {
+  try {
+    const text = (req.query.text || '').toString().trim().slice(0, 200);
+    if (!text) {
+      return res.status(400).send('Matn yuborilmadi');
+    }
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=en&client=tw-ob`;
+    const response = await fetch(ttsUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+      }
+    });
+    if (!response.ok) {
+      console.error('TTS xatosi:', response.status);
+      return res.status(502).send('Ovoz olinmadi');
+    }
+    const buffer = Buffer.from(await response.arrayBuffer());
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(buffer);
+  } catch (e) {
+    console.error('Talaffuz server xatosi:', e);
+    res.status(500).send('Server xatosi');
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server ${PORT}-portda ishga tushdi`);
