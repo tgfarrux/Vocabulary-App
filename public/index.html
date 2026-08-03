@@ -120,18 +120,13 @@
 
   /* ---------- Header / cover ---------- */
   .cover{margin-bottom:22px; position:relative;}
-  .title-row{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:14px;
-    flex-wrap:nowrap;
-  }
   .top-icons{
+    position:absolute;
+    top:0;
+    right:0;
     display:flex;
     align-items:center;
     gap:20px;
-    flex-shrink:0;
   }
   .icon-group{display:flex; gap:10px;}
   .top-icon-btn{
@@ -202,16 +197,12 @@
     display:inline-block;
     font-family:'Fraunces', serif;
     font-weight:700;
-    font-size:20px;
+    font-size:34px;
     background: linear-gradient(180deg, rgba(201,151,31,0.18), rgba(201,151,31,0.18));
-    padding:5px 14px 6px;
+    padding:6px 18px 8px;
     transform:rotate(-1.2deg);
     position:relative;
     box-shadow: inset 0 -2px 0 rgba(178,58,46,0.35);
-    flex-shrink:1;
-    min-width:0;
-    align-self:flex-start;
-    margin-top:2px;
   }
   .tape::before, .tape::after{
     content:"";
@@ -515,8 +506,12 @@
     .binder{display:none;}
     main{padding:24px 18px 50px;}
     .lists{flex-direction:column;}
-    .tape{font-size:16px; padding:4px 10px 5px;}
-    .title-row{align-items:center;}
+    .cover{display:flex; flex-direction:column;}
+    .top-icons{position:static; align-self:flex-end; margin-bottom:18px; order:-1;}
+    .top-icon-btn{width:28px; height:28px; font-size:12px;}
+    #profileBtn{width:36px; height:36px;}
+    #profileBtn .avatar-fallback svg{width:18px; height:18px;}
+    .tape{font-size:20px; padding:5px 14px 6px;}
   }
 </style>
 </head>
@@ -534,16 +529,14 @@
 
   <main>
     <header class="cover">
-      <div class="title-row">
-        <div class="tape" id="appTitle">Lug'at daftarcham</div>
-        <div class="top-icons">
-          <div class="icon-group">
-            <button class="top-icon-btn" id="langSwitchBtn" title="Ilova tilini tanlash">🌐</button>
-            <button class="top-icon-btn" id="themeToggleBtn" title="Tungi/kunduzgi rejim">🌙</button>
-          </div>
-          <button class="top-icon-btn" id="profileBtn" title="Profil"><span id="profileAvatarWrap" class="avatar-fallback"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span></button>
+      <div class="top-icons">
+        <div class="icon-group">
+          <button class="top-icon-btn" id="langSwitchBtn" title="Ilova tilini tanlash">🌐</button>
+          <button class="top-icon-btn" id="themeToggleBtn" title="Tungi/kunduzgi rejim">🌙</button>
         </div>
+        <button class="top-icon-btn" id="profileBtn" title="Profil"><span id="profileAvatarWrap" class="avatar-fallback"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span></button>
       </div>
+      <div class="tape" id="appTitle">Lug'at daftarcham</div>
       <div class="stats">
         <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
         <span><span class="stat-dot">●</span> <span id="statMemorizedLabel">Yodlangan</span>: <b id="statMemorized">0</b></span>
@@ -910,13 +903,23 @@ function retryWord(id){
   });
 }
 
+let currentAudio = null;
 function speakWord(text){
-  if(!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'en-US';
-  utter.rate = 0.9;
-  window.speechSynthesis.speak(utter);
+  if(currentAudio){
+    currentAudio.pause();
+    currentAudio = null;
+  }
+  const audio = new Audio('/api/speak?text=' + encodeURIComponent(text));
+  currentAudio = audio;
+  audio.play().catch(() => {
+    if('speechSynthesis' in window){
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      utter.rate = 0.9;
+      window.speechSynthesis.speak(utter);
+    }
+  });
 }
 
 function copyText(text, btn){
