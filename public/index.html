@@ -120,13 +120,18 @@
 
   /* ---------- Header / cover ---------- */
   .cover{margin-bottom:22px; position:relative;}
+  .title-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:nowrap;
+  }
   .top-icons{
-    position:absolute;
-    top:0;
-    right:0;
     display:flex;
     align-items:center;
     gap:20px;
+    flex-shrink:0;
   }
   .icon-group{display:flex; gap:10px;}
   .top-icon-btn{
@@ -197,12 +202,16 @@
     display:inline-block;
     font-family:'Fraunces', serif;
     font-weight:700;
-    font-size:34px;
+    font-size:20px;
     background: linear-gradient(180deg, rgba(201,151,31,0.18), rgba(201,151,31,0.18));
-    padding:6px 18px 8px;
+    padding:5px 14px 6px;
     transform:rotate(-1.2deg);
     position:relative;
     box-shadow: inset 0 -2px 0 rgba(178,58,46,0.35);
+    flex-shrink:1;
+    min-width:0;
+    align-self:flex-start;
+    margin-top:2px;
   }
   .tape::before, .tape::after{
     content:"";
@@ -506,9 +515,8 @@
     .binder{display:none;}
     main{padding:24px 18px 50px;}
     .lists{flex-direction:column;}
-    .tape{font-size:26px;}
-    .cover{display:flex; flex-direction:column;}
-    .top-icons{position:static; align-self:flex-end; margin-bottom:14px; order:-1;}
+    .tape{font-size:16px; padding:4px 10px 5px;}
+    .title-row{align-items:center;}
   }
 </style>
 </head>
@@ -526,14 +534,16 @@
 
   <main>
     <header class="cover">
-      <div class="top-icons">
-        <div class="icon-group">
-          <button class="top-icon-btn" id="langSwitchBtn" title="Ilova tilini tanlash">🌐</button>
-          <button class="top-icon-btn" id="themeToggleBtn" title="Tungi/kunduzgi rejim">🌙</button>
+      <div class="title-row">
+        <div class="tape" id="appTitle">Lug'at daftarcham</div>
+        <div class="top-icons">
+          <div class="icon-group">
+            <button class="top-icon-btn" id="langSwitchBtn" title="Ilova tilini tanlash">🌐</button>
+            <button class="top-icon-btn" id="themeToggleBtn" title="Tungi/kunduzgi rejim">🌙</button>
+          </div>
+          <button class="top-icon-btn" id="profileBtn" title="Profil"><span id="profileAvatarWrap" class="avatar-fallback"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span></button>
         </div>
-        <button class="top-icon-btn" id="profileBtn" title="Profil"><span id="profileAvatarWrap" class="avatar-fallback"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span></button>
       </div>
-      <div class="tape" id="appTitle">Lug'at daftarcham</div>
       <div class="stats">
         <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
         <span><span class="stat-dot">●</span> <span id="statMemorizedLabel">Yodlangan</span>: <b id="statMemorized">0</b></span>
