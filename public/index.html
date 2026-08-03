@@ -116,19 +116,23 @@
   .tab-btn:hover{transform:translateX(4px);}
   .tab-btn.active{background:var(--red);}
 
-  main{flex:1; padding:34px 40px 60px; min-width:0;}
+  main{flex:1; padding:24px 30px 60px; min-width:0;}
 
   /* ---------- Header / cover ---------- */
-  .cover{margin-bottom:22px; position:relative;}
-  .top-icons{
-    position:absolute;
-    top:0;
-    right:0;
+  .cover{
+    margin-bottom:20px;
     display:flex;
     align-items:center;
-    gap:20px;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
   }
-  .icon-group{display:flex; gap:10px;}
+  .top-icons{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .icon-group{display:flex; gap:8px;}
   .top-icon-btn{
     width:34px;height:34px;
     border-radius:50%;
@@ -148,11 +152,48 @@
   .top-icon-btn img{width:100%; height:100%; object-fit:cover; border-radius:50%;}
   .avatar-fallback{display:flex; align-items:center; justify-content:center; width:100%; height:100%;}
   #profileBtn{
-    width:46px; height:46px;
+    width:38px; height:38px;
     border-width:2px;
   }
-  #profileBtn .avatar-fallback svg{width:24px; height:24px;}
-  #profileBtn .avatar-fallback{font-size:16px; font-weight:700;}
+  #profileBtn .avatar-fallback svg{width:20px; height:20px;}
+  #profileBtn .avatar-fallback{font-size:15px; font-weight:700;}
+
+  /* ---------- Kichraytirilgan tape ---------- */
+  .tape{
+    display:inline-block;
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:19px;
+    background: linear-gradient(180deg, rgba(201,151,31,0.18), rgba(201,151,31,0.18));
+    padding:4px 12px 5px;
+    transform:rotate(-1deg);
+    position:relative;
+    box-shadow: inset 0 -2px 0 rgba(178,58,46,0.35);
+    white-space:nowrap;
+  }
+  .tape::before, .tape::after{
+    content:"";
+    position:absolute;
+    top:-4px;
+    width:18px;height:10px;
+    background:var(--tape-overlay);
+    border:1px solid rgba(0,0,0,0.04);
+  }
+  .tape::before{left:-6px; transform:rotate(-8deg);}
+  .tape::after{right:-6px; transform:rotate(8deg);}
+
+  .stats{
+    width:100%;
+    margin-top:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .stats b{color:var(--ink); font-weight:600;}
+  .stat-dot{color:var(--gold);}
 
   /* ---------- Profile & language modals ---------- */
   .profile-modal{text-align:center;}
@@ -193,46 +234,13 @@
   .lang-option:hover{border-color:var(--gold);}
   .lang-option.active{border-color:var(--navy); background:var(--paper-dark);}
   .lang-option .flag{font-size:20px;}
-  .tape{
-    display:inline-block;
-    font-family:'Fraunces', serif;
-    font-weight:700;
-    font-size:34px;
-    background: linear-gradient(180deg, rgba(201,151,31,0.18), rgba(201,151,31,0.18));
-    padding:6px 18px 8px;
-    transform:rotate(-1.2deg);
-    position:relative;
-    box-shadow: inset 0 -2px 0 rgba(178,58,46,0.35);
-  }
-  .tape::before, .tape::after{
-    content:"";
-    position:absolute;
-    top:-6px;
-    width:26px;height:14px;
-    background:var(--tape-overlay);
-    border:1px solid rgba(0,0,0,0.04);
-  }
-  .tape::before{left:-8px; transform:rotate(-8deg);}
-  .tape::after{right:-8px; transform:rotate(8deg);}
-
-  .stats{
-    margin-top:14px;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12.5px;
-    color:var(--ink-soft);
-    display:flex;
-    gap:22px;
-    flex-wrap:wrap;
-  }
-  .stats b{color:var(--ink); font-weight:600;}
-  .stat-dot{color:var(--gold);}
 
   /* ---------- Lang switch row ---------- */
   .lang-row{
     display:flex;
     align-items:center;
     gap:10px;
-    margin-top:24px;
+    margin-top:16px;
     font-family:'Inter', sans-serif;
     font-size:13px;
     font-weight:600;
@@ -273,6 +281,7 @@
     background:var(--surface);
     outline:none;
     transition:border-color .15s;
+    color:var(--ink);
   }
   .add-row input:focus{border-color:var(--gold);}
   .add-row button{
@@ -283,7 +292,7 @@
     border:none;
     border-radius:10px;
     background:var(--ink);
-    color:#F6F1E4;
+    color:var(--paper);
     cursor:pointer;
     transition:background .15s, transform .1s;
   }
@@ -319,6 +328,127 @@
     cursor:pointer;
     white-space:nowrap;
   }
+
+  /* ---------- Views (Words vs Translator) ---------- */
+  .view-pane{display:none;}
+  .view-pane.active{display:block;}
+
+  /* ---------- Translator Section ---------- */
+  .translator-card{
+    background:var(--surface);
+    border:1.5px solid var(--paper-line);
+    border-radius:14px;
+    padding:20px;
+    box-shadow:var(--card-shadow);
+    margin-top:10px;
+  }
+  .translator-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--paper-line);
+  }
+  .lang-select-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .lang-badge{
+    padding:6px 14px;
+    background:var(--paper-dark);
+    border:1px solid var(--paper-line);
+    border-radius:8px;
+  }
+  .trans-box{
+    position:relative;
+    margin-bottom:14px;
+  }
+  .trans-textarea{
+    width:100%;
+    min-height:110px;
+    padding:12px 14px;
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+    color:var(--ink);
+    background:var(--paper);
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    outline:none;
+    resize:vertical;
+    transition:border-color .15s;
+  }
+  .trans-textarea:focus{border-color:var(--gold);}
+  .trans-result-box{
+    min-height:110px;
+    padding:12px 14px;
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+    color:var(--ink);
+    background:var(--paper-dark);
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    position:relative;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .trans-result-box.placeholder{
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  .trans-actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:8px;
+  }
+  .trans-action-btns{
+    display:flex;
+    gap:8px;
+  }
+  .action-icon-btn{
+    border:1px solid var(--paper-line);
+    background:var(--surface);
+    color:var(--ink);
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:background .15s, border-color .15s;
+  }
+  .action-icon-btn:hover{
+    background:var(--paper-dark);
+    border-color:var(--gold);
+  }
+  .action-icon-btn.copied{
+    color:var(--green);
+    border-color:var(--green);
+  }
+  .translate-action-btn{
+    font-family:'Inter', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:10px 24px;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background .15s, transform .1s;
+    align-self:flex-end;
+  }
+  .translate-action-btn:hover{background:var(--navy);}
+  .translate-action-btn:active{transform:scale(0.97);}
+  .translate-action-btn:disabled{opacity:0.5; cursor:default;}
 
   /* ---------- Lists ---------- */
   .lists{display:flex; gap:28px; align-items:flex-start;}
@@ -472,6 +602,7 @@
     border-radius:9px;
     cursor:pointer;
     transition:border-color .12s, background .12s;
+    color:var(--ink);
   }
   .quiz-option:hover{border-color:var(--navy);}
   .quiz-option.correct{border-color:var(--green); background:var(--green-soft);}
@@ -484,7 +615,7 @@
   .quiz-footer{margin-top:20px; display:flex; justify-content:flex-end;}
   .next-btn{
     font-family:'Inter'; font-weight:700; font-size:13.5px;
-    background:var(--ink); color:#F6F1E4;
+    background:var(--ink); color:var(--paper);
     border:none; padding:10px 20px; border-radius:8px; cursor:pointer;
   }
   .next-btn:disabled{opacity:0.35; cursor:default;}
@@ -504,14 +635,14 @@
 
   @media (max-width: 720px){
     .binder{display:none;}
-    main{padding:24px 18px 50px;}
+    main{padding:18px 16px 40px;}
     .lists{flex-direction:column;}
-    .cover{display:flex; flex-direction:column;}
-    .top-icons{position:static; align-self:flex-end; margin-bottom:18px; order:-1;}
-    .top-icon-btn{width:28px; height:28px; font-size:12px;}
-    #profileBtn{width:36px; height:36px;}
-    #profileBtn .avatar-fallback svg{width:18px; height:18px;}
-    .tape{font-size:20px; padding:5px 14px 6px;}
+    .cover{flex-direction:row; justify-content:space-between; align-items:center;}
+    .top-icons{gap:8px;}
+    .top-icon-btn{width:30px; height:30px; font-size:13px;}
+    #profileBtn{width:34px; height:34px;}
+    #profileBtn .avatar-fallback svg{width:16px; height:16px;}
+    .tape{font-size:16px; padding:4px 10px 5px;}
   }
 </style>
 </head>
@@ -522,13 +653,15 @@
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
     <div class="binder-tabs">
-      <button class="tab-btn active" data-view="all" id="tabWordsBtn">SO'ZLAR</button>
+      <button class="tab-btn active" data-view="words" id="tabWordsBtn">SO'ZLAR</button>
+      <button class="tab-btn" data-view="translator" id="tabTransBtn">TARJIMON</button>
       <button class="tab-btn" data-view="quiz-tab" id="tabTestBtn">TEST</button>
     </div>
   </div>
 
   <main>
     <header class="cover">
+      <div class="tape" id="appTitle">Lug'at daftarcham</div>
       <div class="top-icons">
         <div class="icon-group">
           <button class="top-icon-btn" id="langSwitchBtn" title="Ilova tilini tanlash">🌐</button>
@@ -536,7 +669,7 @@
         </div>
         <button class="top-icon-btn" id="profileBtn" title="Profil"><span id="profileAvatarWrap" class="avatar-fallback"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span></button>
       </div>
-      <div class="tape" id="appTitle">Lug'at daftarcham</div>
+
       <div class="stats">
         <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
         <span><span class="stat-dot">●</span> <span id="statMemorizedLabel">Yodlangan</span>: <b id="statMemorized">0</b></span>
@@ -544,32 +677,70 @@
       </div>
     </header>
 
-    <div class="lang-row">
-      <span id="langFrom">Inglizcha</span>
-      <button id="swapLangBtn" title="Yo'nalishni almashtirish">⇄</button>
-      <span id="langTo">O'zbek</span>
-    </div>
-    <div class="add-row">
-      <input id="wordInput" type="text" placeholder="Bilmagan inglizcha so'zingizni yozing va Enter bosing..." autocomplete="off">
-      <button id="addBtn">Qo'shish</button>
-    </div>
-    <div class="hint" id="hintText">Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.</div>
+    <!-- SO'ZLAR BO'LIMI -->
+    <div id="wordsView" class="view-pane active">
+      <div class="lang-row">
+        <span id="langFrom">Inglizcha</span>
+        <button id="swapLangBtn" title="Yo'nalishni almashtirish">⇄</button>
+        <span id="langTo">O'zbek</span>
+      </div>
+      <div class="add-row">
+        <input id="wordInput" type="text" placeholder="Bilmagan inglizcha so'zingizni yozing va Enter bosing..." autocomplete="off">
+        <button id="addBtn">Qo'shish</button>
+      </div>
+      <div class="hint" id="hintText">Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.</div>
 
-    <div id="quizBanner" class="quiz-banner hidden">
-      <span id="quizBannerText">🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.</span>
-      <button id="startQuizBtn">Testni boshlash</button>
+      <div id="quizBanner" class="quiz-banner hidden">
+        <span id="quizBannerText">🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.</span>
+        <button id="startQuizBtn">Testni boshlash</button>
+      </div>
+
+      <div class="lists">
+        <section class="col">
+          <h2><span id="colLearningLabel">O'rganilmoqda</span> <span id="learningCount">(0)</span></h2>
+          <div id="learningList" class="cards"></div>
+        </section>
+        <section class="col">
+          <h2><span id="colMemorizedLabel">Yodlangan</span> <span id="memorizedCount">(0)</span></h2>
+          <div id="memorizedList" class="cards"></div>
+        </section>
+      </div>
     </div>
 
-    <div class="lists">
-      <section class="col">
-        <h2><span id="colLearningLabel">O'rganilmoqda</span> <span id="learningCount">(0)</span></h2>
-        <div id="learningList" class="cards"></div>
-      </section>
-      <section class="col">
-        <h2><span id="colMemorizedLabel">Yodlangan</span> <span id="memorizedCount">(0)</span></h2>
-        <div id="memorizedList" class="cards"></div>
-      </section>
+    <!-- MATN TARJIMON BO'LIMI -->
+    <div id="translatorView" class="view-pane">
+      <div class="translator-card">
+        <div class="translator-header">
+          <div class="lang-select-box">
+            <span class="lang-badge" id="transFromLabel">Inglizcha</span>
+            <button id="transSwapBtn" class="top-icon-btn" style="width:32px;height:32px;" title="Tilni almashtirish">⇄</button>
+            <span class="lang-badge" id="transToLabel">O'zbekcha</span>
+          </div>
+        </div>
+
+        <div class="trans-box">
+          <textarea id="transInput" class="trans-textarea" placeholder="Matn yoki gapni kiriting..."></textarea>
+          <div class="trans-actions">
+            <div class="trans-action-btns">
+              <button class="action-icon-btn" id="transSpeakSrcBtn" title="Talaffuz">🔊 Eshitish</button>
+              <button class="action-icon-btn" id="transClearBtn" title="Tozalash">✕ O'chirish</button>
+            </div>
+            <button id="transSubmitBtn" class="translate-action-btn">Tarjima qilish</button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <div id="transResult" class="trans-result-box placeholder">Tarjima natijasi shu yerda ko'rinadi...</div>
+          <div class="trans-actions" style="margin-top:10px;">
+            <div class="trans-action-btns">
+              <button class="action-icon-btn" id="transSpeakDstBtn" title="Talaffuz">🔊 Eshitish</button>
+              <button class="action-icon-btn" id="transCopyBtn" title="Nusxa olish">⧉ Nusxa olish</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
   </main>
 </div>
 
@@ -616,7 +787,7 @@ const quizBody = document.getElementById('quizBody');
 const I18N = {
   uz: {
     appTitle: "Lug'at daftarcham",
-    tabWords: "SO'ZLAR", tabTest: "TEST",
+    tabWords: "SO'ZLAR", tabTrans: "TARJIMON", tabTest: "TEST",
     statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
     addBtn: "Qo'shish",
     hint: "Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.",
@@ -642,11 +813,14 @@ const I18N = {
     profileTitle: "Profil", profileNoUser: "Telegram foydalanuvchisi topilmadi",
     profileWords: "so'z", profileMemorized: "yodlangan",
     langModalTitle: "Ilova tilini tanlang",
-    themeTitle: "Tungi/kunduzgi rejim", profileTitleAttr: "Profil", langTitleAttr: "Ilova tilini tanlash"
+    themeTitle: "Tungi/kunduzgi rejim", profileTitleAttr: "Profil", langTitleAttr: "Ilova tilini tanlash",
+    transPlaceholderInput: "Matn yoki gapni kiriting...",
+    transPlaceholderResult: "Tarjima natijasi shu yerda ko'rinadi...",
+    transBtnText: "Tarjima qilish", transTranslating: "Tarjima qilinmoqda..."
   },
   en: {
     appTitle: "My Vocabulary",
-    tabWords: "WORDS", tabTest: "TEST",
+    tabWords: "WORDS", tabTrans: "TRANSLATOR", tabTest: "TEST",
     statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
     addBtn: "Add",
     hint: "When you add a word, its Uzbek meaning and an example sentence are generated automatically.",
@@ -672,11 +846,14 @@ const I18N = {
     profileTitle: "Profile", profileNoUser: "Telegram user not found",
     profileWords: "words", profileMemorized: "memorized",
     langModalTitle: "Choose app language",
-    themeTitle: "Dark/light mode", profileTitleAttr: "Profile", langTitleAttr: "Choose app language"
+    themeTitle: "Dark/light mode", profileTitleAttr: "Profile", langTitleAttr: "Choose app language",
+    transPlaceholderInput: "Type text or sentence here...",
+    transPlaceholderResult: "Translation result will appear here...",
+    transBtnText: "Translate", transTranslating: "Translating..."
   },
   ru: {
     appTitle: "Мой словарь",
-    tabWords: "СЛОВА", tabTest: "ТЕСТ",
+    tabWords: "СЛОВА", tabTrans: "ПЕРЕВОДЧИК", tabTest: "ТЕСТ",
     statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
     addBtn: "Добавить",
     hint: "При добавлении слова автоматически создаются перевод на узбекский и пример предложения.",
@@ -702,7 +879,10 @@ const I18N = {
     profileTitle: "Профиль", profileNoUser: "Пользователь Telegram не найден",
     profileWords: "слов", profileMemorized: "выучено",
     langModalTitle: "Выберите язык приложения",
-    themeTitle: "Тёмный/светлый режим", profileTitleAttr: "Профиль", langTitleAttr: "Выбрать язык приложения"
+    themeTitle: "Тёмный/светлый режим", profileTitleAttr: "Профиль", langTitleAttr: "Выбрать язык приложения",
+    transPlaceholderInput: "Введите текст или предложение...",
+    transPlaceholderResult: "Результат перевода появится здесь...",
+    transBtnText: "Перевести", transTranslating: "Переводится..."
   }
 };
 
@@ -718,6 +898,7 @@ function applyStaticI18n(){
   document.documentElement.lang = currentLang;
   document.getElementById('appTitle').textContent = t('appTitle');
   document.getElementById('tabWordsBtn').textContent = t('tabWords');
+  if(document.getElementById('tabTransBtn')) document.getElementById('tabTransBtn').textContent = t('tabTrans');
   document.getElementById('tabTestBtn').textContent = t('tabTest');
   document.getElementById('statTotalLabel').textContent = t('statTotal');
   document.getElementById('statMemorizedLabel').textContent = t('statMemorized');
@@ -732,6 +913,14 @@ function applyStaticI18n(){
   document.getElementById('profileBtn').title = t('profileTitleAttr');
   document.getElementById('langSwitchBtn').title = t('langTitleAttr');
   document.getElementById('themeToggleBtn').title = t('themeTitle');
+  document.getElementById('transInput').placeholder = t('transPlaceholderInput');
+  document.getElementById('transSubmitBtn').textContent = t('transBtnText');
+  
+  const resEl = document.getElementById('transResult');
+  if(resEl.classList.contains('placeholder')){
+    resEl.textContent = t('transPlaceholderResult');
+  }
+
   document.querySelectorAll('.lang-option').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === currentLang);
   });
@@ -785,7 +974,7 @@ async function loadWords(){
         .map(id => items['word_' + id] ? JSON.parse(items['word_' + id]) : null)
         .filter(Boolean);
     }catch(e){
-      console.error('CloudStorage o\'qishda xato', e);
+      console.error('CloudStorage o'qishda xato', e);
       words = [];
     }
   } else {
@@ -827,10 +1016,10 @@ async function fetchTranslation(word, direction){
     body: JSON.stringify({ word, direction: direction || currentDirection })
   });
   if(!response.ok){
-    throw new Error('So\'rov muvaffaqiyatsiz');
+    throw new Error('So'rov muvaffaqiyatsiz');
   }
   const data = await response.json();
-  if(!data.en || !data.uzbek || !data.example) throw new Error('Noto\'g\'ri format');
+  if(!data.en || !data.uzbek || !data.example) throw new Error('Noto'g'ri format');
   return data;
 }
 
@@ -879,7 +1068,7 @@ function deleteWord(id){
   render();
   saveWords();
   if(hasCloudStorage()){
-    cloudRemoveItem('word_' + id).catch(e => console.error('CloudStorage\'dan o\'chirishda xato', e));
+    cloudRemoveItem('word_' + id).catch(e => console.error('CloudStorage'dan o'chirishda xato', e));
   }
 }
 
@@ -904,18 +1093,18 @@ function retryWord(id){
 }
 
 let currentAudio = null;
-function speakWord(text){
+function speakWord(text, lang = 'en'){
   if(currentAudio){
     currentAudio.pause();
     currentAudio = null;
   }
-  const audio = new Audio('/api/speak?text=' + encodeURIComponent(text));
+  const audio = new Audio(`/api/speak?text=${encodeURIComponent(text)}&lang=${lang}`);
   currentAudio = audio;
   audio.play().catch(() => {
     if('speechSynthesis' in window){
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'en-US';
+      utter.lang = lang === 'uz' ? 'uz-UZ' : 'en-US';
       utter.rate = 0.9;
       window.speechSynthesis.speak(utter);
     }
@@ -926,8 +1115,9 @@ function copyText(text, btn){
   const done = () => {
     if(!btn) return;
     btn.classList.add('copied');
+    const oldHtml = btn.innerHTML;
     btn.textContent = '✓';
-    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '⧉'; }, 1200);
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = oldHtml; }, 1200);
   };
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(done).catch(() => {});
@@ -993,7 +1183,7 @@ function cardHtml(w){
 }
 
 function escapeJs(s){
-  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  return String(s).replace(/\/g,'\\').replace(/'/g,"\'").replace(/"/g,'&quot;');
 }
 
 function escapeHtml(s){
@@ -1058,11 +1248,20 @@ wordInput.addEventListener('keydown', (e) => {
   }
 });
 
+// ---------- TAB NAVIGATION ----------
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    if(btn.dataset.view === 'quiz-tab'){
+    
+    const view = btn.dataset.view;
+    if(view === 'words'){
+      document.getElementById('wordsView').classList.add('active');
+      document.getElementById('translatorView').classList.remove('active');
+    } else if(view === 'translator'){
+      document.getElementById('wordsView').classList.remove('active');
+      document.getElementById('translatorView').classList.add('active');
+    } else if(view === 'quiz-tab'){
       openQuizIfPossible();
     }
   });
@@ -1071,6 +1270,102 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 document.getElementById('startQuizBtn').addEventListener('click', openQuizIfPossible);
 document.getElementById('quizClose').addEventListener('click', closeQuiz);
 
+// ---------- MATN TARJIMONI (TRANSLATOR) LOGIC ----------
+let transDirection = 'en-uz';
+const transInput = document.getElementById('transInput');
+const transResult = document.getElementById('transResult');
+const transSubmitBtn = document.getElementById('transSubmitBtn');
+const transFromLabel = document.getElementById('transFromLabel');
+const transToLabel = document.getElementById('transToLabel');
+const transSwapBtn = document.getElementById('transSwapBtn');
+const transSpeakSrcBtn = document.getElementById('transSpeakSrcBtn');
+const transSpeakDstBtn = document.getElementById('transSpeakDstBtn');
+const transClearBtn = document.getElementById('transClearBtn');
+const transCopyBtn = document.getElementById('transCopyBtn');
+
+function updateTransLabels(){
+  if(transDirection === 'en-uz'){
+    transFromLabel.textContent = t('langEnglish');
+    transToLabel.textContent = t('langUzbek');
+  } else {
+    transFromLabel.textContent = t('langUzbek');
+    transToLabel.textContent = t('langEnglish');
+  }
+}
+
+transSwapBtn.addEventListener('click', () => {
+  transDirection = transDirection === 'en-uz' ? 'uz-en' : 'en-uz';
+  updateTransLabels();
+  transSwapBtn.classList.add('spin');
+  setTimeout(() => transSwapBtn.classList.remove('spin'), 200);
+  
+  // Swap input and output if result exists
+  const resText = transResult.classList.contains('placeholder') ? '' : transResult.textContent;
+  if(resText){
+    transInput.value = resText;
+    transResult.textContent = t('transPlaceholderResult');
+    transResult.classList.add('placeholder');
+  }
+});
+
+async function translateText(){
+  const text = transInput.value.trim();
+  if(!text) return;
+
+  transSubmitBtn.disabled = true;
+  transSubmitBtn.textContent = t('transTranslating');
+  
+  try{
+    const response = await fetch("/api/translate-text", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, direction: transDirection })
+    });
+
+    if(!response.ok) throw new Error('Tarjima qilib bo'lmadi');
+    const data = await response.json();
+
+    if(data.translatedText){
+      transResult.textContent = data.translatedText;
+      transResult.classList.remove('placeholder');
+    } else {
+      throw new Error('Natija topilmadi');
+    }
+  } catch(e){
+    transResult.textContent = 'Tarjima qilishda xatolik yuz berdi.';
+    transResult.classList.remove('placeholder');
+  } finally{
+    transSubmitBtn.disabled = false;
+    transSubmitBtn.textContent = t('transBtnText');
+  }
+}
+
+transSubmitBtn.addEventListener('click', translateText);
+
+transClearBtn.addEventListener('click', () => {
+  transInput.value = '';
+  transResult.textContent = t('transPlaceholderResult');
+  transResult.classList.add('placeholder');
+  transInput.focus();
+});
+
+transCopyBtn.addEventListener('click', () => {
+  if(transResult.classList.contains('placeholder') || !transResult.textContent) return;
+  copyText(transResult.textContent, transCopyBtn);
+});
+
+transSpeakSrcBtn.addEventListener('click', () => {
+  const val = transInput.value.trim();
+  if(!val) return;
+  speakWord(val, transDirection === 'en-uz' ? 'en' : 'uz');
+});
+
+transSpeakDstBtn.addEventListener('click', () => {
+  if(transResult.classList.contains('placeholder') || !transResult.textContent) return;
+  speakWord(transResult.textContent, transDirection === 'en-uz' ? 'uz' : 'en');
+});
+
+// ---------- QUIZ LOGIC ----------
 const FALLBACK_DISTRACTORS = ["kitob","stol","osmon","daryo","tog'","gul","quyosh","uy","yo'l","olma","non","suv","daraxt","yulduz","shahar","qishloq","mashina","oyna","eshik","bola"];
 
 function buildQuizQuestions(){
