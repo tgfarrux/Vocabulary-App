@@ -20,7 +20,39 @@
     --green: #4F7A5D;
     --green-soft: #dbe7dd;
     --navy: #2D3A55;
+    --surface: #fffdf7;
+    --binder-a: #E9DFC4;
+    --binder-b: #E2D6B4;
+    --binder-border: #c8b98a;
+    --ring-a: #fff8e8;
+    --ring-b: #cbb87e;
+    --ring-c: #9c8a54;
+    --ring-shadow: #efe6c9;
+    --tape-overlay: rgba(255,255,255,0.55);
     --card-shadow: 0 1px 0 rgba(36,33,27,0.06), 0 6px 16px -8px rgba(36,33,27,0.25);
+  }
+  html[data-theme="dark"]{
+    --paper: #1E1B16;
+    --paper-dark: #2A251E;
+    --paper-line: #3A3327;
+    --ink: #ECE4D3;
+    --ink-soft: #a89f8a;
+    --red: #E2685A;
+    --red-soft: #c9584c;
+    --gold: #E0B84D;
+    --green: #7FAE8D;
+    --green-soft: #24352a;
+    --navy: #7C93C7;
+    --surface: #29241D;
+    --binder-a: #2b2620;
+    --binder-b: #221d18;
+    --binder-border: #4a4030;
+    --ring-a: #4a4436;
+    --ring-b: #6b5f42;
+    --ring-c: #3a3225;
+    --ring-shadow: #352f24;
+    --tape-overlay: rgba(255,255,255,0.08);
+    --card-shadow: 0 1px 0 rgba(0,0,0,0.2), 0 6px 16px -8px rgba(0,0,0,0.6);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -43,8 +75,8 @@
   .binder{
     width:64px;
     flex-shrink:0;
-    background:linear-gradient(180deg, #E9DFC4, #E2D6B4);
-    border-right:2px dashed #c8b98a;
+    background:linear-gradient(180deg, var(--binder-a), var(--binder-b));
+    border-right:2px dashed var(--binder-border);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -54,8 +86,8 @@
   }
   .ring{
     width:20px;height:20px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #fff8e8, #cbb87e 55%, #9c8a54 100%);
-    box-shadow: inset 0 0 0 3px #efe6c9, 0 1px 2px rgba(0,0,0,0.25);
+    background:radial-gradient(circle at 35% 30%, var(--ring-a), var(--ring-b) 55%, var(--ring-c) 100%);
+    box-shadow: inset 0 0 0 3px var(--ring-shadow), 0 1px 2px rgba(0,0,0,0.25);
     flex-shrink:0;
   }
   .binder-tabs{
@@ -87,7 +119,72 @@
   main{flex:1; padding:34px 40px 60px; min-width:0;}
 
   /* ---------- Header / cover ---------- */
-  .cover{margin-bottom:22px;}
+  .cover{margin-bottom:22px; position:relative;}
+  .top-icons{
+    position:absolute;
+    top:0;
+    right:0;
+    display:flex;
+    gap:10px;
+  }
+  .top-icon-btn{
+    width:34px;height:34px;
+    border-radius:50%;
+    border:1.5px solid var(--paper-line);
+    background:var(--surface);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    cursor:pointer;
+    padding:0;
+    overflow:hidden;
+    color:var(--ink);
+    transition:transform .15s, border-color .15s;
+  }
+  .top-icon-btn:hover{border-color:var(--gold); transform:translateY(-1px);}
+  .top-icon-btn img{width:100%; height:100%; object-fit:cover; border-radius:50%;}
+  .avatar-fallback{display:flex; align-items:center; justify-content:center; width:100%; height:100%;}
+
+  /* ---------- Profile & language modals ---------- */
+  .profile-modal{text-align:center;}
+  .profile-avatar-big{
+    width:84px;height:84px;border-radius:50%;
+    object-fit:cover;
+    margin:6px auto 14px;
+    border:2px solid var(--paper-line);
+    display:block;
+  }
+  .profile-avatar-big.avatar-fallback{
+    display:flex; align-items:center; justify-content:center;
+    font-size:34px;
+    background:var(--paper-dark);
+  }
+  .profile-name{font-family:'Fraunces', serif; font-weight:600; font-size:19px;}
+  .profile-username{color:var(--ink-soft); font-size:13.5px; margin-top:4px; font-family:'IBM Plex Mono', monospace;}
+  .profile-stats{
+    display:flex; justify-content:center; gap:22px;
+    margin-top:18px; padding-top:16px; border-top:1px solid var(--paper-line);
+    font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--ink-soft);
+  }
+  .profile-stats b{display:block; font-family:'Inter',sans-serif; font-size:18px; color:var(--ink); font-weight:700;}
+
+  .lang-modal h3{font-family:'Fraunces', serif; margin:0 0 16px;}
+  .lang-options{display:flex; flex-direction:column; gap:10px;}
+  .lang-option{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Inter', sans-serif; font-size:15px; font-weight:600;
+    padding:12px 16px;
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    background:var(--surface);
+    cursor:pointer;
+    color:var(--ink);
+    transition:border-color .15s;
+  }
+  .lang-option:hover{border-color:var(--gold);}
+  .lang-option.active{border-color:var(--navy); background:var(--paper-dark);}
+  .lang-option .flag{font-size:20px;}
   .tape{
     display:inline-block;
     font-family:'Fraunces', serif;
@@ -104,7 +201,7 @@
     position:absolute;
     top:-6px;
     width:26px;height:14px;
-    background:rgba(255,255,255,0.55);
+    background:var(--tape-overlay);
     border:1px solid rgba(0,0,0,0.04);
   }
   .tape::before{left:-8px; transform:rotate(-8deg);}
@@ -137,7 +234,7 @@
     padding:6px 12px;
     border:1.5px solid var(--paper-line);
     border-radius:8px;
-    background:#fffdf7;
+    background:var(--surface);
   }
   #swapLangBtn{
     border:none;
@@ -165,7 +262,7 @@
     padding:13px 16px;
     border:1.5px solid var(--paper-line);
     border-radius:10px;
-    background:#fffdf7;
+    background:var(--surface);
     outline:none;
     transition:border-color .15s;
   }
@@ -233,7 +330,7 @@
   .cards{display:flex; flex-direction:column; gap:12px;}
 
   .card{
-    background:#fffdf7;
+    background:var(--surface);
     border:1px solid var(--paper-line);
     border-radius:10px;
     padding:14px 16px;
@@ -352,7 +449,7 @@
     text-align:center;
     margin:18px 0 22px;
     padding:18px;
-    background:#fffdf7;
+    background:var(--surface);
     border-radius:10px;
     border:1px solid var(--paper-line);
   }
@@ -363,7 +460,7 @@
     text-align:left;
     padding:12px 16px;
     border:1.5px solid var(--paper-line);
-    background:#fffdf7;
+    background:var(--surface);
     border-radius:9px;
     cursor:pointer;
     transition:border-color .12s, background .12s;
@@ -412,18 +509,23 @@
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
     <div class="binder-tabs">
-      <button class="tab-btn active" data-view="all">SO'ZLAR</button>
-      <button class="tab-btn" data-view="quiz-tab">TEST</button>
+      <button class="tab-btn active" data-view="all" id="tabWordsBtn">SO'ZLAR</button>
+      <button class="tab-btn" data-view="quiz-tab" id="tabTestBtn">TEST</button>
     </div>
   </div>
 
   <main>
     <header class="cover">
-      <div class="tape">Lug'at daftarcham</div>
+      <div class="top-icons">
+        <button class="top-icon-btn" id="profileBtn" title="Profil"><span id="profileAvatarWrap" class="avatar-fallback">👤</span></button>
+        <button class="top-icon-btn" id="langSwitchBtn" title="Ilova tilini tanlash">🌐</button>
+        <button class="top-icon-btn" id="themeToggleBtn" title="Tungi/kunduzgi rejim">🌙</button>
+      </div>
+      <div class="tape" id="appTitle">Lug'at daftarcham</div>
       <div class="stats">
-        <span><span class="stat-dot">●</span> Jami so'z: <b id="statTotal">0</b></span>
-        <span><span class="stat-dot">●</span> Yodlangan: <b id="statMemorized">0</b></span>
-        <span><span class="stat-dot">●</span> Testga tayyor: <b id="statReady">0</b></span>
+        <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
+        <span><span class="stat-dot">●</span> <span id="statMemorizedLabel">Yodlangan</span>: <b id="statMemorized">0</b></span>
+        <span><span class="stat-dot">●</span> <span id="statReadyLabel">Testga tayyor</span>: <b id="statReady">0</b></span>
       </div>
     </header>
 
@@ -436,20 +538,20 @@
       <input id="wordInput" type="text" placeholder="Bilmagan inglizcha so'zingizni yozing va Enter bosing..." autocomplete="off">
       <button id="addBtn">Qo'shish</button>
     </div>
-    <div class="hint">Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.</div>
+    <div class="hint" id="hintText">Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.</div>
 
     <div id="quizBanner" class="quiz-banner hidden">
-      <span>🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.</span>
+      <span id="quizBannerText">🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.</span>
       <button id="startQuizBtn">Testni boshlash</button>
     </div>
 
     <div class="lists">
       <section class="col">
-        <h2>O'rganilmoqda <span id="learningCount">(0)</span></h2>
+        <h2><span id="colLearningLabel">O'rganilmoqda</span> <span id="learningCount">(0)</span></h2>
         <div id="learningList" class="cards"></div>
       </section>
       <section class="col">
-        <h2>Yodlangan <span id="memorizedCount">(0)</span></h2>
+        <h2><span id="colMemorizedLabel">Yodlangan</span> <span id="memorizedCount">(0)</span></h2>
         <div id="memorizedList" class="cards"></div>
       </section>
     </div>
@@ -460,6 +562,25 @@
   <div class="quiz-modal">
     <button class="quiz-close" id="quizClose">✕</button>
     <div id="quizBody"></div>
+  </div>
+</div>
+
+<div id="profileOverlay" class="overlay hidden">
+  <div class="quiz-modal profile-modal">
+    <button class="quiz-close" id="profileClose">✕</button>
+    <div id="profileBody"></div>
+  </div>
+</div>
+
+<div id="langOverlay" class="overlay hidden">
+  <div class="quiz-modal lang-modal">
+    <button class="quiz-close" id="langClose">✕</button>
+    <h3 id="langModalTitle">Ilova tilini tanlang</h3>
+    <div class="lang-options">
+      <button class="lang-option" data-lang="uz"><span class="flag">🇺🇿</span> O'zbekcha</button>
+      <button class="lang-option" data-lang="en"><span class="flag">🇬🇧</span> English</button>
+      <button class="lang-option" data-lang="ru"><span class="flag">🇷🇺</span> Русский</button>
+    </div>
   </div>
 </div>
 
@@ -475,6 +596,133 @@ const addBtn = document.getElementById('addBtn');
 const quizBanner = document.getElementById('quizBanner');
 const quizOverlay = document.getElementById('quizOverlay');
 const quizBody = document.getElementById('quizBody');
+
+// ---------- I18N ----------
+const I18N = {
+  uz: {
+    appTitle: "Lug'at daftarcham",
+    tabWords: "SO'ZLAR", tabTest: "TEST",
+    statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
+    addBtn: "Qo'shish",
+    hint: "Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.",
+    placeholderEnUz: "Bilmagan inglizcha so'zingizni yozing va Enter bosing...",
+    placeholderUzEn: "O'zbekcha so'zni yozing, inglizchasini topamiz...",
+    langEnglish: "Inglizcha", langUzbek: "O'zbek",
+    quizBannerText: "🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.",
+    startQuiz: "Testni boshlash",
+    colLearning: "O'rganilmoqda", colMemorized: "Yodlangan",
+    emptyLearning: "Hozircha bo'sh. Yangi so'z qo'shing.",
+    emptyMemorized: "Yodlagan so'zlaringiz shu yerda to'planadi.",
+    loadingText: "tarjima qilinmoqda...",
+    errorText: "Tarjima olinmadi.", retryLink: "qayta urinish",
+    stamp: "yodlandi",
+    titleSpeak: "Talaffuzni eshitish",
+    titleMemorize: "Yodladim deb belgilash", titleUnmemorize: "Yodlanmagan deb belgilash",
+    titleDelete: "O'chirish", titleCopy: "Nusxalash",
+    quizNotReadyTitle: "Test hali tayyor emas",
+    quizNotReadyText: (n) => `Test boshlash uchun kamida 10 ta so'zni "yodladim" deb belgilashingiz kerak. Hozircha: ${n}/10.`,
+    quizTitle: "So'z testi", quizQuestion: "Savol", quizScore: "Ball", quizNext: "Keyingisi",
+    quizFinished: "Test yakunlandi", quizCorrect: "to'g'ri javob", quizClose: "Yopish",
+    resultExcellent: "A'LO!", resultGreat: "ZO'R!", resultGood: "YAXSHI", resultRetry: "YANA URINING",
+    profileTitle: "Profil", profileNoUser: "Telegram foydalanuvchisi topilmadi",
+    profileWords: "so'z", profileMemorized: "yodlangan",
+    langModalTitle: "Ilova tilini tanlang",
+    themeTitle: "Tungi/kunduzgi rejim", profileTitleAttr: "Profil", langTitleAttr: "Ilova tilini tanlash"
+  },
+  en: {
+    appTitle: "My Vocabulary",
+    tabWords: "WORDS", tabTest: "TEST",
+    statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
+    addBtn: "Add",
+    hint: "When you add a word, its Uzbek meaning and an example sentence are generated automatically.",
+    placeholderEnUz: "Type an English word you don't know and press Enter...",
+    placeholderUzEn: "Type an Uzbek word, we'll find the English one...",
+    langEnglish: "English", langUzbek: "Uzbek",
+    quizBannerText: "🎉 10 new words memorized! Test your knowledge.",
+    startQuiz: "Start quiz",
+    colLearning: "Learning", colMemorized: "Memorized",
+    emptyLearning: "Empty for now. Add a new word.",
+    emptyMemorized: "Your memorized words will collect here.",
+    loadingText: "translating...",
+    errorText: "Translation failed.", retryLink: "retry",
+    stamp: "memorized",
+    titleSpeak: "Listen to pronunciation",
+    titleMemorize: "Mark as memorized", titleUnmemorize: "Mark as not memorized",
+    titleDelete: "Delete", titleCopy: "Copy",
+    quizNotReadyTitle: "Quiz not ready yet",
+    quizNotReadyText: (n) => `You need at least 10 words marked "memorized" to start a quiz. So far: ${n}/10.`,
+    quizTitle: "Word quiz", quizQuestion: "Question", quizScore: "Score", quizNext: "Next",
+    quizFinished: "Quiz finished", quizCorrect: "correct answers", quizClose: "Close",
+    resultExcellent: "EXCELLENT!", resultGreat: "GREAT!", resultGood: "GOOD", resultRetry: "TRY AGAIN",
+    profileTitle: "Profile", profileNoUser: "Telegram user not found",
+    profileWords: "words", profileMemorized: "memorized",
+    langModalTitle: "Choose app language",
+    themeTitle: "Dark/light mode", profileTitleAttr: "Profile", langTitleAttr: "Choose app language"
+  },
+  ru: {
+    appTitle: "Мой словарь",
+    tabWords: "СЛОВА", tabTest: "ТЕСТ",
+    statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
+    addBtn: "Добавить",
+    hint: "При добавлении слова автоматически создаются перевод на узбекский и пример предложения.",
+    placeholderEnUz: "Введите незнакомое английское слово и нажмите Enter...",
+    placeholderUzEn: "Введите узбекское слово, найдём английское...",
+    langEnglish: "Английский", langUzbek: "Узбекский",
+    quizBannerText: "🎉 Выучено 10 новых слов! Проверьте свои знания.",
+    startQuiz: "Начать тест",
+    colLearning: "Изучается", colMemorized: "Выучено",
+    emptyLearning: "Пока пусто. Добавьте новое слово.",
+    emptyMemorized: "Здесь появятся выученные слова.",
+    loadingText: "переводится...",
+    errorText: "Перевод не получен.", retryLink: "повторить",
+    stamp: "выучено",
+    titleSpeak: "Прослушать произношение",
+    titleMemorize: "Отметить как выученное", titleUnmemorize: "Отметить как невыученное",
+    titleDelete: "Удалить", titleCopy: "Копировать",
+    quizNotReadyTitle: "Тест ещё не готов",
+    quizNotReadyText: (n) => `Чтобы начать тест, отметьте минимум 10 слов как «выучено». Сейчас: ${n}/10.`,
+    quizTitle: "Тест слов", quizQuestion: "Вопрос", quizScore: "Балл", quizNext: "Далее",
+    quizFinished: "Тест завершён", quizCorrect: "правильных ответов", quizClose: "Закрыть",
+    resultExcellent: "ОТЛИЧНО!", resultGreat: "ЗДОРОВО!", resultGood: "ХОРОШО", resultRetry: "ПОПРОБУЙТЕ ЕЩЁ",
+    profileTitle: "Профиль", profileNoUser: "Пользователь Telegram не найден",
+    profileWords: "слов", profileMemorized: "выучено",
+    langModalTitle: "Выберите язык приложения",
+    themeTitle: "Тёмный/светлый режим", profileTitleAttr: "Профиль", langTitleAttr: "Выбрать язык приложения"
+  }
+};
+
+let currentLang = localStorage.getItem('ui-lang') || 'uz';
+
+function t(key, ...args){
+  const dict = I18N[currentLang] || I18N.uz;
+  const val = dict[key] !== undefined ? dict[key] : I18N.uz[key];
+  return typeof val === 'function' ? val(...args) : val;
+}
+
+function applyStaticI18n(){
+  document.documentElement.lang = currentLang;
+  document.getElementById('appTitle').textContent = t('appTitle');
+  document.getElementById('tabWordsBtn').textContent = t('tabWords');
+  document.getElementById('tabTestBtn').textContent = t('tabTest');
+  document.getElementById('statTotalLabel').textContent = t('statTotal');
+  document.getElementById('statMemorizedLabel').textContent = t('statMemorized');
+  document.getElementById('statReadyLabel').textContent = t('statReady');
+  addBtn.textContent = t('addBtn');
+  document.getElementById('hintText').textContent = t('hint');
+  document.getElementById('quizBannerText').textContent = t('quizBannerText');
+  document.getElementById('startQuizBtn').textContent = t('startQuiz');
+  document.getElementById('colLearningLabel').textContent = t('colLearning');
+  document.getElementById('colMemorizedLabel').textContent = t('colMemorized');
+  document.getElementById('langModalTitle').textContent = t('langModalTitle');
+  document.getElementById('profileBtn').title = t('profileTitleAttr');
+  document.getElementById('langSwitchBtn').title = t('langTitleAttr');
+  document.getElementById('themeToggleBtn').title = t('themeTitle');
+  document.querySelectorAll('.lang-option').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === currentLang);
+  });
+  updateLangLabels();
+  render();
+}
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
 
@@ -680,10 +928,10 @@ function cardHtml(w){
       <div class="card-top">
         <div class="en-word">${escapeHtml(headword)}</div>
         <div class="card-actions">
-          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="O'chirish">✕</button>
+          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
         </div>
       </div>
-      <div class="loading-text">tarjima qilinmoqda...</div>
+      <div class="loading-text">${t('loadingText')}</div>
     </div>`;
   }
   if(w.status === 'error'){
@@ -691,20 +939,20 @@ function cardHtml(w){
       <div class="card-top">
         <div class="en-word">${escapeHtml(headword)}</div>
         <div class="card-actions">
-          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="O'chirish">✕</button>
+          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
         </div>
       </div>
-      <div class="error-text">Tarjima olinmadi. <span class="retry-link" onclick="retryWord('${w.id}')">qayta urinish</span></div>
+      <div class="error-text">${t('errorText')} <span class="retry-link" onclick="retryWord('${w.id}')">${t('retryLink')}</span></div>
     </div>`;
   }
   return `<div class="card">
-    ${w.memorized ? '<div class="stamp">yodlandi</div>' : ''}
+    ${w.memorized ? `<div class="stamp">${t('stamp')}</div>` : ''}
     <div class="card-top">
       <div class="en-word">${escapeHtml(w.en)}</div>
       <div class="card-actions">
-        <button class="icon-btn speak-btn" onclick="speakWord('${escapeJs(w.en)}')" title="Talaffuzni eshitish">🔊</button>
-        <button class="icon-btn memorize" onclick="toggleMemorized('${w.id}')" title="${w.memorized ? 'Yodlanmagan deb belgilash' : 'Yodladim deb belgilash'}">${w.memorized ? '↺' : '✓'}</button>
-        <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="O'chirish">✕</button>
+        <button class="icon-btn speak-btn" onclick="speakWord('${escapeJs(w.en)}')" title="${t('titleSpeak')}">🔊</button>
+        <button class="icon-btn memorize" onclick="toggleMemorized('${w.id}')" title="${w.memorized ? t('titleUnmemorize') : t('titleMemorize')}">${w.memorized ? '↺' : '✓'}</button>
+        <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
       </div>
     </div>
     <div class="word-meta">
@@ -713,7 +961,7 @@ function cardHtml(w){
     </div>
     <div class="uz-word">
       ${escapeHtml(w.uz)}
-      <button class="copy-btn" onclick="copyText('${escapeJs(w.uz)}', this)" title="Nusxalash">⧉</button>
+      <button class="copy-btn" onclick="copyText('${escapeJs(w.uz)}', this)" title="${t('titleCopy')}">⧉</button>
     </div>
     <div class="example">${escapeHtml(w.example)}</div>
   </div>`;
@@ -733,11 +981,11 @@ function render(){
 
   learningList.innerHTML = learning.length
     ? learning.map(cardHtml).join('')
-    : '<div class="empty">Hozircha bo\'sh. Yangi so\'z qo\'shing.</div>';
+    : `<div class="empty">${t('emptyLearning')}</div>`;
 
   memorizedList.innerHTML = memorized.length
     ? memorized.map(cardHtml).join('')
-    : '<div class="empty">Yodlagan so\'zlaringiz shu yerda to\'planadi.</div>';
+    : `<div class="empty">${t('emptyMemorized')}</div>`;
 
   document.getElementById('learningCount').textContent = `(${learning.length})`;
   document.getElementById('memorizedCount').textContent = `(${memorized.length})`;
@@ -760,13 +1008,13 @@ const swapLangBtn = document.getElementById('swapLangBtn');
 
 function updateLangLabels(){
   if(currentDirection === 'en-uz'){
-    langFromEl.textContent = 'Inglizcha';
-    langToEl.textContent = "O'zbek";
-    wordInput.placeholder = "Bilmagan inglizcha so'zingizni yozing va Enter bosing...";
+    langFromEl.textContent = t('langEnglish');
+    langToEl.textContent = t('langUzbek');
+    wordInput.placeholder = t('placeholderEnUz');
   } else {
-    langFromEl.textContent = "O'zbek";
-    langToEl.textContent = 'Inglizcha';
-    wordInput.placeholder = "O'zbekcha so'zni yozing, inglizchasini topamiz...";
+    langFromEl.textContent = t('langUzbek');
+    langToEl.textContent = t('langEnglish');
+    wordInput.placeholder = t('placeholderUzEn');
   }
 }
 
@@ -825,10 +1073,9 @@ function buildQuizQuestions(){
 function openQuizIfPossible(){
   const eligible = words.filter(w => w.memorized && !w.quizzed && w.status === 'ready');
   if(eligible.length < 10){
-    quizBody.innerHTML = `<h3>Test hali tayyor emas</h3>
+    quizBody.innerHTML = `<h3>${t('quizNotReadyTitle')}</h3>
       <p style="color:var(--ink-soft); font-size:14px; line-height:1.5;">
-      Test boshlash uchun kamida 10 ta so'zni "yodladim" deb belgilashingiz kerak.
-      Hozircha: <b>${eligible.length}/10</b>.
+      ${t('quizNotReadyText', eligible.length)}
       </p>`;
     quizOverlay.classList.remove('hidden');
     return;
@@ -852,14 +1099,14 @@ function renderQuizQuestion(){
   const q = quizState.questions[quizState.index];
   quizState.answered = false;
   quizBody.innerHTML = `
-    <h3>So'z testi</h3>
-    <div class="quiz-progress">Savol ${quizState.index + 1} / ${quizState.questions.length} &nbsp;•&nbsp; Ball: ${quizState.score}</div>
+    <h3>${t('quizTitle')}</h3>
+    <div class="quiz-progress">${t('quizQuestion')} ${quizState.index + 1} / ${quizState.questions.length} &nbsp;•&nbsp; ${t('quizScore')}: ${quizState.score}</div>
     <div class="quiz-word">${escapeHtml(q.en)}</div>
     <div class="quiz-options" id="quizOptions">
       ${q.options.map((opt) => `<button type="button" class="quiz-option">${escapeHtml(opt)}</button>`).join('')}
     </div>
     <div class="quiz-footer">
-      <button class="next-btn" id="nextBtn" disabled>Keyingisi</button>
+      <button class="next-btn" id="nextBtn" disabled>${t('quizNext')}</button>
     </div>
   `;
   const optionButtons = Array.from(document.querySelectorAll('#quizOptions .quiz-option'));
@@ -901,25 +1148,119 @@ function finishQuiz(){
   const score = quizState.score;
   const total = quizState.questions.length;
   const pct = Math.round((score/total)*100);
-  const label = pct === 100 ? "A'LO!" : pct >= 70 ? "ZO'R!" : pct >= 40 ? "YAXSHI" : "YANA URINING";
+  const label = pct === 100 ? t('resultExcellent') : pct >= 70 ? t('resultGreat') : pct >= 40 ? t('resultGood') : t('resultRetry');
   quizBody.innerHTML = `
     <div class="quiz-result">
-      <h3>Test yakunlandi</h3>
+      <h3>${t('quizFinished')}</h3>
       <div class="big-stamp">${label}</div>
-      <div class="quiz-score">${score} / ${total} to'g'ri javob (${pct}%)</div>
+      <div class="quiz-score">${score} / ${total} ${t('quizCorrect')} (${pct}%)</div>
       <div class="quiz-footer" style="justify-content:center; margin-top:22px;">
-        <button class="next-btn" onclick="closeQuiz()">Yopish</button>
+        <button class="next-btn" onclick="closeQuiz()">${t('quizClose')}</button>
       </div>
     </div>
   `;
 }
 
+// ---------- Theme (dark/light) ----------
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('ui-theme', theme);
+}
+
+themeToggleBtn.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+// ---------- Language switcher modal ----------
+const langOverlay = document.getElementById('langOverlay');
+const langSwitchBtn = document.getElementById('langSwitchBtn');
+const langClose = document.getElementById('langClose');
+
+langSwitchBtn.addEventListener('click', () => langOverlay.classList.remove('hidden'));
+langClose.addEventListener('click', () => langOverlay.classList.add('hidden'));
+langOverlay.addEventListener('click', (e) => { if(e.target === langOverlay) langOverlay.classList.add('hidden'); });
+
+document.querySelectorAll('.lang-option').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentLang = btn.dataset.lang;
+    localStorage.setItem('ui-lang', currentLang);
+    applyStaticI18n();
+    langOverlay.classList.add('hidden');
+  });
+});
+
+// ---------- Profile modal ----------
+const profileOverlay = document.getElementById('profileOverlay');
+const profileBtn = document.getElementById('profileBtn');
+const profileClose = document.getElementById('profileClose');
+const profileBody = document.getElementById('profileBody');
+
+function getTelegramUser(){
+  if(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe){
+    return window.Telegram.WebApp.initDataUnsafe.user || null;
+  }
+  return null;
+}
+
+function initialsOf(user){
+  const a = (user.first_name || '').charAt(0);
+  const b = (user.last_name || '').charAt(0);
+  return (a + b).toUpperCase() || '👤';
+}
+
+function renderProfileButton(){
+  const user = getTelegramUser();
+  const wrap = document.getElementById('profileAvatarWrap');
+  if(user && user.photo_url){
+    wrap.outerHTML = `<img id="profileAvatarWrap" src="${user.photo_url}" alt="">`;
+  } else if(user){
+    wrap.textContent = initialsOf(user);
+  }
+}
+
+function openProfile(){
+  const user = getTelegramUser();
+  if(!user){
+    profileBody.innerHTML = `<p style="text-align:center; color:var(--ink-soft);">${t('profileNoUser')}</p>`;
+    profileOverlay.classList.remove('hidden');
+    return;
+  }
+  const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
+  const avatarHtml = user.photo_url
+    ? `<img class="profile-avatar-big" src="${user.photo_url}" alt="">`
+    : `<div class="profile-avatar-big avatar-fallback">${initialsOf(user)}</div>`;
+  const memorizedCount = words.filter(w => w.memorized).length;
+  profileBody.innerHTML = `
+    <h3>${t('profileTitle')}</h3>
+    ${avatarHtml}
+    <div class="profile-name">${escapeHtml(fullName)}</div>
+    ${user.username ? `<div class="profile-username">@${escapeHtml(user.username)}</div>` : ''}
+    <div class="profile-stats">
+      <span><b>${words.length}</b>${t('profileWords')}</span>
+      <span><b>${memorizedCount}</b>${t('profileMemorized')}</span>
+    </div>
+  `;
+  profileOverlay.classList.remove('hidden');
+}
+
+profileBtn.addEventListener('click', openProfile);
+profileClose.addEventListener('click', () => profileOverlay.classList.add('hidden'));
+profileOverlay.addEventListener('click', (e) => { if(e.target === profileOverlay) profileOverlay.classList.add('hidden'); });
+
+// ---------- Init ----------
 if(window.Telegram && window.Telegram.WebApp){
   const tg = window.Telegram.WebApp;
   tg.ready();
   tg.expand();
 }
 
+applyTheme(localStorage.getItem('ui-theme') || 'light');
+renderProfileButton();
+applyStaticI18n();
 loadWords();
 </script>
 </body>
