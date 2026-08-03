@@ -19,6 +19,7 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GE
 app.post('/api/translate', async (req, res) => {
   try {
     const word = (req.body && req.body.word || '').trim();
+    const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
     if (!word) {
       return res.status(400).json({ error: 'So\'z yuborilmadi' });
     }
@@ -26,11 +27,19 @@ app.post('/api/translate', async (req, res) => {
       return res.status(500).json({ error: 'Server sozlanmagan: GEMINI_API_KEY topilmadi' });
     }
 
+    const directionInstruction = direction === 'uz-en'
+      ? "Foydalanuvchi bitta o'zbekcha so'z yuboradi. Uning inglizcha muqobilini top."
+      : "Foydalanuvchi bitta inglizcha so'z yuboradi.";
+
     const systemPrompt =
-      "Sen ingliz tilidan o'zbek tiliga tarjima qiluvchi yordamchisan. " +
-      "Foydalanuvchi bitta inglizcha so'z yuboradi. " +
+      "Sen ingliz va o'zbek tillari o'rtasida tarjima qiluvchi yordamchisan. " +
+      directionInstruction + " " +
       "Faqat va faqat quyidagi JSON formatida javob ber, boshqa hech qanday matn, izoh yoki markdown belgilarisiz: " +
-      '{"uzbek":"so\'zning o\'zbekcha ma\'nosi (qisqa, 1-4 so\'z)","example":"shu inglizcha so\'z ishtirok etgan oddiy va qisqa inglizcha gap"}';
+      '{"en":"inglizcha so\'z (lug\'at shaklida, kichik harflarda)",' +
+      '"uzbek":"so\'zning o\'zbekcha ma\'nosi (qisqa, 1-4 so\'z)",' +
+      '"transcription":"inglizcha so\'zning IPA talaffuz belgisi, kvadrat qavslarda, masalan [\'\u00e6n\u0259m(\u0259)l]",' +
+      '"partOfSpeech":"so\'z turkumi o\'zbekcha bitta so\'z bilan: ot, fe\'l, sifat, ravish, olmosh, son, predlog yoki undov",' +
+      '"example":"shu inglizcha so\'z ishtirok etgan oddiy va qisqa inglizcha gap"}';
 
     const response = await fetch(GEMINI_URL, {
       method: 'POST',
@@ -74,11 +83,17 @@ app.post('/api/translate', async (req, res) => {
       return res.status(502).json({ error: 'Noto\'g\'ri formatdagi javob' });
     }
 
-    if (!parsed.uzbek || !parsed.example) {
+    if (!parsed.en || !parsed.uzbek || !parsed.example) {
       return res.status(502).json({ error: 'Tarjima topilmadi' });
     }
 
-    res.json({ uzbek: parsed.uzbek, example: parsed.example });
+    res.json({
+      en: parsed.en,
+      uzbek: parsed.uzbek,
+      example: parsed.example,
+      transcription: parsed.transcription || '',
+      partOfSpeech: parsed.partOfSpeech || ''
+    });
   } catch (e) {
     console.error('Server xatosi:', e);
     res.status(500).json({ error: 'Server xatosi' });
