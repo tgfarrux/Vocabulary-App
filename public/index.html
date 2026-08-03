@@ -122,11 +122,41 @@
   .stats b{color:var(--ink); font-weight:600;}
   .stat-dot{color:var(--gold);}
 
+  /* ---------- Lang switch row ---------- */
+  .lang-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:24px;
+    font-family:'Inter', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+  .lang-row span{
+    padding:6px 12px;
+    border:1.5px solid var(--paper-line);
+    border-radius:8px;
+    background:#fffdf7;
+  }
+  #swapLangBtn{
+    border:none;
+    background:none;
+    font-size:16px;
+    cursor:pointer;
+    color:var(--navy);
+    padding:4px 8px;
+    border-radius:8px;
+    transition:transform .15s, background .15s;
+  }
+  #swapLangBtn:hover{background:var(--paper-dark);}
+  #swapLangBtn.spin{transform:rotate(180deg);}
+
   /* ---------- Add row ---------- */
   .add-row{
     display:flex;
     gap:10px;
-    margin:24px 0 8px;
+    margin:10px 0 8px;
   }
   .add-row input{
     flex:1;
@@ -227,6 +257,29 @@
   .icon-btn.del:hover{color:var(--red);}
 
   .uz-word{color:var(--red); font-weight:600; font-size:14.5px; margin-top:4px;}
+  .word-meta{display:flex; align-items:center; gap:8px; margin-top:2px; flex-wrap:wrap;}
+  .transcription{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft);}
+  .pos-tag{
+    font-family:'Inter', sans-serif;
+    font-size:11px;
+    font-weight:600;
+    color:var(--navy);
+    background:var(--paper-dark);
+    padding:2px 8px;
+    border-radius:20px;
+  }
+  .speak-btn, .copy-btn{
+    border:none;
+    background:none;
+    cursor:pointer;
+    color:var(--ink-soft);
+    font-size:14px;
+    padding:2px 4px;
+    border-radius:6px;
+    transition:color .15s, background .15s;
+  }
+  .speak-btn:hover, .copy-btn:hover{color:var(--navy); background:var(--paper-dark);}
+  .copy-btn.copied{color:var(--green);}
   .example{
     font-style:italic;
     color:var(--ink-soft);
@@ -374,6 +427,11 @@
       </div>
     </header>
 
+    <div class="lang-row">
+      <span id="langFrom">Inglizcha</span>
+      <button id="swapLangBtn" title="Yo'nalishni almashtirish">⇄</button>
+      <span id="langTo">O'zbek</span>
+    </div>
     <div class="add-row">
       <input id="wordInput" type="text" placeholder="Bilmagan inglizcha so'zingizni yozing va Enter bosing..." autocomplete="off">
       <button id="addBtn">Qo'shish</button>
@@ -497,37 +555,45 @@ async function saveWords(){
   }
 }
 
-async function fetchTranslation(word){
+let currentDirection = 'en-uz'; // 'en-uz' yoki 'uz-en'
+
+async function fetchTranslation(word, direction){
   const response = await fetch("/api/translate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ word })
+    body: JSON.stringify({ word, direction: direction || currentDirection })
   });
   if(!response.ok){
     throw new Error('So\'rov muvaffaqiyatsiz');
   }
   const data = await response.json();
-  if(!data.uzbek || !data.example) throw new Error('Noto\'g\'ri format');
+  if(!data.en || !data.uzbek || !data.example) throw new Error('Noto\'g\'ri format');
   return data;
 }
 
-async function addWord(rawWord){
-  const en = rawWord.trim();
-  if(!en) return;
-  const exists = words.some(w => w.en.toLowerCase() === en.toLowerCase());
-  if(exists){
-    wordInput.value = '';
-    return;
-  }
-  const w = { id: uid(), en, uz: '', example: '', status: 'loading', memorized: false, quizzed: false };
+async function addWord(rawInput){
+  const inputWord = rawInput.trim();
+  if(!inputWord) return;
+  const w = { id: uid(), en: currentDirection === 'en-uz' ? inputWord : '', uz: currentDirection === 'uz-en' ? inputWord : '',
+    example: '', transcription: '', partOfSpeech: '', status: 'loading', memorized: false, quizzed: false };
   words.unshift(w);
   render();
   saveWords();
 
   try{
-    const result = await fetchTranslation(en);
+    const result = await fetchTranslation(inputWord, currentDirection);
+    const dupe = words.find(x => x.id !== w.id && x.en.toLowerCase() === result.en.toLowerCase());
+    if(dupe){
+      words = words.filter(x => x.id !== w.id);
+      render();
+      saveWords();
+      return;
+    }
+    w.en = result.en;
     w.uz = result.uzbek;
     w.example = result.example;
+    w.transcription = result.transcription;
+    w.partOfSpeech = result.partOfSpeech;
     w.status = 'ready';
   }catch(e){
     w.status = 'error';
@@ -559,9 +625,12 @@ function retryWord(id){
   if(!w) return;
   w.status = 'loading';
   render();
-  fetchTranslation(w.en).then(result => {
+  fetchTranslation(w.en || w.uz, w.en ? 'en-uz' : 'uz-en').then(result => {
+    w.en = result.en;
     w.uz = result.uzbek;
     w.example = result.example;
+    w.transcription = result.transcription;
+    w.partOfSpeech = result.partOfSpeech;
     w.status = 'ready';
     render();
     saveWords();
@@ -571,16 +640,45 @@ function retryWord(id){
   });
 }
 
+function speakWord(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  window.speechSynthesis.speak(utter);
+}
+
+function copyText(text, btn){
+  const done = () => {
+    if(!btn) return;
+    btn.classList.add('copied');
+    btn.textContent = '✓';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '⧉'; }, 1200);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(() => {});
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); done(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
 function checkQuizReady(){
   const ready = words.filter(w => w.memorized && !w.quizzed);
   quizBanner.classList.toggle('hidden', ready.length < 10);
 }
 
 function cardHtml(w){
+  const headword = w.en || w.uz;
   if(w.status === 'loading'){
     return `<div class="card pending">
       <div class="card-top">
-        <div class="en-word">${escapeHtml(w.en)}</div>
+        <div class="en-word">${escapeHtml(headword)}</div>
         <div class="card-actions">
           <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="O'chirish">✕</button>
         </div>
@@ -591,7 +689,7 @@ function cardHtml(w){
   if(w.status === 'error'){
     return `<div class="card">
       <div class="card-top">
-        <div class="en-word">${escapeHtml(w.en)}</div>
+        <div class="en-word">${escapeHtml(headword)}</div>
         <div class="card-actions">
           <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="O'chirish">✕</button>
         </div>
@@ -604,13 +702,25 @@ function cardHtml(w){
     <div class="card-top">
       <div class="en-word">${escapeHtml(w.en)}</div>
       <div class="card-actions">
+        <button class="icon-btn speak-btn" onclick="speakWord('${escapeJs(w.en)}')" title="Talaffuzni eshitish">🔊</button>
         <button class="icon-btn memorize" onclick="toggleMemorized('${w.id}')" title="${w.memorized ? 'Yodlanmagan deb belgilash' : 'Yodladim deb belgilash'}">${w.memorized ? '↺' : '✓'}</button>
         <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="O'chirish">✕</button>
       </div>
     </div>
-    <div class="uz-word">${escapeHtml(w.uz)}</div>
+    <div class="word-meta">
+      ${w.transcription ? `<span class="transcription">${escapeHtml(w.transcription)}</span>` : ''}
+      ${w.partOfSpeech ? `<span class="pos-tag">${escapeHtml(w.partOfSpeech)}</span>` : ''}
+    </div>
+    <div class="uz-word">
+      ${escapeHtml(w.uz)}
+      <button class="copy-btn" onclick="copyText('${escapeJs(w.uz)}', this)" title="Nusxalash">⧉</button>
+    </div>
     <div class="example">${escapeHtml(w.example)}</div>
   </div>`;
+}
+
+function escapeJs(s){
+  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
 }
 
 function escapeHtml(s){
@@ -642,6 +752,30 @@ addBtn.addEventListener('click', () => {
   const v = wordInput.value;
   wordInput.value = '';
   addWord(v);
+});
+
+const langFromEl = document.getElementById('langFrom');
+const langToEl = document.getElementById('langTo');
+const swapLangBtn = document.getElementById('swapLangBtn');
+
+function updateLangLabels(){
+  if(currentDirection === 'en-uz'){
+    langFromEl.textContent = 'Inglizcha';
+    langToEl.textContent = "O'zbek";
+    wordInput.placeholder = "Bilmagan inglizcha so'zingizni yozing va Enter bosing...";
+  } else {
+    langFromEl.textContent = "O'zbek";
+    langToEl.textContent = 'Inglizcha';
+    wordInput.placeholder = "O'zbekcha so'zni yozing, inglizchasini topamiz...";
+  }
+}
+
+swapLangBtn.addEventListener('click', () => {
+  currentDirection = currentDirection === 'en-uz' ? 'uz-en' : 'en-uz';
+  updateLangLabels();
+  swapLangBtn.classList.add('spin');
+  setTimeout(() => swapLangBtn.classList.remove('spin'), 200);
+  wordInput.focus();
 });
 wordInput.addEventListener('keydown', (e) => {
   if(e.key === 'Enter'){
