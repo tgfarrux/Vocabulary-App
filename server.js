@@ -7,9 +7,17 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-// Barqaror Gemini modeli
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+// Bepul va tezkor Google Translate funksiyasi
+async function translateWithGoogle(text, fromLang, toLang) {
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Google Translate xatosi');
+  const data = await res.json();
+  if (data && data[0]) {
+    return data[0].map(item => item[0]).join('');
+  }
+  throw new Error('Tarjima olinmadi');
+}
 
 // 1. So'z tarjima qilish API
 app.post('/api/translate', async (req, res) => {
@@ -20,61 +28,32 @@ app.post('/api/translate', async (req, res) => {
     if (!word) {
       return res.status(400).json({ error: "So'z yuborilmadi" });
     }
-    if (!GEMINI_API_KEY) {
-      console.error("GEMINI_API_KEY topilmadi!");
-      return res.status(500).json({ error: 'Server sozlanmagan: GEMINI_API_KEY topilmadi' });
-    }
 
-    const directionInstruction = direction === 'uz-en'
-      ? "Foydalanuvchi bitta o'zbekcha so'z yuboradi. Uning inglizcha muqobilini top."
-      : "Foydalanuvchi bitta inglizcha so'z yuboradi.";
+    const fromLang = direction === 'uz-en' ? 'uz' : 'en';
+    const toLang = direction === 'uz-en' ? 'en' : 'uz';
 
-    const promptText = 
-      "Sen ingliz va o'zbek tillari o'rtasida tarjima qiluvchi yordamchisan. " +
-      directionInstruction + " So'z: '" + word + "'. " +
-      "Faqat va faqat quyidagi JSON formatida javob ber, boshqa hech qanday markdown yoki izohlarsiz: " +
-      '{"en":"inglizcha so\'z","uzbek":"o\'zbekcha tarjimasi","transcription":"[IPA talaffuzi]","partOfSpeech":"so\'z turkumi","example":"namuna gap"}';
+    // Google Translate orqali tarjima qilish
+    const translatedText = await translateWithGoogle(word, fromLang, toLang);
 
-    const response = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: promptText }] }]
-      })
-    });
+    const enWord = direction === 'en-uz' ? word.toLowerCase() : translatedText.toLowerCase();
+    const uzWord = direction === 'en-uz' ? translatedText : word;
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('Gemini API xatosi:', response.status, errText);
-      return res.status(502).json({ error: 'Tarjima xizmati javob bermadi' });
-    }
-
-    const data = await response.json();
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!rawText) {
-      return res.status(502).json({ error: "Bo'sh javob keldi" });
-    }
-
-    const cleanJson = rawText.trim()
-      .replace(/^```json/i, '')
-      .replace(/^```/, '')
-      .replace(/```$/, '')
-      .trim();
-
-    const parsed = JSON.parse(cleanJson);
+    // Namuna gap tayyorlash
+    const exampleSentence = direction === 'en-uz'
+      ? `I am learning the word "${enWord}" today.`
+      : `Bu gapda "${uzWord}" so'zi qo'llanilgan.`;
 
     res.json({
-      en: parsed.en || word,
-      uzbek: parsed.uzbek || "Tarjima topilmadi",
-      example: parsed.example || "",
-      transcription: parsed.transcription || "",
-      partOfSpeech: parsed.partOfSpeech || ""
+      en: enWord,
+      uzbek: uzWord,
+      example: exampleSentence,
+      transcription: `[${enWord}]`,
+      partOfSpeech: "so'z"
     });
 
   } catch (e) {
-    console.error('Serverda xatolik:', e);
-    res.status(500).json({ error: 'Server xatosi' });
+    console.error('Tarjimada xatolik:', e.message);
+    res.status(500).json({ error: 'Tarjima qilishda xatolik yuz berdi' });
   }
 });
 
@@ -85,30 +64,16 @@ app.post('/api/translate-text', async (req, res) => {
     const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
 
     if (!text) return res.status(400).json({ error: 'Matn yuborilmadi' });
-    if (!GEMINI_API_KEY) return res.status(500).json({ error: 'GEMINI_API_KEY topilmadi' });
 
-    const srcLang = direction === 'en-uz' ? 'Ingliz' : "O'zbek";
-    const targetLang = direction === 'en-uz' ? "O'zbek" : 'Ingliz';
+    const fromLang = direction === 'uz-en' ? 'uz' : 'en';
+    const toLang = direction === 'uz-en' ? 'en' : 'uz';
 
-    const promptText = `Matnni ${srcLang} tilidan ${targetLang} tiliga ravon tarjima qil. Faqat tarjimani qaytar: "${text}"`;
+    const resultText = await translateWithGoogle(text, fromLang, toLang);
 
-    const response = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: promptText }] }]
-      })
-    });
-
-    if (!response.ok) return res.status(502).json({ error: 'Tarjima xizmati javob bermadi' });
-
-    const data = await response.json();
-    const resultText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    res.json({ translation: resultText.trim() });
+    res.json({ translation: resultText, translatedText: resultText });
 
   } catch (e) {
-    console.error('Text translate error:', e);
+    console.error('Text translate error:', e.message);
     res.status(500).json({ error: 'Server xatosi' });
   }
 });
@@ -135,12 +100,14 @@ if (BOT_TOKEN) {
   });
 }
 
-// 5. Talaffuz (TTS)
+// 5. Talaffuz (TTS) API
 app.get('/api/speak', async (req, res) => {
   try {
     const text = (req.query.text || '').toString().trim().slice(0, 300);
+    const lang = (req.query.lang === 'uz') ? 'uz' : 'en';
     if (!text) return res.status(400).send('Matn yo\'q');
-    const ttsUrl = `[https://translate.google.com/translate_tts?ie=UTF-8&q=$](https://translate.google.com/translate_tts?ie=UTF-8&q=$){encodeURIComponent(text)}&tl=en&client=tw-ob`;
+    
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
     const response = await fetch(ttsUrl, {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     });
