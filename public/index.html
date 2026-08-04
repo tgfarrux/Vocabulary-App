@@ -92,7 +92,7 @@
   }
   main{flex:1; padding:34px 40px 110px; min-width:0;}
 
- /* ---------- Bottom nav ---------- */
+  /* ---------- Bottom nav ---------- */
   .bottom-nav{
     position:fixed;
     left:50%;
@@ -108,7 +108,7 @@
     border: 1.5px solid var(--paper-line);
     border-radius:20px;
     padding:6px;
-    box-shadow: 0 10px 25px -5px rgba(36,33,27,0.15), var(--card-shadow);
+    box-shadow: 0 10px 25px -5px rgba(36,33,27,0.12), var(--card-shadow);
     z-index:40;
     transition: background .2s, border-color .2s;
   }
@@ -130,7 +130,7 @@
     font-weight:600;
     transition:background .15s, color .15s;
   }
-  .bn-item:hover{ color: var(--ink); }
+  .bn-item:hover{color: var(--ink);}
   .bn-item.active{
     background: var(--paper-dark);
     color: var(--navy);
@@ -351,6 +351,7 @@
     background:var(--surface);
     outline:none;
     transition:border-color .15s;
+    color:var(--ink);
   }
   .add-row input:focus{border-color:var(--gold);}
   .add-row button{
@@ -361,7 +362,7 @@
     border:none;
     border-radius:10px;
     background:var(--ink);
-    color:#F6F1E4;
+    color:var(--paper);
     cursor:pointer;
     transition:background .15s, transform .1s;
   }
@@ -550,6 +551,7 @@
     border-radius:9px;
     cursor:pointer;
     transition:border-color .12s, background .12s;
+    color:var(--ink);
   }
   .quiz-option:hover{border-color:var(--navy);}
   .quiz-option.correct{border-color:var(--green); background:var(--green-soft);}
@@ -562,7 +564,7 @@
   .quiz-footer{margin-top:20px; display:flex; justify-content:flex-end;}
   .next-btn{
     font-family:'Inter'; font-weight:700; font-size:13.5px;
-    background:var(--ink); color:#F6F1E4;
+    background:var(--ink); color:var(--paper);
     border:none; padding:10px 20px; border-radius:8px; cursor:pointer;
   }
   .next-btn:disabled{opacity:0.35; cursor:default;}
@@ -723,7 +725,7 @@
 
 <script>
 const STORAGE_KEY = 'vocab-words-v1';
-let words = []; // {id, en, uz, example, status: 'loading'|'ready'|'error', memorized, quizzed}
+let words = [];
 let quizState = null;
 
 const learningList = document.getElementById('learningList');
@@ -734,7 +736,6 @@ const quizBanner = document.getElementById('quizBanner');
 const quizOverlay = document.getElementById('quizOverlay');
 const quizBody = document.getElementById('quizBody');
 
-// ---------- I18N ----------
 const I18N = {
   uz: {
     appTitle: "Lug'at daftarcham",
@@ -958,7 +959,7 @@ async function saveWords(){
   }
 }
 
-let currentDirection = 'en-uz'; // 'en-uz' yoki 'uz-en'
+let currentDirection = 'en-uz';
 
 async function fetchTranslation(word, direction){
   const response = await fetch("/api/translate", {
