@@ -71,7 +71,6 @@
     min-height:100vh;
   }
 
-  /* ---------- Spiral binder sidebar ---------- */
   .binder{
     width:64px;
     flex-shrink:0;
@@ -116,19 +115,22 @@
   .tab-btn:hover{transform:translateX(4px);}
   .tab-btn.active{background:var(--red);}
 
-  main{flex:1; padding:34px 40px 60px; min-width:0;}
+  main{flex:1; padding:24px 30px 60px; min-width:0;}
 
-  /* ---------- Header / cover ---------- */
-  .cover{margin-bottom:22px; position:relative;}
-  .top-icons{
-    position:absolute;
-    top:0;
-    right:0;
+  .cover{
+    margin-bottom:20px;
     display:flex;
     align-items:center;
-    gap:20px;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
   }
-  .icon-group{display:flex; gap:10px;}
+  .top-icons{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .icon-group{display:flex; gap:8px;}
   .top-icon-btn{
     width:34px;height:34px;
     border-radius:50%;
@@ -148,13 +150,48 @@
   .top-icon-btn img{width:100%; height:100%; object-fit:cover; border-radius:50%;}
   .avatar-fallback{display:flex; align-items:center; justify-content:center; width:100%; height:100%;}
   #profileBtn{
-    width:46px; height:46px;
+    width:38px; height:38px;
     border-width:2px;
   }
-  #profileBtn .avatar-fallback svg{width:24px; height:24px;}
-  #profileBtn .avatar-fallback{font-size:16px; font-weight:700;}
+  #profileBtn .avatar-fallback svg{width:20px; height:20px;}
+  #profileBtn .avatar-fallback{font-size:15px; font-weight:700;}
 
-  /* ---------- Profile & language modals ---------- */
+  .tape{
+    display:inline-block;
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:19px;
+    background: linear-gradient(180deg, rgba(201,151,31,0.18), rgba(201,151,31,0.18));
+    padding:4px 12px 5px;
+    transform:rotate(-1deg);
+    position:relative;
+    box-shadow: inset 0 -2px 0 rgba(178,58,46,0.35);
+    white-space:nowrap;
+  }
+  .tape::before, .tape::after{
+    content:"";
+    position:absolute;
+    top:-4px;
+    width:18px;height:10px;
+    background:var(--tape-overlay);
+    border:1px solid rgba(0,0,0,0.04);
+  }
+  .tape::before{left:-6px; transform:rotate(-8deg);}
+  .tape::after{right:-6px; transform:rotate(8deg);}
+
+  .stats{
+    width:100%;
+    margin-top:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .stats b{color:var(--ink); font-weight:600;}
+  .stat-dot{color:var(--gold);}
+
   .profile-modal{text-align:center;}
   .profile-avatar-big{
     width:84px;height:84px;border-radius:50%;
@@ -194,100 +231,11 @@
   .lang-option.active{border-color:var(--navy); background:var(--paper-dark);}
   .lang-option .flag{font-size:20px;}
 
-  /* ---------- Text translator ---------- */
-  .translate-modal{max-width:560px;}
-  .tt-box{
-    position:relative;
-    border:1.5px solid var(--paper-line);
-    border-radius:10px;
-    background:var(--surface);
-    margin-top:14px;
-  }
-  .tt-box textarea{
-    width:100%;
-    border:none;
-    background:none;
-    resize:vertical;
-    font-family:'Inter', sans-serif;
-    font-size:15px;
-    color:var(--ink);
-    padding:14px 44px 14px 14px;
-    box-sizing:border-box;
-    min-height:100px;
-  }
-  .tt-box textarea:focus{outline:none;}
-  .tt-box-actions{
-    position:absolute;
-    top:8px; right:8px;
-    display:flex; flex-direction:column; gap:4px;
-  }
-  .tt-translate-btn{
-    display:block;
-    margin:14px auto 0;
-    background:var(--navy);
-    color:var(--surface);
-    border:none;
-    font-family:'Inter', sans-serif;
-    font-weight:600;
-    font-size:14px;
-    padding:10px 26px;
-    border-radius:8px;
-    cursor:pointer;
-    transition:opacity .15s;
-  }
-  .tt-translate-btn:hover{opacity:0.85;}
-  .tt-translate-btn:disabled{opacity:0.5; cursor:default;}
-  .tt-output-box{min-height:70px;}
-  .tt-output{
-    padding:14px 44px 14px 14px;
-    font-family:'Inter', sans-serif;
-    font-size:15px;
-    color:var(--ink);
-    white-space:pre-wrap;
-    line-height:1.5;
-    min-height:48px;
-  }
-  .tt-output.placeholder{color:var(--ink-soft);}
-  .tape{
-    display:inline-block;
-    font-family:'Fraunces', serif;
-    font-weight:700;
-    font-size:34px;
-    background: linear-gradient(180deg, rgba(201,151,31,0.18), rgba(201,151,31,0.18));
-    padding:6px 18px 8px;
-    transform:rotate(-1.2deg);
-    position:relative;
-    box-shadow: inset 0 -2px 0 rgba(178,58,46,0.35);
-  }
-  .tape::before, .tape::after{
-    content:"";
-    position:absolute;
-    top:-6px;
-    width:26px;height:14px;
-    background:var(--tape-overlay);
-    border:1px solid rgba(0,0,0,0.04);
-  }
-  .tape::before{left:-8px; transform:rotate(-8deg);}
-  .tape::after{right:-8px; transform:rotate(8deg);}
-
-  .stats{
-    margin-top:14px;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12.5px;
-    color:var(--ink-soft);
-    display:flex;
-    gap:22px;
-    flex-wrap:wrap;
-  }
-  .stats b{color:var(--ink); font-weight:600;}
-  .stat-dot{color:var(--gold);}
-
-  /* ---------- Lang switch row ---------- */
   .lang-row{
     display:flex;
     align-items:center;
     gap:10px;
-    margin-top:24px;
+    margin-top:16px;
     font-family:'Inter', sans-serif;
     font-size:13px;
     font-weight:600;
@@ -312,7 +260,6 @@
   #swapLangBtn:hover{background:var(--paper-dark);}
   #swapLangBtn.spin{transform:rotate(180deg);}
 
-  /* ---------- Add row ---------- */
   .add-row{
     display:flex;
     gap:10px;
@@ -328,6 +275,7 @@
     background:var(--surface);
     outline:none;
     transition:border-color .15s;
+    color:var(--ink);
   }
   .add-row input:focus{border-color:var(--gold);}
   .add-row button{
@@ -338,7 +286,7 @@
     border:none;
     border-radius:10px;
     background:var(--ink);
-    color:#F6F1E4;
+    color:var(--paper);
     cursor:pointer;
     transition:background .15s, transform .1s;
   }
@@ -347,7 +295,6 @@
   .add-row button:disabled{opacity:0.5; cursor:default;}
   .hint{font-size:12.5px; color:var(--ink-soft); margin-bottom:18px;}
 
-  /* ---------- Quiz banner ---------- */
   .quiz-banner{
     display:flex;
     align-items:center;
@@ -375,7 +322,125 @@
     white-space:nowrap;
   }
 
-  /* ---------- Lists ---------- */
+  .view-pane{display:none;}
+  .view-pane.active{display:block;}
+
+  .translator-card{
+    background:var(--surface);
+    border:1.5px solid var(--paper-line);
+    border-radius:14px;
+    padding:20px;
+    box-shadow:var(--card-shadow);
+    margin-top:10px;
+  }
+  .translator-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--paper-line);
+  }
+  .lang-select-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .lang-badge{
+    padding:6px 14px;
+    background:var(--paper-dark);
+    border:1px solid var(--paper-line);
+    border-radius:8px;
+  }
+  .trans-box{
+    position:relative;
+    margin-bottom:14px;
+  }
+  .trans-textarea{
+    width:100%;
+    min-height:110px;
+    padding:12px 14px;
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+    color:var(--ink);
+    background:var(--paper);
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    outline:none;
+    resize:vertical;
+    transition:border-color .15s;
+  }
+  .trans-textarea:focus{border-color:var(--gold);}
+  .trans-result-box{
+    min-height:110px;
+    padding:12px 14px;
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+    color:var(--ink);
+    background:var(--paper-dark);
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    position:relative;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .trans-result-box.placeholder{
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  .trans-actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:8px;
+  }
+  .trans-action-btns{
+    display:flex;
+    gap:8px;
+  }
+  .action-icon-btn{
+    border:1px solid var(--paper-line);
+    background:var(--surface);
+    color:var(--ink);
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:background .15s, border-color .15s;
+  }
+  .action-icon-btn:hover{
+    background:var(--paper-dark);
+    border-color:var(--gold);
+  }
+  .action-icon-btn.copied{
+    color:var(--green);
+    border-color:var(--green);
+  }
+  .translate-action-btn{
+    font-family:'Inter', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:10px 24px;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background .15s, transform .1s;
+    align-self:flex-end;
+  }
+  .translate-action-btn:hover{background:var(--navy);}
+  .translate-action-btn:active{transform:scale(0.97);}
+  .translate-action-btn:disabled{opacity:0.5; cursor:default;}
+
   .lists{display:flex; gap:28px; align-items:flex-start;}
   .col{flex:1; min-width:0;}
   .col h2{
@@ -476,7 +541,6 @@
     border-radius:10px;
   }
 
-  /* ---------- Quiz overlay ---------- */
   .overlay{
     position:fixed; inset:0;
     background:rgba(36,33,27,0.55);
@@ -527,6 +591,7 @@
     border-radius:9px;
     cursor:pointer;
     transition:border-color .12s, background .12s;
+    color:var(--ink);
   }
   .quiz-option:hover{border-color:var(--navy);}
   .quiz-option.correct{border-color:var(--green); background:var(--green-soft);}
@@ -539,7 +604,7 @@
   .quiz-footer{margin-top:20px; display:flex; justify-content:flex-end;}
   .next-btn{
     font-family:'Inter'; font-weight:700; font-size:13.5px;
-    background:var(--ink); color:#F6F1E4;
+    background:var(--ink); color:var(--paper);
     border:none; padding:10px 20px; border-radius:8px; cursor:pointer;
   }
   .next-btn:disabled{opacity:0.35; cursor:default;}
@@ -559,24 +624,14 @@
 
   @media (max-width: 720px){
     .binder{display:none;}
-    main{padding:24px 18px 50px;}
+    main{padding:18px 16px 40px;}
     .lists{flex-direction:column;}
-    .cover{
-      display:grid;
-      grid-template-columns:1fr auto;
-      grid-template-areas:"title icons" "stats stats";
-      align-items:center;
-      column-gap:10px;
-      row-gap:10px;
-    }
-    .tape{grid-area:title; justify-self:start; font-size:16px; padding:5px 12px 6px; margin:0; transform:rotate(0deg);}
-    .tape::before, .tape::after{display:none;}
-    .top-icons{grid-area:icons; position:static; justify-self:end;}
-    .stats{grid-area:stats;}
-    .top-icon-btn{width:26px; height:26px; font-size:11px;}
-    #profileBtn{width:32px; height:32px;}
+    .cover{flex-direction:row; justify-content:space-between; align-items:center;}
+    .top-icons{gap:8px;}
+    .top-icon-btn{width:30px; height:30px; font-size:13px;}
+    #profileBtn{width:34px; height:34px;}
     #profileBtn .avatar-fallback svg{width:16px; height:16px;}
-    .icon-group{gap:6px;}
+    .tape{font-size:16px; padding:4px 10px 5px;}
   }
 </style>
 </head>
@@ -587,23 +642,23 @@
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
     <div class="binder-tabs">
-      <button class="tab-btn active" data-view="all" id="tabWordsBtn">SO'ZLAR</button>
-      <button class="tab-btn" data-view="translate-tab" id="tabTranslateBtn">MATN</button>
+      <button class="tab-btn active" data-view="words" id="tabWordsBtn">SO'ZLAR</button>
+      <button class="tab-btn" data-view="translator" id="tabTransBtn">TARJIMON</button>
       <button class="tab-btn" data-view="quiz-tab" id="tabTestBtn">TEST</button>
     </div>
   </div>
 
   <main>
     <header class="cover">
+      <div class="tape" id="appTitle">Lug'at daftarcham</div>
       <div class="top-icons">
         <div class="icon-group">
-          <button class="top-icon-btn" id="translateBtn" title="Matn tarjimon">🔤</button>
           <button class="top-icon-btn" id="langSwitchBtn" title="Ilova tilini tanlash">🌐</button>
           <button class="top-icon-btn" id="themeToggleBtn" title="Tungi/kunduzgi rejim">🌙</button>
         </div>
         <button class="top-icon-btn" id="profileBtn" title="Profil"><span id="profileAvatarWrap" class="avatar-fallback"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span></button>
       </div>
-      <div class="tape" id="appTitle">Lug'at daftarcham</div>
+
       <div class="stats">
         <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
         <span><span class="stat-dot">●</span> <span id="statMemorizedLabel">Yodlangan</span>: <b id="statMemorized">0</b></span>
@@ -611,59 +666,69 @@
       </div>
     </header>
 
-    <div class="lang-row">
-      <span id="langFrom">Inglizcha</span>
-      <button id="swapLangBtn" title="Yo'nalishni almashtirish">⇄</button>
-      <span id="langTo">O'zbek</span>
-    </div>
-    <div class="add-row">
-      <input id="wordInput" type="text" placeholder="Bilmagan inglizcha so'zingizni yozing va Enter bosing..." autocomplete="off">
-      <button id="addBtn">Qo'shish</button>
-    </div>
-    <div class="hint" id="hintText">Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.</div>
+    <div id="wordsView" class="view-pane active">
+      <div class="lang-row">
+        <span id="langFrom">Inglizcha</span>
+        <button id="swapLangBtn" title="Yo'nalishni almashtirish">⇄</button>
+        <span id="langTo">O'zbek</span>
+      </div>
+      <div class="add-row">
+        <input id="wordInput" type="text" placeholder="Bilmagan inglizcha so'zingizni yozing va Enter bosing..." autocomplete="off">
+        <button id="addBtn">Qo'shish</button>
+      </div>
+      <div class="hint" id="hintText">Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.</div>
 
-    <div id="quizBanner" class="quiz-banner hidden">
-      <span id="quizBannerText">🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.</span>
-      <button id="startQuizBtn">Testni boshlash</button>
+      <div id="quizBanner" class="quiz-banner hidden">
+        <span id="quizBannerText">🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.</span>
+        <button id="startQuizBtn">Testni boshlash</button>
+      </div>
+
+      <div class="lists">
+        <section class="col">
+          <h2><span id="colLearningLabel">O'rganilmoqda</span> <span id="learningCount">(0)</span></h2>
+          <div id="learningList" class="cards"></div>
+        </section>
+        <section class="col">
+          <h2><span id="colMemorizedLabel">Yodlangan</span> <span id="memorizedCount">(0)</span></h2>
+          <div id="memorizedList" class="cards"></div>
+        </section>
+      </div>
     </div>
 
-    <div class="lists">
-      <section class="col">
-        <h2><span id="colLearningLabel">O'rganilmoqda</span> <span id="learningCount">(0)</span></h2>
-        <div id="learningList" class="cards"></div>
-      </section>
-      <section class="col">
-        <h2><span id="colMemorizedLabel">Yodlangan</span> <span id="memorizedCount">(0)</span></h2>
-        <div id="memorizedList" class="cards"></div>
-      </section>
+    <div id="translatorView" class="view-pane">
+      <div class="translator-card">
+        <div class="translator-header">
+          <div class="lang-select-box">
+            <span class="lang-badge" id="transFromLabel">Inglizcha</span>
+            <button id="transSwapBtn" class="top-icon-btn" style="width:32px;height:32px;" title="Tilni almashtirish">⇄</button>
+            <span class="lang-badge" id="transToLabel">O'zbekcha</span>
+          </div>
+        </div>
+
+        <div class="trans-box">
+          <textarea id="transInput" class="trans-textarea" placeholder="Matn yoki gapni kiriting..."></textarea>
+          <div class="trans-actions">
+            <div class="trans-action-btns">
+              <button class="action-icon-btn" id="transSpeakSrcBtn" title="Talaffuz">🔊 Eshitish</button>
+              <button class="action-icon-btn" id="transClearBtn" title="Tozalash">✕ O'chirish</button>
+            </div>
+            <button id="transSubmitBtn" class="translate-action-btn">Tarjima qilish</button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <div id="transResult" class="trans-result-box placeholder">Tarjima natijasi shu yerda ko'rinadi...</div>
+          <div class="trans-actions" style="margin-top:10px;">
+            <div class="trans-action-btns">
+              <button class="action-icon-btn" id="transSpeakDstBtn" title="Talaffuz">🔊 Eshitish</button>
+              <button class="action-icon-btn" id="transCopyBtn" title="Nusxa olish">⧉ Nusxa olish</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
   </main>
-</div>
-
-<div id="translateOverlay" class="overlay hidden">
-  <div class="quiz-modal translate-modal">
-    <button class="quiz-close" id="translateClose">✕</button>
-    <div class="lang-row" style="margin-top:6px;">
-      <span id="ttFrom">Inglizcha</span>
-      <button id="ttSwapBtn" title="Yo'nalishni almashtirish">⇄</button>
-      <span id="ttTo">O'zbek</span>
-    </div>
-    <div class="tt-box">
-      <textarea id="ttInput" rows="5" placeholder="Matnni shu yerga yozing yoki joylashtiring..."></textarea>
-      <div class="tt-box-actions">
-        <button class="icon-btn speak-btn" id="ttInputSpeak" title="Talaffuzni eshitish">🔊</button>
-        <button class="copy-btn" id="ttInputCopy" title="Nusxalash">⧉</button>
-      </div>
-    </div>
-    <button id="ttTranslateBtn" class="tt-translate-btn">Tarjima qilish</button>
-    <div class="tt-box tt-output-box">
-      <div id="ttOutput" class="tt-output"></div>
-      <div class="tt-box-actions">
-        <button class="icon-btn speak-btn" id="ttOutputSpeak" title="Talaffuzni eshitish">🔊</button>
-        <button class="copy-btn" id="ttOutputCopy" title="Nusxalash">⧉</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <div id="quizOverlay" class="overlay hidden">
@@ -694,7 +759,7 @@
 
 <script>
 const STORAGE_KEY = 'vocab-words-v1';
-let words = []; // {id, en, uz, example, status: 'loading'|'ready'|'error', memorized, quizzed}
+let words = [];
 let quizState = null;
 
 const learningList = document.getElementById('learningList');
@@ -705,11 +770,10 @@ const quizBanner = document.getElementById('quizBanner');
 const quizOverlay = document.getElementById('quizOverlay');
 const quizBody = document.getElementById('quizBody');
 
-// ---------- I18N ----------
 const I18N = {
   uz: {
     appTitle: "Lug'at daftarcham",
-    tabWords: "SO'ZLAR", tabTest: "TEST",
+    tabWords: "SO'ZLAR", tabTrans: "TARJIMON", tabTest: "TEST",
     statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
     addBtn: "Qo'shish",
     hint: "Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.",
@@ -736,13 +800,13 @@ const I18N = {
     profileWords: "so'z", profileMemorized: "yodlangan",
     langModalTitle: "Ilova tilini tanlang",
     themeTitle: "Tungi/kunduzgi rejim", profileTitleAttr: "Profil", langTitleAttr: "Ilova tilini tanlash",
-    tabTranslate: "MATN", translateBtnTitle: "Matn tarjimon",
-    ttPlaceholder: "Matnni shu yerga yozing yoki joylashtiring...",
-    ttTranslateBtnText: "Tarjima qilish"
+    transPlaceholderInput: "Matn yoki gapni kiriting...",
+    transPlaceholderResult: "Tarjima natijasi shu yerda ko'rinadi...",
+    transBtnText: "Tarjima qilish", transTranslating: "Tarjima qilinmoqda..."
   },
   en: {
     appTitle: "My Vocabulary",
-    tabWords: "WORDS", tabTest: "TEST",
+    tabWords: "WORDS", tabTrans: "TRANSLATOR", tabTest: "TEST",
     statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
     addBtn: "Add",
     hint: "When you add a word, its Uzbek meaning and an example sentence are generated automatically.",
@@ -769,13 +833,13 @@ const I18N = {
     profileWords: "words", profileMemorized: "memorized",
     langModalTitle: "Choose app language",
     themeTitle: "Dark/light mode", profileTitleAttr: "Profile", langTitleAttr: "Choose app language",
-    tabTranslate: "TEXT", translateBtnTitle: "Text translator",
-    ttPlaceholder: "Type or paste your text here...",
-    ttTranslateBtnText: "Translate"
+    transPlaceholderInput: "Type text or sentence here...",
+    transPlaceholderResult: "Translation result will appear here...",
+    transBtnText: "Translate", transTranslating: "Translating..."
   },
   ru: {
     appTitle: "Мой словарь",
-    tabWords: "СЛОВА", tabTest: "ТЕСТ",
+    tabWords: "СЛОВА", tabTrans: "ПЕРЕВОДЧИК", tabTest: "ТЕСТ",
     statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
     addBtn: "Добавить",
     hint: "При добавлении слова автоматически создаются перевод на узбекский и пример предложения.",
@@ -802,9 +866,9 @@ const I18N = {
     profileWords: "слов", profileMemorized: "выучено",
     langModalTitle: "Выберите язык приложения",
     themeTitle: "Тёмный/светлый режим", profileTitleAttr: "Профиль", langTitleAttr: "Выбрать язык приложения",
-    tabTranslate: "ТЕКСТ", translateBtnTitle: "Переводчик текста",
-    ttPlaceholder: "Введите или вставьте текст сюда...",
-    ttTranslateBtnText: "Перевести"
+    transPlaceholderInput: "Введите текст или предложение...",
+    transPlaceholderResult: "Результат перевода появится здесь...",
+    transBtnText: "Перевести", transTranslating: "Переводится..."
   }
 };
 
@@ -820,6 +884,7 @@ function applyStaticI18n(){
   document.documentElement.lang = currentLang;
   document.getElementById('appTitle').textContent = t('appTitle');
   document.getElementById('tabWordsBtn').textContent = t('tabWords');
+  if(document.getElementById('tabTransBtn')) document.getElementById('tabTransBtn').textContent = t('tabTrans');
   document.getElementById('tabTestBtn').textContent = t('tabTest');
   document.getElementById('statTotalLabel').textContent = t('statTotal');
   document.getElementById('statMemorizedLabel').textContent = t('statMemorized');
@@ -834,11 +899,14 @@ function applyStaticI18n(){
   document.getElementById('profileBtn').title = t('profileTitleAttr');
   document.getElementById('langSwitchBtn').title = t('langTitleAttr');
   document.getElementById('themeToggleBtn').title = t('themeTitle');
-  document.getElementById('tabTranslateBtn').textContent = t('tabTranslate');
-  document.getElementById('translateBtn').title = t('translateBtnTitle');
-  document.getElementById('ttInput').placeholder = t('ttPlaceholder');
-  document.getElementById('ttTranslateBtn').textContent = t('ttTranslateBtnText');
-  if(typeof updateTtLabels === 'function') updateTtLabels();
+  document.getElementById('transInput').placeholder = t('transPlaceholderInput');
+  document.getElementById('transSubmitBtn').textContent = t('transBtnText');
+  
+  const resEl = document.getElementById('transResult');
+  if(resEl.classList.contains('placeholder')){
+    resEl.textContent = t('transPlaceholderResult');
+  }
+
   document.querySelectorAll('.lang-option').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === currentLang);
   });
@@ -925,7 +993,7 @@ async function saveWords(){
   }
 }
 
-let currentDirection = 'en-uz'; // 'en-uz' yoki 'uz-en'
+let currentDirection = 'en-uz';
 
 async function fetchTranslation(word, direction){
   const response = await fetch("/api/translate", {
@@ -1011,18 +1079,18 @@ function retryWord(id){
 }
 
 let currentAudio = null;
-function speakWord(text){
+function speakWord(text, lang = 'en'){
   if(currentAudio){
     currentAudio.pause();
     currentAudio = null;
   }
-  const audio = new Audio('/api/speak?text=' + encodeURIComponent(text));
+  const audio = new Audio(`/api/speak?text=${encodeURIComponent(text)}&lang=${lang}`);
   currentAudio = audio;
   audio.play().catch(() => {
     if('speechSynthesis' in window){
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'en-US';
+      utter.lang = lang === 'uz' ? 'uz-UZ' : 'en-US';
       utter.rate = 0.9;
       window.speechSynthesis.speak(utter);
     }
@@ -1033,8 +1101,9 @@ function copyText(text, btn){
   const done = () => {
     if(!btn) return;
     btn.classList.add('copied');
+    const oldHtml = btn.innerHTML;
     btn.textContent = '✓';
-    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '⧉'; }, 1200);
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = oldHtml; }, 1200);
   };
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(done).catch(() => {});
@@ -1169,16 +1238,115 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    if(btn.dataset.view === 'quiz-tab'){
+    
+    const view = btn.dataset.view;
+    if(view === 'words'){
+      document.getElementById('wordsView').classList.add('active');
+      document.getElementById('translatorView').classList.remove('active');
+    } else if(view === 'translator'){
+      document.getElementById('wordsView').classList.remove('active');
+      document.getElementById('translatorView').classList.add('active');
+    } else if(view === 'quiz-tab'){
       openQuizIfPossible();
-    } else if(btn.dataset.view === 'translate-tab'){
-      openTranslateModal();
     }
   });
 });
 
 document.getElementById('startQuizBtn').addEventListener('click', openQuizIfPossible);
 document.getElementById('quizClose').addEventListener('click', closeQuiz);
+
+let transDirection = 'en-uz';
+const transInput = document.getElementById('transInput');
+const transResult = document.getElementById('transResult');
+const transSubmitBtn = document.getElementById('transSubmitBtn');
+const transFromLabel = document.getElementById('transFromLabel');
+const transToLabel = document.getElementById('transToLabel');
+const transSwapBtn = document.getElementById('transSwapBtn');
+const transSpeakSrcBtn = document.getElementById('transSpeakSrcBtn');
+const transSpeakDstBtn = document.getElementById('transSpeakDstBtn');
+const transClearBtn = document.getElementById('transClearBtn');
+const transCopyBtn = document.getElementById('transCopyBtn');
+
+function updateTransLabels(){
+  if(transDirection === 'en-uz'){
+    transFromLabel.textContent = t('langEnglish');
+    transToLabel.textContent = t('langUzbek');
+  } else {
+    transFromLabel.textContent = t('langUzbek');
+    transToLabel.textContent = t('langEnglish');
+  }
+}
+
+transSwapBtn.addEventListener('click', () => {
+  transDirection = transDirection === 'en-uz' ? 'uz-en' : 'en-uz';
+  updateTransLabels();
+  transSwapBtn.classList.add('spin');
+  setTimeout(() => transSwapBtn.classList.remove('spin'), 200);
+  
+  const resText = transResult.classList.contains('placeholder') ? '' : transResult.textContent;
+  if(resText){
+    transInput.value = resText;
+    transResult.textContent = t('transPlaceholderResult');
+    transResult.classList.add('placeholder');
+  }
+});
+
+async function translateText(){
+  const text = transInput.value.trim();
+  if(!text) return;
+
+  transSubmitBtn.disabled = true;
+  transSubmitBtn.textContent = t('transTranslating');
+  
+  try{
+    const response = await fetch("/api/translate-text", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, direction: transDirection })
+    });
+
+    if(!response.ok) throw new Error('Tarjima qilib bo\'lmadi');
+    const data = await response.json();
+
+    if(data.translatedText){
+      transResult.textContent = data.translatedText;
+      transResult.classList.remove('placeholder');
+    } else {
+      throw new Error('Natija topilmadi');
+    }
+  } catch(e){
+    transResult.textContent = 'Tarjima qilishda xatolik yuz berdi.';
+    transResult.classList.remove('placeholder');
+  } finally{
+    transSubmitBtn.disabled = false;
+    transSubmitBtn.textContent = t('transBtnText');
+  }
+}
+
+transSubmitBtn.addEventListener('click', translateText);
+
+transClearBtn.addEventListener('click', () => {
+  transInput.value = '';
+  transResult.textContent = t('transPlaceholderResult');
+  transResult.classList.add('placeholder');
+  transInput.focus();
+});
+
+transCopyBtn.addEventListener('click', () => {
+  if(transResult.classList.contains('placeholder') || !transResult.textContent) return;
+  copyText(transResult.textContent, transCopyBtn);
+});
+
+transSpeakSrcBtn.addEventListener('click', () => {
+  const val = transInput.value.trim();
+  if(!val) return;
+  speakWord(val, transDirection === 'en-uz' ? 'en' : 'uz');
+});
+
+transSpeakDstBtn.addEventListener('click', () => {
+  if(transResult.classList.contains('placeholder') || !transResult.textContent) return;
+  speakWord(transResult.textContent, transDirection === 'en-uz' ? 'uz' : 'en');
+});
 
 const FALLBACK_DISTRACTORS = ["kitob","stol","osmon","daryo","tog'","gul","quyosh","uy","yo'l","olma","non","suv","daraxt","yulduz","shahar","qishloq","mashina","oyna","eshik","bola"];
 
@@ -1295,7 +1463,6 @@ function finishQuiz(){
   `;
 }
 
-// ---------- Theme (dark/light) ----------
 const themeToggleBtn = document.getElementById('themeToggleBtn');
 
 function applyTheme(theme){
@@ -1309,7 +1476,6 @@ themeToggleBtn.addEventListener('click', () => {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 });
 
-// ---------- Language switcher modal ----------
 const langOverlay = document.getElementById('langOverlay');
 const langSwitchBtn = document.getElementById('langSwitchBtn');
 const langClose = document.getElementById('langClose');
@@ -1327,7 +1493,6 @@ document.querySelectorAll('.lang-option').forEach(btn => {
   });
 });
 
-// ---------- Profile modal ----------
 const profileOverlay = document.getElementById('profileOverlay');
 const profileBtn = document.getElementById('profileBtn');
 const profileClose = document.getElementById('profileClose');
@@ -1385,98 +1550,11 @@ profileBtn.addEventListener('click', openProfile);
 profileClose.addEventListener('click', () => profileOverlay.classList.add('hidden'));
 profileOverlay.addEventListener('click', (e) => { if(e.target === profileOverlay) profileOverlay.classList.add('hidden'); });
 
-// ---------- Init ----------
 if(window.Telegram && window.Telegram.WebApp){
   const tg = window.Telegram.WebApp;
   tg.ready();
   tg.expand();
 }
-
-// ---------- Text translator ----------
-let ttDirection = 'en-uz';
-const translateOverlay = document.getElementById('translateOverlay');
-const translateBtn = document.getElementById('translateBtn');
-const translateClose = document.getElementById('translateClose');
-const ttFromEl = document.getElementById('ttFrom');
-const ttToEl = document.getElementById('ttTo');
-const ttSwapBtn = document.getElementById('ttSwapBtn');
-const ttInput = document.getElementById('ttInput');
-const ttOutput = document.getElementById('ttOutput');
-const ttTranslateBtn = document.getElementById('ttTranslateBtn');
-
-function updateTtLabels(){
-  if(ttDirection === 'en-uz'){
-    ttFromEl.textContent = t('langEnglish');
-    ttToEl.textContent = t('langUzbek');
-  } else {
-    ttFromEl.textContent = t('langUzbek');
-    ttToEl.textContent = t('langEnglish');
-  }
-}
-
-function openTranslateModal(){
-  updateTtLabels();
-  translateOverlay.classList.remove('hidden');
-}
-
-translateBtn.addEventListener('click', openTranslateModal);
-translateClose.addEventListener('click', () => translateOverlay.classList.add('hidden'));
-translateOverlay.addEventListener('click', (e) => { if(e.target === translateOverlay) translateOverlay.classList.add('hidden'); });
-
-ttSwapBtn.addEventListener('click', () => {
-  ttDirection = ttDirection === 'en-uz' ? 'uz-en' : 'en-uz';
-  updateTtLabels();
-  ttSwapBtn.classList.add('spin');
-  setTimeout(() => ttSwapBtn.classList.remove('spin'), 200);
-  const oldInput = ttInput.value;
-  ttInput.value = ttOutput.textContent && !ttOutput.classList.contains('placeholder') ? ttOutput.textContent : oldInput;
-  ttOutput.textContent = '';
-  ttOutput.classList.add('placeholder');
-});
-
-async function runTranslateText(){
-  const text = ttInput.value.trim();
-  if(!text) return;
-  ttTranslateBtn.disabled = true;
-  ttOutput.classList.remove('placeholder');
-  ttOutput.textContent = t('loadingText');
-  try{
-    const response = await fetch('/api/translate-text', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, direction: ttDirection })
-    });
-    if(!response.ok) throw new Error('fail');
-    const data = await response.json();
-    if(!data.translation) throw new Error('empty');
-    ttOutput.textContent = data.translation;
-  }catch(e){
-    ttOutput.textContent = t('errorText');
-  }
-  ttTranslateBtn.disabled = false;
-}
-
-ttTranslateBtn.addEventListener('click', runTranslateText);
-ttInput.addEventListener('keydown', (e) => {
-  if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){
-    runTranslateText();
-  }
-});
-
-document.getElementById('ttInputSpeak').addEventListener('click', () => {
-  if(ttInput.value.trim()) speakWord(ttInput.value.trim());
-});
-document.getElementById('ttOutputSpeak').addEventListener('click', () => {
-  const text = ttOutput.textContent.trim();
-  if(text && !ttOutput.classList.contains('placeholder')) speakWord(text);
-});
-document.getElementById('ttInputCopy').addEventListener('click', (e) => {
-  if(ttInput.value.trim()) copyText(ttInput.value.trim(), e.currentTarget);
-});
-document.getElementById('ttOutputCopy').addEventListener('click', (e) => {
-  const text = ttOutput.textContent.trim();
-  if(text && !ttOutput.classList.contains('placeholder')) copyText(text, e.currentTarget);
-});
 
 applyTheme(localStorage.getItem('ui-theme') || 'light');
 renderProfileButton();
