@@ -90,33 +90,61 @@
     box-shadow: inset 0 0 0 3px var(--ring-shadow), 0 1px 2px rgba(0,0,0,0.25);
     flex-shrink:0;
   }
-  .binder-tabs{
-    position:absolute;
-    right:-1px;
-    top:120px;
+  main{flex:1; padding:34px 40px 110px; min-width:0;}
+
+  /* ---------- Bottom nav ---------- */
+  .bottom-nav{
+    position:fixed;
+    left:50%;
+    bottom:16px;
+    transform:translateX(-50%);
+    width:calc(100% - 32px);
+    max-width:420px;
+    display:flex;
+    align-items:stretch;
+    justify-content:space-between;
+    gap:4px;
+    background:linear-gradient(180deg, #1c2540, #141b30);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:20px;
+    padding:8px;
+    box-shadow:0 12px 30px -8px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
+    z-index:40;
+  }
+  .bn-item{
+    flex:1;
     display:flex;
     flex-direction:column;
-    gap:14px;
-  }
-  .tab-btn{
-    writing-mode:vertical-rl;
-    text-orientation:mixed;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
-    letter-spacing:0.08em;
-    padding:14px 8px;
-    background:var(--navy);
-    color:#F6F1E4;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    background:none;
     border:none;
-    border-radius:0 8px 8px 0;
+    border-radius:14px;
+    padding:9px 4px 8px;
     cursor:pointer;
-    transform:translateX(0);
-    transition:transform .18s ease, background .18s ease;
+    color:#8b93ab;
+    font-family:'Inter', sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    transition:background .15s, color .15s;
   }
-  .tab-btn:hover{transform:translateX(4px);}
-  .tab-btn.active{background:var(--red);}
-
-  main{flex:1; padding:34px 40px 60px; min-width:0;}
+  .bn-item:hover{color:#c9d0e3;}
+  .bn-item.active{
+    background:rgba(255,255,255,0.08);
+    color:#ffffff;
+  }
+  .bn-icon{display:flex; align-items:center; justify-content:center; height:22px;}
+  .bn-emoji{font-size:19px; line-height:1;}
+  .bn-avatar{
+    width:22px; height:22px;
+    border-radius:50%;
+    overflow:hidden;
+    background:rgba(255,255,255,0.12);
+    color:#c9d0e3;
+  }
+  .bn-avatar img{width:100%; height:100%; object-fit:cover; display:block;}
+  .bn-item.active .bn-avatar{box-shadow:0 0 0 2px rgba(255,255,255,0.5);}
 
   /* ---------- Header / cover ---------- */
   .cover{margin-bottom:22px; position:relative;}
@@ -147,12 +175,6 @@
   .top-icon-btn:hover{border-color:var(--gold); transform:translateY(-1px);}
   .top-icon-btn img{width:100%; height:100%; object-fit:cover; border-radius:50%;}
   .avatar-fallback{display:flex; align-items:center; justify-content:center; width:100%; height:100%;}
-  #profileBtn{
-    width:46px; height:46px;
-    border-width:2px;
-  }
-  #profileBtn .avatar-fallback svg{width:24px; height:24px;}
-  #profileBtn .avatar-fallback{font-size:16px; font-weight:700;}
 
   /* ---------- Profile & language modals ---------- */
   .profile-modal{text-align:center;}
@@ -559,7 +581,7 @@
 
   @media (max-width: 720px){
     .binder{display:none;}
-    main{padding:24px 18px 50px;}
+    main{padding:24px 18px 100px;}
     .lists{flex-direction:column;}
     .cover{
       display:grid;
@@ -574,8 +596,6 @@
     .top-icons{grid-area:icons; position:static; justify-self:end;}
     .stats{grid-area:stats;}
     .top-icon-btn{width:26px; height:26px; font-size:11px;}
-    #profileBtn{width:32px; height:32px;}
-    #profileBtn .avatar-fallback svg{width:16px; height:16px;}
     .icon-group{gap:6px;}
   }
 </style>
@@ -586,22 +606,15 @@
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-    <div class="binder-tabs">
-      <button class="tab-btn active" data-view="all" id="tabWordsBtn">SO'ZLAR</button>
-      <button class="tab-btn" data-view="translate-tab" id="tabTranslateBtn">MATN</button>
-      <button class="tab-btn" data-view="quiz-tab" id="tabTestBtn">TEST</button>
-    </div>
   </div>
 
   <main>
     <header class="cover">
       <div class="top-icons">
         <div class="icon-group">
-          <button class="top-icon-btn" id="translateBtn" title="Matn tarjimon">🔤</button>
           <button class="top-icon-btn" id="langSwitchBtn" title="Ilova tilini tanlash">🌐</button>
           <button class="top-icon-btn" id="themeToggleBtn" title="Tungi/kunduzgi rejim">🌙</button>
         </div>
-        <button class="top-icon-btn" id="profileBtn" title="Profil"><span id="profileAvatarWrap" class="avatar-fallback"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span></button>
       </div>
       <div class="tape" id="appTitle">Lug'at daftarcham</div>
       <div class="stats">
@@ -639,6 +652,21 @@
     </div>
   </main>
 </div>
+
+<nav class="bottom-nav">
+  <button class="bn-item active" id="bnHomeBtn" title="Asosiy">
+    <svg class="bn-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.2 12 4l9 7.2"/><path d="M5.5 9.8V20h13V9.8"/><path d="M10 20v-6h4v6"/></svg>
+    <span id="bnHomeLabel">Asosiy</span>
+  </button>
+  <button class="bn-item" id="bnTranslateBtn" title="Tarjima">
+    <span class="bn-icon bn-emoji">🌐</span>
+    <span id="bnTranslateLabel">Tarjima</span>
+  </button>
+  <button class="bn-item" id="bnProfileBtn" title="Profil">
+    <span class="bn-icon bn-avatar" id="bnAvatarWrap"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+    <span id="bnProfileLabel">Profil</span>
+  </button>
+</nav>
 
 <div id="translateOverlay" class="overlay hidden">
   <div class="quiz-modal translate-modal">
@@ -738,7 +766,8 @@ const I18N = {
     themeTitle: "Tungi/kunduzgi rejim", profileTitleAttr: "Profil", langTitleAttr: "Ilova tilini tanlash",
     tabTranslate: "MATN", translateBtnTitle: "Matn tarjimon",
     ttPlaceholder: "Matnni shu yerga yozing yoki joylashtiring...",
-    ttTranslateBtnText: "Tarjima qilish"
+    ttTranslateBtnText: "Tarjima qilish",
+    navHome: "Asosiy", navTranslate: "Tarjima", navProfile: "Profil"
   },
   en: {
     appTitle: "My Vocabulary",
@@ -771,7 +800,8 @@ const I18N = {
     themeTitle: "Dark/light mode", profileTitleAttr: "Profile", langTitleAttr: "Choose app language",
     tabTranslate: "TEXT", translateBtnTitle: "Text translator",
     ttPlaceholder: "Type or paste your text here...",
-    ttTranslateBtnText: "Translate"
+    ttTranslateBtnText: "Translate",
+    navHome: "Home", navTranslate: "Translate", navProfile: "Profile"
   },
   ru: {
     appTitle: "Мой словарь",
@@ -804,7 +834,8 @@ const I18N = {
     themeTitle: "Тёмный/светлый режим", profileTitleAttr: "Профиль", langTitleAttr: "Выбрать язык приложения",
     tabTranslate: "ТЕКСТ", translateBtnTitle: "Переводчик текста",
     ttPlaceholder: "Введите или вставьте текст сюда...",
-    ttTranslateBtnText: "Перевести"
+    ttTranslateBtnText: "Перевести",
+    navHome: "Главная", navTranslate: "Перевод", navProfile: "Профиль"
   }
 };
 
@@ -819,8 +850,6 @@ function t(key, ...args){
 function applyStaticI18n(){
   document.documentElement.lang = currentLang;
   document.getElementById('appTitle').textContent = t('appTitle');
-  document.getElementById('tabWordsBtn').textContent = t('tabWords');
-  document.getElementById('tabTestBtn').textContent = t('tabTest');
   document.getElementById('statTotalLabel').textContent = t('statTotal');
   document.getElementById('statMemorizedLabel').textContent = t('statMemorized');
   document.getElementById('statReadyLabel').textContent = t('statReady');
@@ -831,11 +860,14 @@ function applyStaticI18n(){
   document.getElementById('colLearningLabel').textContent = t('colLearning');
   document.getElementById('colMemorizedLabel').textContent = t('colMemorized');
   document.getElementById('langModalTitle').textContent = t('langModalTitle');
-  document.getElementById('profileBtn').title = t('profileTitleAttr');
   document.getElementById('langSwitchBtn').title = t('langTitleAttr');
   document.getElementById('themeToggleBtn').title = t('themeTitle');
-  document.getElementById('tabTranslateBtn').textContent = t('tabTranslate');
-  document.getElementById('translateBtn').title = t('translateBtnTitle');
+  document.getElementById('bnHomeLabel').textContent = t('navHome');
+  document.getElementById('bnTranslateLabel').textContent = t('navTranslate');
+  document.getElementById('bnProfileLabel').textContent = t('navProfile');
+  document.getElementById('bnHomeBtn').title = t('navHome');
+  document.getElementById('bnTranslateBtn').title = t('translateBtnTitle');
+  document.getElementById('bnProfileBtn').title = t('profileTitleAttr');
   document.getElementById('ttInput').placeholder = t('ttPlaceholder');
   document.getElementById('ttTranslateBtn').textContent = t('ttTranslateBtnText');
   if(typeof updateTtLabels === 'function') updateTtLabels();
@@ -1165,16 +1197,28 @@ wordInput.addEventListener('keydown', (e) => {
   }
 });
 
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    if(btn.dataset.view === 'quiz-tab'){
-      openQuizIfPossible();
-    } else if(btn.dataset.view === 'translate-tab'){
-      openTranslateModal();
-    }
-  });
+const bnHomeBtn = document.getElementById('bnHomeBtn');
+const bnTranslateBtn = document.getElementById('bnTranslateBtn');
+const bnProfileBtn = document.getElementById('bnProfileBtn');
+
+function setActiveNav(btn){
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+bnHomeBtn.addEventListener('click', () => {
+  setActiveNav(bnHomeBtn);
+  translateOverlay.classList.add('hidden');
+  profileOverlay.classList.add('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+bnTranslateBtn.addEventListener('click', () => {
+  setActiveNav(bnTranslateBtn);
+  openTranslateModal();
+});
+bnProfileBtn.addEventListener('click', () => {
+  setActiveNav(bnProfileBtn);
+  openProfile();
 });
 
 document.getElementById('startQuizBtn').addEventListener('click', openQuizIfPossible);
@@ -1329,7 +1373,6 @@ document.querySelectorAll('.lang-option').forEach(btn => {
 
 // ---------- Profile modal ----------
 const profileOverlay = document.getElementById('profileOverlay');
-const profileBtn = document.getElementById('profileBtn');
 const profileClose = document.getElementById('profileClose');
 const profileBody = document.getElementById('profileBody');
 
@@ -1348,9 +1391,10 @@ function initialsOf(user){
 
 function renderProfileButton(){
   const user = getTelegramUser();
-  const wrap = document.getElementById('profileAvatarWrap');
+  const wrap = document.getElementById('bnAvatarWrap');
+  if(!wrap) return;
   if(user && user.photo_url){
-    wrap.outerHTML = `<img id="profileAvatarWrap" src="${user.photo_url}" alt="">`;
+    wrap.innerHTML = `<img src="${user.photo_url}" alt="">`;
   } else if(user){
     wrap.textContent = initialsOf(user);
   }
@@ -1381,9 +1425,8 @@ function openProfile(){
   profileOverlay.classList.remove('hidden');
 }
 
-profileBtn.addEventListener('click', openProfile);
-profileClose.addEventListener('click', () => profileOverlay.classList.add('hidden'));
-profileOverlay.addEventListener('click', (e) => { if(e.target === profileOverlay) profileOverlay.classList.add('hidden'); });
+profileClose.addEventListener('click', () => { profileOverlay.classList.add('hidden'); setActiveNav(bnHomeBtn); });
+profileOverlay.addEventListener('click', (e) => { if(e.target === profileOverlay){ profileOverlay.classList.add('hidden'); setActiveNav(bnHomeBtn); } });
 
 // ---------- Init ----------
 if(window.Telegram && window.Telegram.WebApp){
@@ -1395,7 +1438,6 @@ if(window.Telegram && window.Telegram.WebApp){
 // ---------- Text translator ----------
 let ttDirection = 'en-uz';
 const translateOverlay = document.getElementById('translateOverlay');
-const translateBtn = document.getElementById('translateBtn');
 const translateClose = document.getElementById('translateClose');
 const ttFromEl = document.getElementById('ttFrom');
 const ttToEl = document.getElementById('ttTo');
@@ -1419,9 +1461,8 @@ function openTranslateModal(){
   translateOverlay.classList.remove('hidden');
 }
 
-translateBtn.addEventListener('click', openTranslateModal);
-translateClose.addEventListener('click', () => translateOverlay.classList.add('hidden'));
-translateOverlay.addEventListener('click', (e) => { if(e.target === translateOverlay) translateOverlay.classList.add('hidden'); });
+translateClose.addEventListener('click', () => { translateOverlay.classList.add('hidden'); setActiveNav(bnHomeBtn); });
+translateOverlay.addEventListener('click', (e) => { if(e.target === translateOverlay){ translateOverlay.classList.add('hidden'); setActiveNav(bnHomeBtn); } });
 
 ttSwapBtn.addEventListener('click', () => {
   ttDirection = ttDirection === 'en-uz' ? 'uz-en' : 'en-uz';
