@@ -30,30 +30,35 @@
     --ring-shadow: #efe6c9;
     --tape-overlay: rgba(255,255,255,0.55);
     --card-shadow: 0 1px 0 rgba(36,33,27,0.06), 0 6px 16px -8px rgba(36,33,27,0.25);
+    --btn-text: #F6F1E4;
   }
+  
+  /* Mukammallashtirilgan Tungi Rejim (Deep Midnight Obsidian) */
   html[data-theme="dark"]{
-    --paper: #1E1B16;
-    --paper-dark: #2A251E;
-    --paper-line: #3A3327;
-    --ink: #ECE4D3;
-    --ink-soft: #a89f8a;
-    --red: #E2685A;
-    --red-soft: #c9584c;
-    --gold: #E0B84D;
-    --green: #7FAE8D;
-    --green-soft: #24352a;
-    --navy: #7C93C7;
-    --surface: #29241D;
-    --binder-a: #2b2620;
-    --binder-b: #221d18;
-    --binder-border: #4a4030;
-    --ring-a: #4a4436;
-    --ring-b: #6b5f42;
-    --ring-c: #3a3225;
-    --ring-shadow: #352f24;
-    --tape-overlay: rgba(255,255,255,0.08);
-    --card-shadow: 0 1px 0 rgba(0,0,0,0.2), 0 6px 16px -8px rgba(0,0,0,0.6);
+    --paper: #12151C;
+    --paper-dark: #1C222E;
+    --paper-line: #262D3B;
+    --ink: #F1F5F9;
+    --ink-soft: #94A3B8;
+    --red: #F87171;
+    --red-soft: #3A1E20;
+    --gold: #F59E0B;
+    --green: #34D399;
+    --green-soft: #133829;
+    --navy: #60A5FA;
+    --surface: #1A1E29;
+    --binder-a: #1C212B;
+    --binder-b: #141720;
+    --binder-border: #2D3646;
+    --ring-a: #475569;
+    --ring-b: #334155;
+    --ring-c: #1E293B;
+    --ring-shadow: #0F172A;
+    --tape-overlay: rgba(255,255,255,0.06);
+    --card-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    --btn-text: #12151C;
   }
+
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
@@ -65,7 +70,13 @@
     min-height:100vh;
   }
 
-  /* ---------- 2 SONIYALIK ANIMATSIYA (SPLASH SCREEN) STILI ---------- */
+  /* Input va Textarea placeholder matni kontrasti */
+  input::placeholder, textarea::placeholder {
+    color: var(--ink-soft);
+    opacity: 0.75;
+  }
+
+  /* ---------- 2 SONIYALIK KIRISH ANIMATSIYASI ---------- */
   .splash-screen {
     position: fixed;
     inset: 0;
@@ -110,7 +121,6 @@
     animation: textPulse 2s ease-in-out infinite;
   }
 
-  /* Keyframe Animatsiyalar */
   @keyframes splashPop {
     0% { transform: scale(0.8); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
@@ -167,7 +177,7 @@
   }
   main{flex:1; padding:34px 40px 110px; min-width:0;}
 
-  /* ---------- Bottom nav (Liquid Glass) ---------- */
+  /* ---------- Bottom nav (Liquid Glass / Glassmorphism) ---------- */
   .bottom-nav{
     position:fixed;
     left:50%;
@@ -179,21 +189,21 @@
     align-items:stretch;
     justify-content:space-between;
     gap:4px;
-    background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius:24px;
     padding:6px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12), inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+    box-shadow: 0 12px 32px 0 rgba(31, 38, 135, 0.12), inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
     z-index:40;
     transition: all .25s ease;
   }
 
   html[data-theme="dark"] .bottom-nav {
-    background: rgba(30, 27, 22, 0.55);
+    background: rgba(26, 30, 41, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   .bn-item{
@@ -214,15 +224,16 @@
     font-weight:600;
     transition:all .2s ease;
   }
-  .bn-item:hover{ color: var(--ink); background: rgba(255, 255, 255, 0.25); }
+  .bn-item:hover{ color: var(--ink); background: rgba(255, 255, 255, 0.15); }
   .bn-item.active{
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.7);
     color: var(--navy);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
   html[data-theme="dark"] .bn-item.active {
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--gold);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
   }
   .bn-icon{display:flex; align-items:center; justify-content:center; height:22px;}
   .bn-emoji{font-size:19px; line-height:1;}
@@ -234,7 +245,7 @@
     color: var(--ink);
   }
   .bn-avatar img{width:100%; height:100%; object-fit:cover; display:block;}
-  .bn-item.active .bn-avatar{box-shadow:0 0 0 2px var(--navy);}
+  .bn-item.active .bn-avatar{box-shadow:0 0 0 2px var(--gold);}
 
   /* ---------- Header / cover ---------- */
   .cover{margin-bottom:22px; position:relative;}
@@ -332,8 +343,8 @@
   .tt-translate-btn{
     display:block;
     margin:14px auto 0;
-    background:var(--navy);
-    color:var(--surface);
+    background:var(--ink);
+    color:var(--btn-text);
     border:none;
     font-family:'Inter', sans-serif;
     font-weight:600;
@@ -361,7 +372,7 @@
     font-family:'Fraunces', serif;
     font-weight:700;
     font-size:34px;
-    background: linear-gradient(180deg, rgba(201,151,31,0.18), rgba(201,151,31,0.18));
+    background: linear-gradient(180deg, rgba(201,151,31,0.22), rgba(201,151,31,0.22));
     padding:6px 18px 8px;
     transform:rotate(-1.2deg);
     position:relative;
@@ -432,6 +443,7 @@
     border:1.5px solid var(--paper-line);
     border-radius:10px;
     background:var(--surface);
+    color:var(--ink);
     outline:none;
     transition:border-color .15s;
   }
@@ -444,7 +456,7 @@
     border:none;
     border-radius:10px;
     background:var(--ink);
-    color:#F6F1E4;
+    color:var(--btn-text);
     cursor:pointer;
     transition:background .15s, transform .1s;
   }
@@ -464,7 +476,7 @@
     padding:14px 18px;
     margin-bottom:20px;
     font-size:14.5px;
-    color:#2f4f3a;
+    color:var(--ink);
   }
   .quiz-banner.hidden{display:none;}
   .quiz-banner button{
@@ -582,7 +594,8 @@
 
   .overlay{
     position:fixed; inset:0;
-    background:rgba(36,33,27,0.55);
+    background:rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
     display:flex; align-items:center; justify-content:center;
     z-index:50;
     padding:20px;
@@ -594,8 +607,9 @@
     width:100%; max-width:520px;
     border-radius:16px;
     padding:30px 32px 26px;
-    box-shadow:0 20px 60px rgba(0,0,0,0.35);
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
     position:relative;
+    border: 1px solid var(--paper-line);
   }
   .quiz-modal h3{
     font-family:'Fraunces', serif;
@@ -627,13 +641,14 @@
     padding:12px 16px;
     border:1.5px solid var(--paper-line);
     background:var(--surface);
+    color:var(--ink);
     border-radius:9px;
     cursor:pointer;
     transition:border-color .12s, background .12s;
   }
   .quiz-option:hover{border-color:var(--navy);}
   .quiz-option.correct{border-color:var(--green); background:var(--green-soft);}
-  .quiz-option.wrong{border-color:var(--red); background:#f6e0dc;}
+  .quiz-option.wrong{border-color:var(--red); background:var(--red-soft);}
   .quiz-option:disabled{cursor:default;}
   .quiz-close{
     position:absolute; top:16px; right:18px;
@@ -642,7 +657,7 @@
   .quiz-footer{margin-top:20px; display:flex; justify-content:flex-end;}
   .next-btn{
     font-family:'Inter'; font-weight:700; font-size:13.5px;
-    background:var(--ink); color:#F6F1E4;
+    background:var(--ink); color:var(--btn-text);
     border:none; padding:10px 20px; border-radius:8px; cursor:pointer;
   }
   .next-btn:disabled{opacity:0.35; cursor:default;}
@@ -819,7 +834,6 @@
 </div>
 
 <script>
-// ANIMATSIYANI AYANAN 2 SONIYADAN SO'NG SILLIQ YO'QOTISH
 setTimeout(() => {
   const splash = document.getElementById('splashScreen');
   if (splash) splash.classList.add('fade-out');
