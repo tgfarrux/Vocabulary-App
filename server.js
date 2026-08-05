@@ -9,19 +9,72 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Google Translate zaxira xizmati
+// So'z turkumlarini o'zbekchaga o'girish xaritasi
+const POS_MAP = {
+  noun: "ot",
+  verb: "fe'l",
+  adjective: "sifat",
+  adverb: "ravish",
+  pronoun: "olmosh",
+  preposition: "predlog",
+  conjunction: "bog'lovchi",
+  interjection: "undov"
+};
+
+// 1. Google Translate bepul xizmati
 async function translateWithGoogle(text, fromLang, toLang) {
-  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Google Translate xatosi');
-  const data = await res.json();
-  if (data && data[0]) {
-    return data[0].map(item => item[0]).join('');
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Google Translate xatosi');
+    const data = await res.json();
+    if (data && data[0]) {
+      return data[0].map(item => item[0]).join('');
+    }
+  } catch (e) {
+    console.error('Google Translate xabari:', e.message);
   }
-  throw new Error('Tarjima olinmadi');
+  return text;
 }
 
-// 1. So'z tarjima qilish va sifatli B1-B2 gap tuzish API
+// 2. Free Dictionary API orqali haqiqiy gap, talaffuz va so'z turkumini olish
+async function fetchFreeDictionaryData(word) {
+  try {
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data) || !data[0]) return null;
+
+    const entry = data[0];
+    let ipa = entry.phonetics?.find(p => p.text)?.text || `[${word}]`;
+    let pos = "so'z";
+    let exampleSentence = "";
+
+    if (entry.meanings && entry.meanings.length > 0) {
+      const primaryMeaning = entry.meanings[0];
+      const rawPos = primaryMeaning.partOfSpeech;
+      pos = POS_MAP[rawPos] || rawPos || "so'z";
+
+      // Barcha ma'nolardan namuna gap qidirish
+      for (const m of entry.meanings) {
+        for (const d of m.definitions || []) {
+          if (d.example) {
+            exampleSentence = d.example;
+            break;
+          }
+        }
+        if (exampleSentence) break;
+      }
+    }
+
+    return { ipa, pos, exampleSentence };
+  } catch (e) {
+    console.warn('Free Dictionary API xatosi:', e.message);
+    return null;
+  }
+}
+
+// MAIN API: So'z tarjima qilish va gap tuzish
 app.post('/api/translate', async (req, res) => {
   try {
     const word = (req.body && req.body.word || '').trim();
@@ -31,22 +84,23 @@ app.post('/api/translate', async (req, res) => {
       return res.status(400).json({ error: "So'z yuborilmadi" });
     }
 
-    // 1-USUL: Gemini AI orqali sifatli, B1/B2 darajadagi gap va tarjima olish
+    // 1-USUL: Gemini AI (Agar kalit sozlangan va ishlayotgan bo'lsa)
     if (GEMINI_API_KEY) {
       try {
         const promptText = `
-        You are an expert English language teacher.
-        Input word: "${word}"
+        You are an expert English teacher.
+        Target Word: "${word}"
         Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
 
-        Generate a JSON object with:
-        1. "en": The English word (lowercase).
-        2. "uzbek": Concise Uzbek translation.
-        3. "transcription": Correct IPA pronunciation in brackets, e.g. [/leɪk/].
-        4. "partOfSpeech": Part of speech in Uzbek (e.g. ot, fe'l, sifat, ravish).
-        5. "example": A natural, meaningful, medium-level (B1/B2 intermediate) English sentence using the English word correctly in real context. Do NOT use generic sentences like "I am learning the word...".
-
-        Return ONLY raw valid JSON.
+        Return ONLY a JSON object with this structure:
+        {
+          "en": "English word in lowercase",
+          "uzbek": "Short Uzbek translation",
+          "transcription": "IPA pronunciation, e.g. [/haɪd/]",
+          "partOfSpeech": "Part of speech in Uzbek (fe'l, ot, sifat, ravish)",
+          "example": "A natural, realistic B1-B2 level intermediate sentence using the English word."
+        }
+        Do NOT use generic text like "I am learning the word...". Make the sentence realistic.
         `;
 
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -77,13 +131,16 @@ app.post('/api/translate', async (req, res) => {
               });
             }
           }
+        } else {
+          const errBody = await aiResponse.text();
+          console.error('Gemini API xatosi kodi:', aiResponse.status, errBody);
         }
       } catch (aiErr) {
-        console.warn('Gemini AI xatosi, zaxiraga o\'tilmoqda:', aiErr.message);
+        console.warn('Gemini AI ishlamadi, zaxiraga o\'tilmoqda:', aiErr.message);
       }
     }
 
-    // 2-USUL (ZAXIRA): Google Translate
+    // 2-USUL (MUKAMMAL ZAXIRA): Free Dictionary API + Google Translate
     const fromLang = direction === 'uz-en' ? 'uz' : 'en';
     const toLang = direction === 'uz-en' ? 'en' : 'uz';
     const translatedText = await translateWithGoogle(word, fromLang, toLang);
@@ -91,24 +148,37 @@ app.post('/api/translate', async (req, res) => {
     const enWord = direction === 'en-uz' ? word.toLowerCase() : translatedText.toLowerCase();
     const uzWord = direction === 'en-uz' ? translatedText : word;
 
-    const backupExamples = [
-      `We noticed the word "${enWord}" used frequently in the article.`,
-      `Understanding how to use "${enWord}" properly will improve your vocabulary.`,
-      `She explained the meaning of "${enWord}" with a clear situation.`
-    ];
-    const randomExample = backupExamples[Math.floor(Math.random() * backupExamples.length)];
+    // Lug'at bazasidan ma'lumotlarni tortish
+    const dictData = await fetchFreeDictionaryData(enWord);
+
+    let finalPos = dictData?.pos || "so'z";
+    let finalIpa = dictData?.ipa || `[${enWord}]`;
+    let finalExample = dictData?.exampleSentence;
+
+    // Gar sentence topilmagan bo'lsa, turkumiga qarab o'rtacha darajadagi tabiiy gaplar yasash
+    if (!finalExample) {
+      if (finalPos === "fe'l") {
+        finalExample = `It is important to ${enWord} carefully when you are in this situation.`;
+      } else if (finalPos === "sifat") {
+        finalExample = `She gave a very ${enWord} explanation that helped everyone understand.`;
+      } else if (finalPos === "ravish") {
+        finalExample = `He completed the whole assignment ${enWord} without any help.`;
+      } else {
+        finalExample = `We need to consider the ${enWord} before making our final decision.`;
+      }
+    }
 
     res.json({
       en: enWord,
       uzbek: uzWord,
-      example: randomExample,
-      transcription: `[${enWord}]`,
-      partOfSpeech: "so'z"
+      example: finalExample,
+      transcription: finalIpa,
+      partOfSpeech: finalPos
     });
 
   } catch (e) {
-    console.error('Tarjimada xatolik:', e.message);
-    res.status(500).json({ error: 'Tarjima qilishda xatolik yuz berdi' });
+    console.error('Server xatosi:', e.message);
+    res.status(500).json({ error: 'Serverda xatolik yuz berdi' });
   }
 });
 
