@@ -418,7 +418,7 @@
   .col h2 span{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); font-weight:400;}
   .cards{display:flex; flex-direction:column; gap:12px;}
 
-  /* ---------- CARD va TUZATILGAN STAMP (MUHR) STILI ---------- */
+  /* ---------- KARTOCHKA VA IXCHAM NISHON (MEMORIZED BADGE) ---------- */
   .card{
     background:var(--surface);
     border:1px solid var(--paper-line);
@@ -431,7 +431,7 @@
   .card.pending{opacity:0.6;}
   .card-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
   .en-word{font-family:'Fraunces', serif; font-weight:600; font-size:19px;}
-  .card-actions{display:flex; gap:6px; flex-shrink:0; z-index: 5;}
+  .card-actions{display:flex; gap:6px; flex-shrink:0;}
   .icon-btn{
     border:none; background:transparent; cursor:pointer;
     width:28px; height:28px; border-radius:6px;
@@ -455,6 +455,22 @@
     padding:2px 8px;
     border-radius:20px;
   }
+
+  /* IXCHAM VA SHINAM YODLANDI NISHONCHASI */
+  .memorized-tag {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green);
+    background: var(--green-soft);
+    border: 1px solid var(--green);
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
   .speak-btn, .copy-btn{
     border:none;
     background:none;
@@ -479,23 +495,6 @@
   .loading-text{font-size:13px; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace;}
   .error-text{font-size:12.5px; color:var(--red); margin-top:4px;}
   .retry-link{color:var(--navy); cursor:pointer; text-decoration:underline; font-weight:600;}
-
-  /* Yodlandi muhri: Pastki o'ng tomonga ko'chirildi va bosilishga xalaqit bermaydi */
-  .stamp{
-    position:absolute;
-    bottom:8px; right:12px;
-    font-family:'Caveat', cursive;
-    font-weight:700;
-    font-size:20px;
-    color:var(--green);
-    border:2px solid var(--green);
-    border-radius:8px;
-    padding:0px 8px 2px;
-    transform:rotate(-6deg);
-    opacity:0.85;
-    letter-spacing:0.02em;
-    pointer-events: none; /* Tugmalarga xalaqit bermasligi uchun */
-  }
 
   .empty{
     color:var(--ink-soft);
@@ -1337,6 +1336,7 @@ function checkQuizReady(){
   quizBanner.classList.toggle('hidden', ready.length < 10);
 }
 
+// IXCHAM NISHONCHA VA O'ZGARTIRILGAN KARTOCHKA KODI
 function cardHtml(w){
   const headword = w.en || w.uz;
   if(w.status === 'loading'){
@@ -1373,13 +1373,13 @@ function cardHtml(w){
     <div class="word-meta">
       ${w.transcription ? `<span class="transcription">${escapeHtml(w.transcription)}</span>` : ''}
       ${w.partOfSpeech ? `<span class="pos-tag">${escapeHtml(w.partOfSpeech)}</span>` : ''}
+      ${w.memorized ? `<span class="memorized-tag">✓ ${t('stamp')}</span>` : ''}
     </div>
     <div class="uz-word">
       ${escapeHtml(w.uz)}
       <button class="copy-btn" onclick="copyText('${escapeJs(w.uz)}', this)" title="${t('titleCopy')}">⧉</button>
     </div>
     <div class="example">${escapeHtml(w.example)}</div>
-    ${w.memorized ? `<div class="stamp">${t('stamp')}</div>` : ''}
   </div>`;
 }
 
