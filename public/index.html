@@ -125,7 +125,7 @@
     pointer-events: none;
   }
 
-  /* ---------- APP LAYOUT VA SURILISH ANIMATSIYASI ---------- */
+  /* ---------- APP LAYOUT ---------- */
   .app{
     display:flex;
     max-width:1180px;
@@ -159,7 +159,6 @@
     position: relative;
   }
 
-  /* Views Slider (Silliq surilish karkasi) */
   .views-wrapper {
     width: 100%;
     overflow: hidden;
@@ -167,7 +166,7 @@
 
   .views-slider {
     display: flex;
-    width: 300%; /* 3 ta bo'lim uchun */
+    width: 300%;
     transition: transform 0.38s cubic-bezier(0.25, 1, 0.35, 1);
     align-items: flex-start;
   }
@@ -419,6 +418,7 @@
   .col h2 span{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); font-weight:400;}
   .cards{display:flex; flex-direction:column; gap:12px;}
 
+  /* ---------- CARD va TUZATILGAN STAMP (MUHR) STILI ---------- */
   .card{
     background:var(--surface);
     border:1px solid var(--paper-line);
@@ -431,10 +431,10 @@
   .card.pending{opacity:0.6;}
   .card-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
   .en-word{font-family:'Fraunces', serif; font-weight:600; font-size:19px;}
-  .card-actions{display:flex; gap:6px; flex-shrink:0;}
+  .card-actions{display:flex; gap:6px; flex-shrink:0; z-index: 5;}
   .icon-btn{
     border:none; background:transparent; cursor:pointer;
-    width:26px; height:26px; border-radius:6px;
+    width:28px; height:28px; border-radius:6px;
     display:flex; align-items:center; justify-content:center;
     color:var(--ink-soft); font-size:14px;
     transition:background .15s, color .15s;
@@ -480,20 +480,23 @@
   .error-text{font-size:12.5px; color:var(--red); margin-top:4px;}
   .retry-link{color:var(--navy); cursor:pointer; text-decoration:underline; font-weight:600;}
 
+  /* Yodlandi muhri: Pastki o'ng tomonga ko'chirildi va bosilishga xalaqit bermaydi */
   .stamp{
     position:absolute;
-    top:10px; right:-6px;
+    bottom:8px; right:12px;
     font-family:'Caveat', cursive;
     font-weight:700;
-    font-size:22px;
+    font-size:20px;
     color:var(--green);
-    border:2.5px solid var(--green);
+    border:2px solid var(--green);
     border-radius:8px;
-    padding:1px 10px 3px;
-    transform:rotate(8deg);
+    padding:0px 8px 2px;
+    transform:rotate(-6deg);
     opacity:0.85;
     letter-spacing:0.02em;
+    pointer-events: none; /* Tugmalarga xalaqit bermasligi uchun */
   }
+
   .empty{
     color:var(--ink-soft);
     font-size:13.5px;
@@ -627,7 +630,6 @@
   .profile-fullname { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; }
   .profile-user-handle { color: var(--ink-soft); font-size: 13.5px; font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
 
-  /* Stats Grid */
   .profile-grid-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -647,7 +649,6 @@
   .stat-card-box b { display: block; font-size: 20px; font-weight: 700; color: var(--ink); }
   .stat-card-box span { font-size: 11.5px; color: var(--ink-soft); font-family: 'IBM Plex Mono', monospace; }
 
-  /* Badges Section */
   .badges-title {
     font-family: 'Fraunces', serif;
     font-size: 16px;
@@ -664,7 +665,7 @@
   }
 
   .badge-item {
-    flex: 0 0 85px;
+    flex: 0 0 90px;
     background: var(--paper);
     border: 1px solid var(--paper-line);
     border-radius: 12px;
@@ -675,7 +676,7 @@
   }
   .badge-item .badge-icon { font-size: 26px; display: block; margin-bottom: 4px; }
 
-  /* ---------- OVERLAYS (MODALS) ---------- */
+  /* ---------- MODALS ---------- */
   .overlay{
     position:fixed; inset:0;
     background:rgba(0,0,0,0.65);
@@ -809,10 +810,10 @@
           </div>
         </div>
 
-        <!-- PANE 2: MATN TARJIMONI (KATTA BO'LIM) -->
+        <!-- PANE 2: MATN TARJIMONI -->
         <div class="view-pane" id="paneTranslate">
           <header class="cover">
-            <div class="tape">Matn Tarjimoni</div>
+            <div class="tape" id="transTitle">Matn Tarjimoni</div>
           </header>
 
           <div class="trans-section-card">
@@ -826,8 +827,8 @@
             
             <div class="trans-bar-actions">
               <div class="trans-action-btn-group">
-                <button class="action-pill-btn" id="ttInputSpeak">🔊 Eshitish</button>
-                <button class="action-pill-btn" id="ttInputClear">✕ Tozalash</button>
+                <button class="action-pill-btn" id="ttInputSpeak">🔊 <span id="lblBtnListen1">Eshitish</span></button>
+                <button class="action-pill-btn" id="ttInputClear">✕ <span id="lblBtnClear">Tozalash</span></button>
               </div>
               <button id="ttTranslateBtn" class="btn-submit-big">Tarjima qilish</button>
             </div>
@@ -836,17 +837,17 @@
 
             <div class="trans-bar-actions">
               <div class="trans-action-btn-group">
-                <button class="action-pill-btn" id="ttOutputSpeak">🔊 Eshitish</button>
-                <button class="action-pill-btn" id="ttOutputCopy">⧉ Nusxalash</button>
+                <button class="action-pill-btn" id="ttOutputSpeak">🔊 <span id="lblBtnListen2">Eshitish</span></button>
+                <button class="action-pill-btn" id="ttOutputCopy">⧉ <span id="lblBtnCopy">Nusxalash</span></button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- PANE 3: PROFIL (KATTA BO'LIM) -->
+        <!-- PANE 3: PROFIL -->
         <div class="view-pane" id="paneProfile">
           <header class="cover">
-            <div class="tape">Mening Profilim</div>
+            <div class="tape" id="profTitle">Mening Profilim</div>
           </header>
 
           <div class="profile-page-card">
@@ -858,35 +859,35 @@
             <div class="profile-grid-stats">
               <div class="stat-card-box">
                 <b id="profWordsCount">0</b>
-                <span>SO'ZLAR</span>
+                <span id="profStatWords">SO'ZLAR</span>
               </div>
               <div class="stat-card-box">
                 <b id="profMemorizedCount">0</b>
-                <span>YODLANGAN</span>
+                <span id="profStatMemorized">YODLANGAN</span>
               </div>
               <div class="stat-card-box">
                 <b id="profStreakCount">🔥 3</b>
-                <span>STREAK KUN</span>
+                <span id="profStatStreak">STREAK KUN</span>
               </div>
             </div>
 
-            <div class="badges-title">🏅 Yutuqlar va Nishonlar</div>
+            <div class="badges-title" id="profBadgesTitle">🏅 Yutuqlar va Nishonlar</div>
             <div class="badges-container">
               <div class="badge-item">
                 <span class="badge-icon">🎯</span>
-                <span>Dastlabki 10 so'z</span>
+                <span id="badgeFirst10">Dastlabki 10 so'z</span>
               </div>
               <div class="badge-item">
                 <span class="badge-icon">🔥</span>
-                <span>3 Kunlik Streak</span>
+                <span id="badgeStreak3">3 Kunlik Streak</span>
               </div>
               <div class="badge-item">
                 <span class="badge-icon">🧠</span>
-                <span>Xotira Ustasi</span>
+                <span id="badgeMaster">Xotira Ustasi</span>
               </div>
               <div class="badge-item">
                 <span class="badge-icon">⚡</span>
-                <span>Tungi Bilimdon</span>
+                <span id="badgeNight">Tungi Bilimdon</span>
               </div>
             </div>
           </div>
@@ -933,7 +934,6 @@
 </div>
 
 <script>
-// ANIMATSIYA
 setTimeout(() => {
   const splash = document.getElementById('splashScreen');
   if (splash) splash.classList.add('fade-out');
@@ -951,10 +951,10 @@ const quizBanner = document.getElementById('quizBanner');
 const quizOverlay = document.getElementById('quizOverlay');
 const quizBody = document.getElementById('quizBody');
 
+// ---------- TO'LIQ LUG'AT I18N DICTIONARY ----------
 const I18N = {
   uz: {
     appTitle: "Lug'at daftarcham",
-    tabWords: "SO'ZLAR", tabTest: "TEST",
     statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
     addBtn: "Qo'shish",
     hint: "Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.",
@@ -977,17 +977,21 @@ const I18N = {
     quizTitle: "So'z testi", quizQuestion: "Savol", quizScore: "Ball", quizNext: "Keyingisi",
     quizFinished: "Test yakunlandi", quizCorrect: "to'g'ri javob", quizClose: "Yopish",
     resultExcellent: "A'LO!", resultGreat: "ZO'R!", resultGood: "YAXSHI", resultRetry: "YANA URINING",
-    profileTitle: "Profil", profileNoUser: "Telegram foydalanuvchisi topilmadi",
-    profileWords: "so'z", profileMemorized: "yodlangan",
     langModalTitle: "Ilova tilini tanlang",
     themeTitle: "Tungi/kunduzgi rejim", profileTitleAttr: "Profil", langTitleAttr: "Ilova tilini tanlash",
+    navHome: "Asosiy", navTranslate: "Tarjima", navProfile: "Profil",
+    transTitle: "Matn Tarjimoni",
     ttPlaceholder: "Matn yoki gapni kiriting...",
+    ttResultPlaceholder: "Tarjima natijasi shu yerda ko'rinadi...",
     ttTranslateBtnText: "Tarjima qilish",
-    navHome: "Asosiy", navTranslate: "Tarjima", navProfile: "Profil"
+    btnListen: "Eshitish", btnClear: "Tozalash", btnCopy: "Nusxalash",
+    profTitle: "Mening Profilim",
+    profStatWords: "SO'ZLAR", profStatMemorized: "YODLANGAN", profStatStreak: "STREAK KUN",
+    profBadgesTitle: "🏅 Yutuqlar va Nishonlar",
+    badgeFirst10: "Dastlabki 10 so'z", badgeStreak3: "3 Kunlik Streak", badgeMaster: "Xotira Ustasi", badgeNight: "Tungi Bilimdon"
   },
   en: {
     appTitle: "My Vocabulary",
-    tabWords: "WORDS", tabTest: "TEST",
     statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
     addBtn: "Add",
     hint: "When you add a word, its Uzbek meaning and an example sentence are generated automatically.",
@@ -1010,17 +1014,21 @@ const I18N = {
     quizTitle: "Word quiz", quizQuestion: "Question", quizScore: "Score", quizNext: "Next",
     quizFinished: "Quiz finished", quizCorrect: "correct answers", quizClose: "Close",
     resultExcellent: "EXCELLENT!", resultGreat: "GREAT!", resultGood: "GOOD", resultRetry: "TRY AGAIN",
-    profileTitle: "Profile", profileNoUser: "Telegram user not found",
-    profileWords: "words", profileMemorized: "memorized",
     langModalTitle: "Choose app language",
     themeTitle: "Dark/light mode", profileTitleAttr: "Profile", langTitleAttr: "Choose app language",
+    navHome: "Home", navTranslate: "Translate", navProfile: "Profile",
+    transTitle: "Text Translator",
     ttPlaceholder: "Type or paste your text here...",
+    ttResultPlaceholder: "Translation result will appear here...",
     ttTranslateBtnText: "Translate",
-    navHome: "Home", navTranslate: "Translate", navProfile: "Profile"
+    btnListen: "Listen", btnClear: "Clear", btnCopy: "Copy",
+    profTitle: "My Profile",
+    profStatWords: "WORDS", profStatMemorized: "MEMORIZED", profStatStreak: "STREAK DAYS",
+    profBadgesTitle: "🏅 Achievements & Badges",
+    badgeFirst10: "First 10 words", badgeStreak3: "3 Day Streak", badgeMaster: "Memory Master", badgeNight: "Night Scholar"
   },
   ru: {
     appTitle: "Мой словарь",
-    tabWords: "СЛОВА", tabTest: "ТЕСТ",
     statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
     addBtn: "Добавить",
     hint: "При добавлении слова автоматически создаются перевод на узбекский и пример предложения.",
@@ -1043,13 +1051,18 @@ const I18N = {
     quizTitle: "Тест слов", quizQuestion: "Вопрос", quizScore: "Балл", quizNext: "Далее",
     quizFinished: "Тест завершён", quizCorrect: "правильных ответов", quizClose: "Закрыть",
     resultExcellent: "ОТЛИЧНО!", resultGreat: "ЗДОРОВО!", resultGood: "ХОРОШО", resultRetry: "ПОПРОБУЙТЕ ЕЩЁ",
-    profileTitle: "Профиль", profileNoUser: "Пользователь Telegram не найден",
-    profileWords: "слов", profileMemorized: "выучено",
     langModalTitle: "Выберите язык приложения",
     themeTitle: "Тёмный/светлый режим", profileTitleAttr: "Профиль", langTitleAttr: "Выбрать язык приложения",
+    navHome: "Главная", navTranslate: "Перевод", navProfile: "Профиль",
+    transTitle: "Переводчик текста",
     ttPlaceholder: "Введите или вставьте текст сюда...",
+    ttResultPlaceholder: "Результат перевода появится здесь...",
     ttTranslateBtnText: "Перевести",
-    navHome: "Главная", navTranslate: "Перевод", navProfile: "Профиль"
+    btnListen: "Слушать", btnClear: "Очистить", btnCopy: "Копировать",
+    profTitle: "Мой профиль",
+    profStatWords: "СЛОВА", profStatMemorized: "ВЫУЧЕНО", profStatStreak: "СТРИК ДНЕЙ",
+    profBadgesTitle: "🏅 Достижения и значки",
+    badgeFirst10: "Первые 10 слов", badgeStreak3: "3 дня стрика", badgeMaster: "Мастер памяти", badgeNight: "Ночной эрудит"
   }
 };
 
@@ -1063,6 +1076,8 @@ function t(key, ...args){
 
 function applyStaticI18n(){
   document.documentElement.lang = currentLang;
+  
+  // Home Pane
   document.getElementById('appTitle').textContent = t('appTitle');
   document.getElementById('statTotalLabel').textContent = t('statTotal');
   document.getElementById('statMemorizedLabel').textContent = t('statMemorized');
@@ -1076,11 +1091,36 @@ function applyStaticI18n(){
   document.getElementById('langModalTitle').textContent = t('langModalTitle');
   document.getElementById('langSwitchBtn').title = t('langTitleAttr');
   document.getElementById('themeToggleBtn').title = t('themeTitle');
+  
+  // Navigation
   document.getElementById('bnHomeLabel').textContent = t('navHome');
   document.getElementById('bnTranslateLabel').textContent = t('navTranslate');
   document.getElementById('bnProfileLabel').textContent = t('navProfile');
+  
+  // Translate Pane
+  document.getElementById('transTitle').textContent = t('transTitle');
   document.getElementById('ttInput').placeholder = t('ttPlaceholder');
   document.getElementById('ttTranslateBtn').textContent = t('ttTranslateBtnText');
+  document.getElementById('lblBtnListen1').textContent = t('btnListen');
+  document.getElementById('lblBtnListen2').textContent = t('btnListen');
+  document.getElementById('lblBtnClear').textContent = t('btnClear');
+  document.getElementById('lblBtnCopy').textContent = t('btnCopy');
+  const ttOut = document.getElementById('ttOutput');
+  if(ttOut.classList.contains('placeholder')){
+    ttOut.textContent = t('ttResultPlaceholder');
+  }
+
+  // Profile Pane
+  document.getElementById('profTitle').textContent = t('profTitle');
+  document.getElementById('profStatWords').textContent = t('profStatWords');
+  document.getElementById('profStatMemorized').textContent = t('profStatMemorized');
+  document.getElementById('profStatStreak').textContent = t('profStatStreak');
+  document.getElementById('profBadgesTitle').textContent = t('profBadgesTitle');
+  document.getElementById('badgeFirst10').textContent = t('badgeFirst10');
+  document.getElementById('badgeStreak3').textContent = t('badgeStreak3');
+  document.getElementById('badgeMaster').textContent = t('badgeMaster');
+  document.getElementById('badgeNight').textContent = t('badgeNight');
+
   document.querySelectorAll('.lang-option').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === currentLang);
   });
@@ -1322,7 +1362,6 @@ function cardHtml(w){
     </div>`;
   }
   return `<div class="card">
-    ${w.memorized ? `<div class="stamp">${t('stamp')}</div>` : ''}
     <div class="card-top">
       <div class="en-word">${escapeHtml(w.en)}</div>
       <div class="card-actions">
@@ -1340,6 +1379,7 @@ function cardHtml(w){
       <button class="copy-btn" onclick="copyText('${escapeJs(w.uz)}', this)" title="${t('titleCopy')}">⧉</button>
     </div>
     <div class="example">${escapeHtml(w.example)}</div>
+    ${w.memorized ? `<div class="stamp">${t('stamp')}</div>` : ''}
   </div>`;
 }
 
@@ -1577,7 +1617,7 @@ document.querySelectorAll('.lang-option').forEach(btn => {
   });
 });
 
-// ---------- KATTA MATN TARJIMONI (PANE 2) LOGIKASI ----------
+// ---------- MATN TARJIMONI (PANE 2) ----------
 let ttDirection = 'en-uz';
 const ttFromEl = document.getElementById('ttFrom');
 const ttToEl = document.getElementById('ttTo');
@@ -1603,7 +1643,7 @@ ttSwapBtn.addEventListener('click', () => {
   setTimeout(() => ttSwapBtn.classList.remove('spin'), 200);
   const oldInput = ttInput.value;
   ttInput.value = ttOutput.textContent && !ttOutput.classList.contains('placeholder') ? ttOutput.textContent : oldInput;
-  ttOutput.textContent = t('ttPlaceholder');
+  ttOutput.textContent = t('ttResultPlaceholder');
   ttOutput.classList.add('placeholder');
 });
 
@@ -1632,7 +1672,7 @@ async function runTranslateText(){
 ttTranslateBtn.addEventListener('click', runTranslateText);
 document.getElementById('ttInputClear').addEventListener('click', () => {
   ttInput.value = '';
-  ttOutput.textContent = 'Tarjima natijasi shu yerda ko\'rinadi...';
+  ttOutput.textContent = t('ttResultPlaceholder');
   ttOutput.classList.add('placeholder');
   ttInput.focus();
 });
@@ -1649,7 +1689,7 @@ document.getElementById('ttOutputCopy').addEventListener('click', (e) => {
   if(text && !ttOutput.classList.contains('placeholder')) copyText(text, e.currentTarget);
 });
 
-// ---------- PROFIL BO'LIMI (PANE 3) LOGIKASI ----------
+// ---------- PROFIL (PANE 3) ----------
 function getTelegramUser(){
   if(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe){
     return window.Telegram.WebApp.initDataUnsafe.user || null;
