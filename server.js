@@ -7,7 +7,9 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Bepul va tezkor Google Translate funksiyasi
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+// Google Translate zaxira xizmati
 async function translateWithGoogle(text, fromLang, toLang) {
   const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
   const res = await fetch(url);
@@ -19,34 +21,87 @@ async function translateWithGoogle(text, fromLang, toLang) {
   throw new Error('Tarjima olinmadi');
 }
 
-// 1. So'z tarjima qilish API
+// 1. So'z tarjima qilish va sifatli B1-B2 gap tuzish API
 app.post('/api/translate', async (req, res) => {
   try {
     const word = (req.body && req.body.word || '').trim();
     const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
-    
+
     if (!word) {
       return res.status(400).json({ error: "So'z yuborilmadi" });
     }
 
+    // 1-USUL: Gemini AI orqali sifatli, B1/B2 darajadagi gap va tarjima olish
+    if (GEMINI_API_KEY) {
+      try {
+        const promptText = `
+        You are an expert English language teacher.
+        Input word: "${word}"
+        Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
+
+        Generate a JSON object with:
+        1. "en": The English word (lowercase).
+        2. "uzbek": Concise Uzbek translation.
+        3. "transcription": Correct IPA pronunciation in brackets, e.g. [/leɪk/].
+        4. "partOfSpeech": Part of speech in Uzbek (e.g. ot, fe'l, sifat, ravish).
+        5. "example": A natural, meaningful, medium-level (B1/B2 intermediate) English sentence using the English word correctly in real context. Do NOT use generic sentences like "I am learning the word...".
+
+        Return ONLY raw valid JSON.
+        `;
+
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const aiResponse = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: promptText }] }],
+            generationConfig: {
+              temperature: 0.7,
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (aiResponse.ok) {
+          const aiData = await aiResponse.json();
+          const rawJson = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawJson) {
+            const parsed = JSON.parse(rawJson);
+            if (parsed.en && parsed.uzbek && parsed.example) {
+              return res.json({
+                en: parsed.en.toLowerCase(),
+                uzbek: parsed.uzbek,
+                example: parsed.example,
+                transcription: parsed.transcription || `[${parsed.en}]`,
+                partOfSpeech: parsed.partOfSpeech || "so'z"
+              });
+            }
+          }
+        }
+      } catch (aiErr) {
+        console.warn('Gemini AI xatosi, zaxiraga o\'tilmoqda:', aiErr.message);
+      }
+    }
+
+    // 2-USUL (ZAXIRA): Google Translate
     const fromLang = direction === 'uz-en' ? 'uz' : 'en';
     const toLang = direction === 'uz-en' ? 'en' : 'uz';
-
-    // Google Translate orqali tarjima qilish
     const translatedText = await translateWithGoogle(word, fromLang, toLang);
 
     const enWord = direction === 'en-uz' ? word.toLowerCase() : translatedText.toLowerCase();
     const uzWord = direction === 'en-uz' ? translatedText : word;
 
-    // Namuna gap tayyorlash
-    const exampleSentence = direction === 'en-uz'
-      ? `I am learning the word "${enWord}" today.`
-      : `Bu gapda "${uzWord}" so'zi qo'llanilgan.`;
+    const backupExamples = [
+      `We noticed the word "${enWord}" used frequently in the article.`,
+      `Understanding how to use "${enWord}" properly will improve your vocabulary.`,
+      `She explained the meaning of "${enWord}" with a clear situation.`
+    ];
+    const randomExample = backupExamples[Math.floor(Math.random() * backupExamples.length)];
 
     res.json({
       en: enWord,
       uzbek: uzWord,
-      example: exampleSentence,
+      example: randomExample,
       transcription: `[${enWord}]`,
       partOfSpeech: "so'z"
     });
@@ -69,7 +124,6 @@ app.post('/api/translate-text', async (req, res) => {
     const toLang = direction === 'uz-en' ? 'en' : 'uz';
 
     const resultText = await translateWithGoogle(text, fromLang, toLang);
-
     res.json({ translation: resultText, translatedText: resultText });
 
   } catch (e) {
@@ -106,7 +160,7 @@ app.get('/api/speak', async (req, res) => {
     const text = (req.query.text || '').toString().trim().slice(0, 300);
     const lang = (req.query.lang === 'uz') ? 'uz' : 'en';
     if (!text) return res.status(400).send('Matn yo\'q');
-    
+
     const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
     const response = await fetch(ttsUrl, {
       headers: { 'User-Agent': 'Mozilla/5.0' }
