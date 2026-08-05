@@ -9,7 +9,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// So'z turkumlarini o'zbekchaga o'girish xaritasi
+// So'z turkumlarini o'zbekchaga o'girish
 const POS_MAP = {
   noun: "ot",
   verb: "fe'l",
@@ -37,7 +37,7 @@ async function translateWithGoogle(text, fromLang, toLang) {
   return text;
 }
 
-// 2. Free Dictionary API orqali haqiqiy gap, talaffuz va so'z turkumini olish
+// 2. Free Dictionary API orqali ma'lumot olish
 async function fetchFreeDictionaryData(word) {
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
@@ -55,7 +55,6 @@ async function fetchFreeDictionaryData(word) {
       const rawPos = primaryMeaning.partOfSpeech;
       pos = POS_MAP[rawPos] || rawPos || "so'z";
 
-      // Barcha ma'nolardan namuna gap qidirish
       for (const m of entry.meanings) {
         for (const d of m.definitions || []) {
           if (d.example) {
@@ -69,38 +68,72 @@ async function fetchFreeDictionaryData(word) {
 
     return { ipa, pos, exampleSentence };
   } catch (e) {
-    console.warn('Free Dictionary API xatosi:', e.message);
     return null;
   }
 }
 
-// MAIN API: So'z tarjima qilish va gap tuzish
+// 3. Aqlli va Xilma-xil gap tuzuvchi zaxira funksiyasi
+function generateSmartExample(word, pos) {
+  const w = word.toLowerCase();
+
+  const templates = {
+    "ot": [
+      `He turned on the ${w} to light up the quiet room.`,
+      `We bought a new decorative ${w} for our living room.`,
+      `She placed the ${w} carefully on the wooden table.`,
+      `The technician fixed the broken ${w} yesterday afternoon.`
+    ],
+    "fe'l": [
+      `They decided to ${w} behind the building to surprise him.`,
+      `It is not easy to ${w} such an important detail from everyone.`,
+      `She tried her best to ${w} her true feelings during the interview.`,
+      `Please ${w} your bags under the seat before the journey.`
+    ],
+    "sifat": [
+      `She couldn't stop laughing at that funny and ${w} situation.`,
+      `Don't be so ${w}, everything will turn out completely fine.`,
+      `It was a slightly ${w} mistake, but nobody seemed to mind.`,
+      `He gave a very ${w} answer that confused all his friends.`
+    ],
+    "ravish": [
+      `She finished the difficult task ${w} and left the office early.`,
+      `He listened ${w} to the teacher's explanation during class.`,
+      `The car moved ${w} through the narrow mountain road.`
+    ]
+  };
+
+  const list = templates[pos] || [
+    `Understanding how to use "${w}" correctly will improve your vocabulary.`,
+    `She used the word "${w}" in a very creative way during her speech.`,
+    `We discussed the importance of "${w}" in our English lesson today.`
+  ];
+
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+// MAIN API: So'z tarjima qilish
 app.post('/api/translate', async (req, res) => {
   try {
     const word = (req.body && req.body.word || '').trim();
     const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
 
-    if (!word) {
-      return res.status(400).json({ error: "So'z yuborilmadi" });
-    }
+    if (!word) return res.status(400).json({ error: "So'z yuborilmadi" });
 
-    // 1-USUL: Gemini AI (Agar kalit sozlangan va ishlayotgan bo'lsa)
+    // 1-USUL: Gemini AI
     if (GEMINI_API_KEY) {
       try {
         const promptText = `
-        You are an expert English teacher.
         Target Word: "${word}"
         Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
 
-        Return ONLY a JSON object with this structure:
+        Return ONLY a JSON object:
         {
           "en": "English word in lowercase",
           "uzbek": "Short Uzbek translation",
-          "transcription": "IPA pronunciation, e.g. [/haɪd/]",
+          "transcription": "IPA pronunciation, e.g. [/sɪli/]",
           "partOfSpeech": "Part of speech in Uzbek (fe'l, ot, sifat, ravish)",
-          "example": "A natural, realistic B1-B2 level intermediate sentence using the English word."
+          "example": "A realistic, intermediate level English sentence using the word."
         }
-        Do NOT use generic text like "I am learning the word...". Make the sentence realistic.
         `;
 
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -109,10 +142,7 @@ app.post('/api/translate', async (req, res) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: promptText }] }],
-            generationConfig: {
-              temperature: 0.7,
-              responseMimeType: "application/json"
-            }
+            generationConfig: { temperature: 0.7, responseMimeType: "application/json" }
           })
         });
 
@@ -131,16 +161,13 @@ app.post('/api/translate', async (req, res) => {
               });
             }
           }
-        } else {
-          const errBody = await aiResponse.text();
-          console.error('Gemini API xatosi kodi:', aiResponse.status, errBody);
         }
       } catch (aiErr) {
-        console.warn('Gemini AI ishlamadi, zaxiraga o\'tilmoqda:', aiErr.message);
+        console.warn('Gemini AI zaxiraga o\'tdi');
       }
     }
 
-    // 2-USUL (MUKAMMAL ZAXIRA): Free Dictionary API + Google Translate
+    // 2-USUL: Google Translate + Free Dictionary API + Smart Example Generator
     const fromLang = direction === 'uz-en' ? 'uz' : 'en';
     const toLang = direction === 'uz-en' ? 'en' : 'uz';
     const translatedText = await translateWithGoogle(word, fromLang, toLang);
@@ -148,24 +175,14 @@ app.post('/api/translate', async (req, res) => {
     const enWord = direction === 'en-uz' ? word.toLowerCase() : translatedText.toLowerCase();
     const uzWord = direction === 'en-uz' ? translatedText : word;
 
-    // Lug'at bazasidan ma'lumotlarni tortish
     const dictData = await fetchFreeDictionaryData(enWord);
 
     let finalPos = dictData?.pos || "so'z";
     let finalIpa = dictData?.ipa || `[${enWord}]`;
     let finalExample = dictData?.exampleSentence;
 
-    // Gar sentence topilmagan bo'lsa, turkumiga qarab o'rtacha darajadagi tabiiy gaplar yasash
     if (!finalExample) {
-      if (finalPos === "fe'l") {
-        finalExample = `It is important to ${enWord} carefully when you are in this situation.`;
-      } else if (finalPos === "sifat") {
-        finalExample = `She gave a very ${enWord} explanation that helped everyone understand.`;
-      } else if (finalPos === "ravish") {
-        finalExample = `He completed the whole assignment ${enWord} without any help.`;
-      } else {
-        finalExample = `We need to consider the ${enWord} before making our final decision.`;
-      }
+      finalExample = generateSmartExample(enWord, finalPos);
     }
 
     res.json({
