@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lug'at daftarcham</title>
+<title>Lug'at</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -74,7 +74,7 @@
     opacity: 0.75;
   }
 
-  /* ---------- SPLASH SCREEN ---------- */
+  /* ---------- SPLASH SCREEN (TUZATILGAN ANIMATSIYA) ---------- */
   .splash-screen {
     position: fixed;
     inset: 0;
@@ -93,31 +93,53 @@
     align-items: center;
     justify-content: center;
     animation: splashPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    perspective: 500px;
   }
 
-  .animated-notebook { width: 120px; height: 120px; }
+  .animated-notebook { 
+    width: 110px; 
+    height: 110px; 
+    overflow: visible;
+  }
+
   .flipping-page {
     transform-origin: 20px 45px;
-    animation: pageTurn 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transform-box: fill-box;
+    animation: pageTurn 1.8s ease-in-out infinite;
   }
-  .line-1 { animation: lineDraw 2s ease-in-out infinite; }
-  .line-2 { animation: lineDraw 2s ease-in-out 0.2s infinite; }
-  .line-3 { animation: lineDraw 2s ease-in-out 0.4s infinite; }
+
+  .line-1 { animation: lineDraw 1.8s ease-in-out infinite; }
+  .line-2 { animation: lineDraw 1.8s ease-in-out 0.2s infinite; }
+  .line-3 { animation: lineDraw 1.8s ease-in-out 0.4s infinite; }
 
   .splash-text {
     font-family: 'Fraunces', serif;
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
     color: var(--ink);
-    margin-top: 16px;
-    letter-spacing: -0.02em;
-    animation: textPulse 2s ease-in-out infinite;
+    margin-top: 18px;
+    letter-spacing: -0.01em;
+    animation: textPulse 1.8s ease-in-out infinite;
   }
 
   @keyframes splashPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-  @keyframes pageTurn { 0% { transform: rotateY(0deg); opacity: 1; } 50% { transform: rotateY(-80deg); opacity: 0.6; } 80%, 100% { transform: rotateY(-160deg); opacity: 0; } }
-  @keyframes lineDraw { 0% { stroke-dasharray: 0 100; opacity: 0; } 40% { stroke-dasharray: 100 0; opacity: 1; } 100% { stroke-dasharray: 100 0; opacity: 1; } }
-  @keyframes textPulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.04); opacity: 1; } }
+  
+  @keyframes pageTurn { 
+    0% { transform: rotateY(0deg); opacity: 1; } 
+    50% { transform: rotateY(-90deg); opacity: 0.5; } 
+    100% { transform: rotateY(-180deg); opacity: 0; } 
+  }
+
+  @keyframes lineDraw { 
+    0% { stroke-dasharray: 0 100; opacity: 0; } 
+    40% { stroke-dasharray: 100 0; opacity: 1; } 
+    100% { stroke-dasharray: 100 0; opacity: 1; } 
+  }
+
+  @keyframes textPulse { 
+    0%, 100% { transform: scale(1); opacity: 0.9; } 
+    50% { transform: scale(1.05); opacity: 1; } 
+  }
 
   .splash-screen.fade-out {
     opacity: 0;
@@ -179,7 +201,7 @@
     min-height: 100vh;
   }
 
-  /* ---------- BOTTOM NAV (LIQUID GLASS) ---------- */
+  /* ---------- BOTTOM NAV ---------- */
   .bottom-nav{
     position:fixed;
     left:50%;
@@ -249,7 +271,7 @@
   .bn-avatar img{width:100%; height:100%; object-fit:cover; display:block;}
   .bn-item.active .bn-avatar{box-shadow:0 0 0 2px var(--gold);}
 
-  /* ---------- HEADERS VA TAPE ---------- */
+  /* ---------- HEADERS ---------- */
   .cover{margin-bottom:22px; position:relative;}
   .top-icons{
     position:absolute;
@@ -418,7 +440,7 @@
   .col h2 span{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); font-weight:400;}
   .cards{display:flex; flex-direction:column; gap:12px;}
 
-  /* ---------- KARTOCHKA VA IXCHAM NISHON (MEMORIZED BADGE) ---------- */
+  /* ---------- KARTOCHKA VA IXCHAM NISHON ---------- */
   .card{
     background:var(--surface);
     border:1px solid var(--paper-line);
@@ -456,7 +478,6 @@
     border-radius:20px;
   }
 
-  /* IXCHAM VA SHINAM YODLANDI NISHONCHASI */
   .memorized-tag {
     font-family: 'Inter', sans-serif;
     font-size: 11px;
@@ -749,7 +770,7 @@
       <line class="line-2" x1="35" y1="42" x2="75" y2="42" stroke="#B23A2E" stroke-width="3" stroke-linecap="round"/>
       <line class="line-3" x1="35" y1="56" x2="80" y2="56" stroke="#2D3A55" stroke-width="3" stroke-linecap="round"/>
     </svg>
-    <h1 class="splash-text">Lug'at daftarcham</h1>
+    <h1 class="splash-text">Xush kelibsiz</h1>
   </div>
 </div>
 
@@ -773,7 +794,7 @@
                 <button class="top-icon-btn" id="themeToggleBtn" title="Tungi/kunduzgi rejim">🌙</button>
               </div>
             </div>
-            <div class="tape" id="appTitle">Lug'at daftarcham</div>
+            <div class="tape" id="appTitle">Lug'at</div>
             <div class="stats">
               <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
               <span><span class="stat-dot">●</span> <span id="statMemorizedLabel">Yodlangan</span>: <b id="statMemorized">0</b></span>
@@ -950,10 +971,10 @@ const quizBanner = document.getElementById('quizBanner');
 const quizOverlay = document.getElementById('quizOverlay');
 const quizBody = document.getElementById('quizBody');
 
-// ---------- TO'LIQ LUG'AT I18N DICTIONARY ----------
+// ---------- I18N DICTIONARY ----------
 const I18N = {
   uz: {
-    appTitle: "Lug'at daftarcham",
+    appTitle: "Lug'at",
     statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
     addBtn: "Qo'shish",
     hint: "Har bir so'z qo'shilganda, o'zbekcha ma'nosi va namunali gap avtomatik yasaladi.",
@@ -990,7 +1011,7 @@ const I18N = {
     badgeFirst10: "Dastlabki 10 so'z", badgeStreak3: "3 Kunlik Streak", badgeMaster: "Xotira Ustasi", badgeNight: "Tungi Bilimdon"
   },
   en: {
-    appTitle: "My Vocabulary",
+    appTitle: "Dictionary",
     statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
     addBtn: "Add",
     hint: "When you add a word, its Uzbek meaning and an example sentence are generated automatically.",
@@ -1027,7 +1048,7 @@ const I18N = {
     badgeFirst10: "First 10 words", badgeStreak3: "3 Day Streak", badgeMaster: "Memory Master", badgeNight: "Night Scholar"
   },
   ru: {
-    appTitle: "Мой словарь",
+    appTitle: "Словарь",
     statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
     addBtn: "Добавить",
     hint: "При добавлении слова автоматически создаются перевод на узбекский и пример предложения.",
@@ -1336,7 +1357,6 @@ function checkQuizReady(){
   quizBanner.classList.toggle('hidden', ready.length < 10);
 }
 
-// IXCHAM NISHONCHA VA O'ZGARTIRILGAN KARTOCHKA KODI
 function cardHtml(w){
   const headword = w.en || w.uz;
   if(w.status === 'loading'){
@@ -1449,7 +1469,7 @@ wordInput.addEventListener('keydown', (e) => {
   }
 });
 
-// ---------- SAHIFALANI SURISH LOGIKASI (SLIDER) ----------
+// ---------- SAHIFALANI SURISH LOGIKASI ----------
 const viewsSlider = document.getElementById('viewsSlider');
 const bnHomeBtn = document.getElementById('bnHomeBtn');
 const bnTranslateBtn = document.getElementById('bnTranslateBtn');
