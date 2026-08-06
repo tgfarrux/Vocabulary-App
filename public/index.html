@@ -74,7 +74,7 @@
     opacity: 0.75;
   }
 
-  /* ---------- SPLASH SCREEN (TUZATILGAN ANIMATSIYA) ---------- */
+  /* ---------- SPLASH SCREEN ---------- */
   .splash-screen {
     position: fixed;
     inset: 0;
@@ -96,12 +96,7 @@
     perspective: 500px;
   }
 
-  .animated-notebook { 
-    width: 110px; 
-    height: 110px; 
-    overflow: visible;
-  }
-
+  .animated-notebook { width: 110px; height: 110px; overflow: visible; }
   .flipping-page {
     transform-origin: 20px 45px;
     transform-box: fill-box;
@@ -123,23 +118,13 @@
   }
 
   @keyframes splashPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-  
   @keyframes pageTurn { 
     0% { transform: rotateY(0deg); opacity: 1; } 
     50% { transform: rotateY(-90deg); opacity: 0.5; } 
     100% { transform: rotateY(-180deg); opacity: 0; } 
   }
-
-  @keyframes lineDraw { 
-    0% { stroke-dasharray: 0 100; opacity: 0; } 
-    40% { stroke-dasharray: 100 0; opacity: 1; } 
-    100% { stroke-dasharray: 100 0; opacity: 1; } 
-  }
-
-  @keyframes textPulse { 
-    0%, 100% { transform: scale(1); opacity: 0.9; } 
-    50% { transform: scale(1.05); opacity: 1; } 
-  }
+  @keyframes lineDraw { 0% { stroke-dasharray: 0 100; opacity: 0; } 40% { stroke-dasharray: 100 0; opacity: 1; } 100% { stroke-dasharray: 100 0; opacity: 1; } }
+  @keyframes textPulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
 
   .splash-screen.fade-out {
     opacity: 0;
@@ -273,31 +258,6 @@
 
   /* ---------- HEADERS ---------- */
   .cover{margin-bottom:22px; position:relative;}
-  .top-icons{
-    position:absolute;
-    top:0;
-    right:0;
-    display:flex;
-    align-items:center;
-    gap:20px;
-  }
-  .icon-group{display:flex; gap:10px;}
-  .top-icon-btn{
-    width:34px;height:34px;
-    border-radius:50%;
-    border:1.5px solid var(--paper-line);
-    background:var(--surface);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:15px;
-    cursor:pointer;
-    padding:0;
-    overflow:hidden;
-    color:var(--ink);
-    transition:transform .15s, border-color .15s;
-  }
-  .top-icon-btn:hover{border-color:var(--gold); transform:translateY(-1px);}
 
   .tape{
     display:inline-block;
@@ -440,7 +400,7 @@
   .col h2 span{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); font-weight:400;}
   .cards{display:flex; flex-direction:column; gap:12px;}
 
-  /* ---------- KARTOCHKA VA IXCHAM NISHON ---------- */
+  /* ---------- KARTOCHKA ---------- */
   .card{
     background:var(--surface);
     border:1px solid var(--paper-line);
@@ -526,7 +486,7 @@
     border-radius:10px;
   }
 
-  /* ---------- KATTA TARJIMA BO'LIMI STILI ---------- */
+  /* ---------- TARJIMA BO'LIMI ---------- */
   .trans-section-card {
     background: var(--surface);
     border: 1.5px solid var(--paper-line);
@@ -605,7 +565,7 @@
     cursor: pointer;
   }
 
-  /* ---------- KATTA PROFIL BO'LIMI STILI ---------- */
+  /* ---------- PROFIL BO'LIMI VA SOZLAMALAR ---------- */
   .profile-page-card {
     background: var(--surface);
     border: 1.5px solid var(--paper-line);
@@ -669,7 +629,7 @@
   .stat-card-box b { display: block; font-size: 20px; font-weight: 700; color: var(--ink); }
   .stat-card-box span { font-size: 11.5px; color: var(--ink-soft); font-family: 'IBM Plex Mono', monospace; }
 
-  .badges-title {
+  .badges-title, .settings-title {
     font-family: 'Fraunces', serif;
     font-size: 16px;
     font-weight: 600;
@@ -695,6 +655,48 @@
     color: var(--ink-soft);
   }
   .badge-item .badge-icon { font-size: 26px; display: block; margin-bottom: 4px; }
+
+  /* SOZLAMALAR PANEL STILI */
+  .settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--paper);
+    border: 1px solid var(--paper-line);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+
+  .setting-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .setting-btn {
+    border: 1px solid var(--paper-line);
+    background: var(--surface);
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .setting-btn:hover {
+    background: var(--paper-dark);
+    border-color: var(--gold);
+  }
 
   /* ---------- MODALS ---------- */
   .overlay{
@@ -750,9 +752,7 @@
     }
     .tape{grid-area:title; justify-self:start; font-size:16px; padding:5px 12px 6px; margin:0; transform:rotate(0deg);}
     .tape::before, .tape::after{display:none;}
-    .top-icons{grid-area:icons; position:static; justify-self:end;}
     .stats{grid-area:stats;}
-    .top-icon-btn{width:28px; height:28px; font-size:12px;}
   }
 </style>
 </head>
@@ -788,12 +788,6 @@
         <!-- PANE 1: ASOSIY (LUG'AT) -->
         <div class="view-pane" id="paneHome">
           <header class="cover">
-            <div class="top-icons">
-              <div class="icon-group">
-                <button class="top-icon-btn" id="langSwitchBtn" title="Ilova tilini tanlash">🌐</button>
-                <button class="top-icon-btn" id="themeToggleBtn" title="Tungi/kunduzgi rejim">🌙</button>
-              </div>
-            </div>
             <div class="tape" id="appTitle">Lug'at</div>
             <div class="stats">
               <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
@@ -864,7 +858,7 @@
           </div>
         </div>
 
-        <!-- PANE 3: PROFIL -->
+        <!-- PANE 3: PROFIL VA SOZLAMALAR -->
         <div class="view-pane" id="paneProfile">
           <header class="cover">
             <div class="tape" id="profTitle">Mening Profilim</div>
@@ -910,6 +904,33 @@
                 <span id="badgeNight">Tungi Bilimdon</span>
               </div>
             </div>
+
+            <!-- SOZLAMALAR PANELI -->
+            <div class="settings-title" id="profSettingsTitle">⚙️ Sozlamalar</div>
+            <div class="settings-list">
+              <!-- Mavzu Almashtirish -->
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span>🎨</span>
+                  <span id="lblTheme">Mavzu</span>
+                </div>
+                <button class="setting-btn" id="themeToggleBtn">
+                  <span id="themeBtnText">Tungi rejim 🌙</span>
+                </button>
+              </div>
+
+              <!-- Til Almashtirish -->
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span>🌐</span>
+                  <span id="lblLang">Ilova tili</span>
+                </div>
+                <button class="setting-btn" id="langSwitchBtn">
+                  <span id="currentLangText">🇺🇿 O'zbekcha</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -998,7 +1019,6 @@ const I18N = {
     quizFinished: "Test yakunlandi", quizCorrect: "to'g'ri javob", quizClose: "Yopish",
     resultExcellent: "A'LO!", resultGreat: "ZO'R!", resultGood: "YAXSHI", resultRetry: "YANA URINING",
     langModalTitle: "Ilova tilini tanlang",
-    themeTitle: "Tungi/kunduzgi rejim", profileTitleAttr: "Profil", langTitleAttr: "Ilova tilini tanlash",
     navHome: "Asosiy", navTranslate: "Tarjima", navProfile: "Profil",
     transTitle: "Matn Tarjimoni",
     ttPlaceholder: "Matn yoki gapni kiriting...",
@@ -1008,7 +1028,10 @@ const I18N = {
     profTitle: "Mening Profilim",
     profStatWords: "SO'ZLAR", profStatMemorized: "YODLANGAN", profStatStreak: "STREAK KUN",
     profBadgesTitle: "🏅 Yutuqlar va Nishonlar",
-    badgeFirst10: "Dastlabki 10 so'z", badgeStreak3: "3 Kunlik Streak", badgeMaster: "Xotira Ustasi", badgeNight: "Tungi Bilimdon"
+    badgeFirst10: "Dastlabki 10 so'z", badgeStreak3: "3 Kunlik Streak", badgeMaster: "Xotira Ustasi", badgeNight: "Tungi Bilimdon",
+    profSettingsTitle: "⚙️ Sozlamalar",
+    lblTheme: "Mavzu", lblLang: "Ilova tili",
+    themeLight: "Kunduzgi ☀️", themeDark: "Tungi 🌙"
   },
   en: {
     appTitle: "Dictionary",
@@ -1035,7 +1058,6 @@ const I18N = {
     quizFinished: "Quiz finished", quizCorrect: "correct answers", quizClose: "Close",
     resultExcellent: "EXCELLENT!", resultGreat: "GREAT!", resultGood: "GOOD", resultRetry: "TRY AGAIN",
     langModalTitle: "Choose app language",
-    themeTitle: "Dark/light mode", profileTitleAttr: "Profile", langTitleAttr: "Choose app language",
     navHome: "Home", navTranslate: "Translate", navProfile: "Profile",
     transTitle: "Text Translator",
     ttPlaceholder: "Type or paste your text here...",
@@ -1045,7 +1067,10 @@ const I18N = {
     profTitle: "My Profile",
     profStatWords: "WORDS", profStatMemorized: "MEMORIZED", profStatStreak: "STREAK DAYS",
     profBadgesTitle: "🏅 Achievements & Badges",
-    badgeFirst10: "First 10 words", badgeStreak3: "3 Day Streak", badgeMaster: "Memory Master", badgeNight: "Night Scholar"
+    badgeFirst10: "First 10 words", badgeStreak3: "3 Day Streak", badgeMaster: "Memory Master", badgeNight: "Night Scholar",
+    profSettingsTitle: "⚙️ Settings",
+    lblTheme: "Theme", lblLang: "App language",
+    themeLight: "Light ☀️", themeDark: "Dark 🌙"
   },
   ru: {
     appTitle: "Словарь",
@@ -1072,7 +1097,6 @@ const I18N = {
     quizFinished: "Тест завершён", quizCorrect: "правильных ответов", quizClose: "Закрыть",
     resultExcellent: "ОТЛИЧНО!", resultGreat: "ЗДОРОВО!", resultGood: "ХОРОШО", resultRetry: "ПОПРОБУЙТЕ ЕЩЁ",
     langModalTitle: "Выберите язык приложения",
-    themeTitle: "Тёмный/светлый режим", profileTitleAttr: "Профиль", langTitleAttr: "Выбрать язык приложения",
     navHome: "Главная", navTranslate: "Перевод", navProfile: "Профиль",
     transTitle: "Переводчик текста",
     ttPlaceholder: "Введите или вставьте текст сюда...",
@@ -1082,7 +1106,10 @@ const I18N = {
     profTitle: "Мой профиль",
     profStatWords: "СЛОВА", profStatMemorized: "ВЫУЧЕНО", profStatStreak: "СТРИК ДНЕЙ",
     profBadgesTitle: "🏅 Достижения и значки",
-    badgeFirst10: "Первые 10 слов", badgeStreak3: "3 дня стрика", badgeMaster: "Мастер памяти", badgeNight: "Ночной эрудит"
+    badgeFirst10: "Первые 10 слов", badgeStreak3: "3 дня стрика", badgeMaster: "Мастер памяти", badgeNight: "Ночной эрудит",
+    profSettingsTitle: "⚙️ Настройки",
+    lblTheme: "Тема", lblLang: "Язык приложения",
+    themeLight: "Светлая ☀️", themeDark: "Тёмная 🌙"
   }
 };
 
@@ -1092,6 +1119,14 @@ function t(key, ...args){
   const dict = I18N[currentLang] || I18N.uz;
   const val = dict[key] !== undefined ? dict[key] : I18N.uz[key];
   return typeof val === 'function' ? val(...args) : val;
+}
+
+function updateLangSettingText() {
+  const langTextEl = document.getElementById('currentLangText');
+  if (!langTextEl) return;
+  if (currentLang === 'uz') langTextEl.textContent = "🇺🇿 O'zbekcha";
+  else if (currentLang === 'en') langTextEl.textContent = "🇬🇧 English";
+  else if (currentLang === 'ru') langTextEl.textContent = "🇷🇺 Русский";
 }
 
 function applyStaticI18n(){
@@ -1109,8 +1144,6 @@ function applyStaticI18n(){
   document.getElementById('colLearningLabel').textContent = t('colLearning');
   document.getElementById('colMemorizedLabel').textContent = t('colMemorized');
   document.getElementById('langModalTitle').textContent = t('langModalTitle');
-  document.getElementById('langSwitchBtn').title = t('langTitleAttr');
-  document.getElementById('themeToggleBtn').title = t('themeTitle');
   
   // Navigation
   document.getElementById('bnHomeLabel').textContent = t('navHome');
@@ -1130,7 +1163,7 @@ function applyStaticI18n(){
     ttOut.textContent = t('ttResultPlaceholder');
   }
 
-  // Profile Pane
+  // Profile Pane & Settings
   document.getElementById('profTitle').textContent = t('profTitle');
   document.getElementById('profStatWords').textContent = t('profStatWords');
   document.getElementById('profStatMemorized').textContent = t('profStatMemorized');
@@ -1140,6 +1173,12 @@ function applyStaticI18n(){
   document.getElementById('badgeStreak3').textContent = t('badgeStreak3');
   document.getElementById('badgeMaster').textContent = t('badgeMaster');
   document.getElementById('badgeNight').textContent = t('badgeNight');
+  document.getElementById('profSettingsTitle').textContent = t('profSettingsTitle');
+  document.getElementById('lblTheme').textContent = t('lblTheme');
+  document.getElementById('lblLang').textContent = t('lblLang');
+
+  updateLangSettingText();
+  applyTheme(localStorage.getItem('ui-theme') || 'light');
 
   document.querySelectorAll('.lang-option').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === currentLang);
@@ -1610,7 +1649,10 @@ const themeToggleBtn = document.getElementById('themeToggleBtn');
 
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
-  themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  const btnText = document.getElementById('themeBtnText');
+  if(btnText){
+    btnText.textContent = theme === 'dark' ? t('themeLight') : t('themeDark');
+  }
   localStorage.setItem('ui-theme', theme);
 }
 
@@ -1750,7 +1792,6 @@ if(window.Telegram && window.Telegram.WebApp){
   tg.expand();
 }
 
-applyTheme(localStorage.getItem('ui-theme') || 'light');
 applyStaticI18n();
 loadWords();
 </script>
