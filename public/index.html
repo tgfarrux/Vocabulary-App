@@ -660,7 +660,7 @@
     margin: 26px 0 14px;
   }
 
-  /* LEADERBOARD SHOHSUPA (PODIUM) STILLARI */
+  /* SHOHSUPA (PODIUM) STILLARI */
   .podium-container {
     display: flex;
     align-items: flex-end;
@@ -678,26 +678,28 @@
     padding: 12px 6px;
     text-align: center;
     position: relative;
-    transition: transform 0.2s ease;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
+  .podium-card:hover { transform: translateY(-3px); }
 
   .podium-card.rank-1 {
     order: 2;
-    background: linear-gradient(180deg, rgba(245, 158, 11, 0.2), var(--surface));
+    background: linear-gradient(180deg, rgba(245, 158, 11, 0.22), var(--surface));
     border: 2px solid var(--gold);
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
     transform: translateY(-8px);
   }
 
   .podium-card.rank-2 {
     order: 1;
-    background: linear-gradient(180deg, rgba(148, 163, 184, 0.2), var(--surface));
+    background: linear-gradient(180deg, rgba(148, 163, 184, 0.22), var(--surface));
     border: 2px solid #94A3B8;
   }
 
   .podium-card.rank-3 {
     order: 3;
-    background: linear-gradient(180deg, rgba(217, 119, 6, 0.2), var(--surface));
+    background: linear-gradient(180deg, rgba(217, 119, 6, 0.22), var(--surface));
     border: 2px solid #D97706;
   }
 
@@ -758,13 +760,39 @@
     border: 1px solid var(--paper-line);
     border-radius: 10px;
     padding: 10px 14px;
+    cursor: pointer;
+    transition: background .15s;
   }
+  .lb-item:hover { background: var(--paper-dark); }
 
   .lb-left { display: flex; align-items: center; gap: 12px; }
   .lb-rank { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 13px; color: var(--ink-soft); width: 22px; }
   .lb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--paper-dark); display: flex; align-items: center; justify-content: center; font-size: 14px; object-fit: cover; }
   .lb-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
   .lb-xp { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: var(--gold); }
+
+  /* TUZATILGAN YUTUQLAR VA NISHONLAR GRIDI */
+  .badges-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .badge-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--paper);
+    border: 1px solid var(--paper-line);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: left;
+  }
+  .badge-item .badge-icon { font-size: 24px; flex-shrink: 0; }
 
   /* SOZLAMALAR PANEL STILI */
   .settings-list {
@@ -998,7 +1026,7 @@
               </div>
             </div>
 
-            <!-- SHOHSUPA LEADERBOARD BO'LIMI -->
+            <!-- LEADERBOARD BO'LIMI -->
             <div class="leaderboard-title" id="profLbTitle">🏆 Peshqadamlar Jadvali (Top XP)</div>
             <div class="podium-container" id="podiumContainer"></div>
             <div class="lb-list" id="lbList"></div>
@@ -1078,6 +1106,13 @@
   </div>
 </div>
 
+<div id="userProfileOverlay" class="overlay hidden">
+  <div class="quiz-modal profile-modal">
+    <button class="quiz-close" id="userProfileClose">✕</button>
+    <div id="userProfileBody"></div>
+  </div>
+</div>
+
 <div id="langOverlay" class="overlay hidden">
   <div class="quiz-modal lang-modal">
     <button class="quiz-close" id="langClose">✕</button>
@@ -1100,6 +1135,7 @@ const STORAGE_KEY = 'vocab-words-v1';
 const VISITS_KEY = 'vocab-visit-dates-v1';
 let words = [];
 let quizState = null;
+let currentLeaderboardUsers = [];
 
 const learningList = document.getElementById('learningList');
 const memorizedList = document.getElementById('memorizedList');
@@ -1132,17 +1168,17 @@ function calculateXP() {
 }
 
 function updateXPDisplay() {
-  const { xp, visitDays } = calculateXP();
+  const { xp, visitDays, memorizedCount } = calculateXP();
   const badgeEl = document.getElementById('xpBadge');
   if (badgeEl) badgeEl.textContent = `⚡ ${xp} XP`;
   
   const profStreak = document.getElementById('profStreakCount');
   if (profStreak) profStreak.textContent = `🔥 ${visitDays}`;
 
-  syncUserXP(xp);
+  syncUserXP(xp, words.length, memorizedCount, visitDays);
 }
 
-async function syncUserXP(xp) {
+async function syncUserXP(xp, wordsCount, memorizedCount, streak) {
   const user = getTelegramUser();
   if(!user) return;
   try {
@@ -1155,7 +1191,10 @@ async function syncUserXP(xp) {
         name: fullName || 'Foydalanuvchi',
         username: user.username || '',
         photoUrl: user.photo_url || '',
-        xp: xp
+        xp: xp,
+        wordsCount: wordsCount,
+        memorizedCount: memorizedCount,
+        streak: streak
       })
     });
   } catch(e){}
@@ -1170,10 +1209,15 @@ async function renderLeaderboard() {
     const res = await fetch('/api/leaderboard');
     if (!res.ok) return;
     const list = await res.json();
+    currentLeaderboardUsers = list || [];
 
-    if (!list || list.length === 0) return;
+    if (!list || list.length === 0) {
+      podiumEl.innerHTML = `<div class="empty" style="width:100%;">Hozircha foydalanuvchilar yo'q. Birinchi bo'ling!</div>`;
+      listEl.innerHTML = '';
+      return;
+    }
 
-    // Shohsupa Top 3
+    // Dynamic Podium Render
     const top3 = list.slice(0, 3);
     const ranks = ['rank-1', 'rank-2', 'rank-3'];
     const crowns = ['👑 1', '🥈 2', '🥉 3'];
@@ -1185,7 +1229,7 @@ async function renderLeaderboard() {
         : `<div class="podium-avatar">${(user.name || 'F')[0].toUpperCase()}</div>`;
 
       podiumHtml += `
-        <div class="podium-card ${ranks[i]}">
+        <div class="podium-card ${ranks[i]}" onclick="openLeaderboardUserProfile('${user.id}')">
           <div class="podium-crown">${crowns[i]}</div>
           ${avatarHtml}
           <div class="podium-name">${escapeHtml(user.name)}</div>
@@ -1195,7 +1239,7 @@ async function renderLeaderboard() {
     });
     podiumEl.innerHTML = podiumHtml;
 
-    // 4-o'rin va undan keyingilar
+    // List for 4th onwards
     const rest = list.slice(3);
     let listHtml = '';
     rest.forEach((user, idx) => {
@@ -1204,7 +1248,7 @@ async function renderLeaderboard() {
         : `<div class="lb-avatar">${(user.name || 'F')[0].toUpperCase()}</div>`;
 
       listHtml += `
-        <div class="lb-item">
+        <div class="lb-item" onclick="openLeaderboardUserProfile('${user.id}')">
           <div class="lb-left">
             <span class="lb-rank">#${idx + 4}</span>
             ${avatarHtml}
@@ -1218,6 +1262,51 @@ async function renderLeaderboard() {
 
   } catch(e){}
 }
+
+function openLeaderboardUserProfile(userId) {
+  const user = currentLeaderboardUsers.find(u => String(u.id) === String(userId));
+  if (!user) return;
+
+  const overlay = document.getElementById('userProfileOverlay');
+  const body = document.getElementById('userProfileBody');
+
+  const avatarHtml = user.photoUrl
+    ? `<img class="profile-page-avatar" src="${user.photoUrl}" alt="">`
+    : `<div class="profile-page-avatar avatar-fallback">${(user.name || 'F')[0].toUpperCase()}</div>`;
+
+  const tgLinkBtn = user.username
+    ? `<a href="https://t.me/${escapeHtml(user.username)}" target="_blank" class="btn-submit-big" style="display:inline-block; margin-top:16px; text-decoration:none;">💬 Telegramda yozish</a>`
+    : '';
+
+  body.innerHTML = `
+    <h3>Foydalanuvchi Profili</h3>
+    ${avatarHtml}
+    <div class="profile-fullname">${escapeHtml(user.name)}</div>
+    ${user.username ? `<div class="profile-user-handle">@${escapeHtml(user.username)}</div>` : ''}
+    
+    <div class="profile-grid-stats">
+      <div class="stat-card-box">
+        <b>${user.xp}</b>
+        <span>TAJRRIBA (XP)</span>
+      </div>
+      <div class="stat-card-box">
+        <b>${user.memorizedCount || 0}</b>
+        <span>YODLANGAN</span>
+      </div>
+      <div class="stat-card-box">
+        <b>🔥 ${user.streak || 1}</b>
+        <span>STREAK KUN</span>
+      </div>
+    </div>
+    ${tgLinkBtn}
+  `;
+
+  overlay.classList.remove('hidden');
+}
+
+document.getElementById('userProfileClose').addEventListener('click', () => {
+  document.getElementById('userProfileOverlay').classList.add('hidden');
+});
 
 // ---------- I18N DICTIONARY ----------
 const I18N = {
