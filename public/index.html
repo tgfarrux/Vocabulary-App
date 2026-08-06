@@ -588,7 +588,7 @@
     cursor: pointer;
   }
 
-  /* ---------- PROFIL BO'LIMI VA SOZLAMALAR ---------- */
+  /* ---------- PROFIL VA LEADERBOARD ---------- */
   .profile-page-card {
     background: var(--surface);
     border: 1.5px solid var(--paper-line);
@@ -652,33 +652,121 @@
   .stat-card-box b { display: block; font-size: 20px; font-weight: 700; color: var(--ink); }
   .stat-card-box span { font-size: 11.5px; color: var(--ink-soft); font-family: 'IBM Plex Mono', monospace; }
 
-  .badges-title, .settings-title {
+  .badges-title, .settings-title, .leaderboard-title {
     font-family: 'Fraunces', serif;
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 17px;
+    font-weight: 700;
     text-align: left;
-    margin: 24px 0 12px;
+    margin: 26px 0 14px;
   }
 
-  .badges-container {
+  /* LEADERBOARD SHOHSUPA (PODIUM) STILLARI */
+  .podium-container {
     display: flex;
+    align-items: flex-end;
+    justify-content: center;
     gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 6px;
+    margin-top: 18px;
+    margin-bottom: 20px;
   }
 
-  .badge-item {
-    flex: 0 0 90px;
+  .podium-card {
+    flex: 1;
+    background: var(--paper);
+    border: 1.5px solid var(--paper-line);
+    border-radius: 14px;
+    padding: 12px 6px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .podium-card.rank-1 {
+    order: 2;
+    background: linear-gradient(180deg, rgba(245, 158, 11, 0.2), var(--surface));
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+    transform: translateY(-8px);
+  }
+
+  .podium-card.rank-2 {
+    order: 1;
+    background: linear-gradient(180deg, rgba(148, 163, 184, 0.2), var(--surface));
+    border: 2px solid #94A3B8;
+  }
+
+  .podium-card.rank-3 {
+    order: 3;
+    background: linear-gradient(180deg, rgba(217, 119, 6, 0.2), var(--surface));
+    border: 2px solid #D97706;
+  }
+
+  .podium-crown {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 22px;
+  }
+
+  .podium-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 6px auto;
+    border: 2px solid var(--paper-line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    background: var(--paper-dark);
+  }
+
+  .rank-1 .podium-avatar { border-color: var(--gold); width: 56px; height: 54px; font-size: 26px; }
+  .rank-2 .podium-avatar { border-color: #94A3B8; }
+  .rank-3 .podium-avatar { border-color: #D97706; }
+
+  .podium-name {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .podium-xp {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-top: 2px;
+  }
+
+  .lb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .lb-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background: var(--paper);
     border: 1px solid var(--paper-line);
-    border-radius: 12px;
-    padding: 10px 6px;
-    text-align: center;
-    font-size: 11px;
-    color: var(--ink-soft);
+    border-radius: 10px;
+    padding: 10px 14px;
   }
-  .badge-item .badge-icon { font-size: 26px; display: block; margin-bottom: 4px; }
 
+  .lb-left { display: flex; align-items: center; gap: 12px; }
+  .lb-rank { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 13px; color: var(--ink-soft); width: 22px; }
+  .lb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--paper-dark); display: flex; align-items: center; justify-content: center; font-size: 14px; object-fit: cover; }
+  .lb-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .lb-xp { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: var(--gold); }
+
+  /* SOZLAMALAR PANEL STILI */
   .settings-list {
     display: flex;
     flex-direction: column;
@@ -774,7 +862,6 @@
     }
     .tape{grid-area:title; justify-self:start; font-size:16px; padding:5px 12px 6px; margin:0; transform:rotate(0deg);}
     .tape::before, .tape::after{display:none;}
-    .top-icons{grid-area:icons; position:static; justify-self:end;}
     .stats{grid-area:stats;}
   }
 </style>
@@ -884,7 +971,7 @@
           </div>
         </div>
 
-        <!-- PANE 3: PROFIL VA SOZLAMALAR -->
+        <!-- PANE 3: PROFIL VA LEADERBOARD -->
         <div class="view-pane" id="paneProfile">
           <header class="cover">
             <div class="tape" id="profTitle">Mening Profilim</div>
@@ -910,6 +997,11 @@
                 <span id="profStatStreak">STREAK KUN</span>
               </div>
             </div>
+
+            <!-- SHOHSUPA LEADERBOARD BO'LIMI -->
+            <div class="leaderboard-title" id="profLbTitle">🏆 Peshqadamlar Jadvali (Top XP)</div>
+            <div class="podium-container" id="podiumContainer"></div>
+            <div class="lb-list" id="lbList"></div>
 
             <div class="badges-title" id="profBadgesTitle">🏅 Yutuqlar va Nishonlar</div>
             <div class="badges-container">
@@ -1017,7 +1109,7 @@ const quizBanner = document.getElementById('quizBanner');
 const quizOverlay = document.getElementById('quizOverlay');
 const quizBody = document.getElementById('quizBody');
 
-// ---------- XP VA KUNLARRINI HISOBLASH LOGIKASI ----------
+// ---------- XP VA KUNLARNI HISOBLASH LOGIKASI ----------
 function updateVisitDays() {
   let visits = [];
   try {
@@ -1046,6 +1138,85 @@ function updateXPDisplay() {
   
   const profStreak = document.getElementById('profStreakCount');
   if (profStreak) profStreak.textContent = `🔥 ${visitDays}`;
+
+  syncUserXP(xp);
+}
+
+async function syncUserXP(xp) {
+  const user = getTelegramUser();
+  if(!user) return;
+  try {
+    const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
+    await fetch('/api/leaderboard/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: user.id,
+        name: fullName || 'Foydalanuvchi',
+        username: user.username || '',
+        photoUrl: user.photo_url || '',
+        xp: xp
+      })
+    });
+  } catch(e){}
+}
+
+async function renderLeaderboard() {
+  const podiumEl = document.getElementById('podiumContainer');
+  const listEl = document.getElementById('lbList');
+  if (!podiumEl || !listEl) return;
+
+  try {
+    const res = await fetch('/api/leaderboard');
+    if (!res.ok) return;
+    const list = await res.json();
+
+    if (!list || list.length === 0) return;
+
+    // Shohsupa Top 3
+    const top3 = list.slice(0, 3);
+    const ranks = ['rank-1', 'rank-2', 'rank-3'];
+    const crowns = ['👑 1', '🥈 2', '🥉 3'];
+
+    let podiumHtml = '';
+    top3.forEach((user, i) => {
+      const avatarHtml = user.photoUrl
+        ? `<img class="podium-avatar" src="${user.photoUrl}" alt="">`
+        : `<div class="podium-avatar">${(user.name || 'F')[0].toUpperCase()}</div>`;
+
+      podiumHtml += `
+        <div class="podium-card ${ranks[i]}">
+          <div class="podium-crown">${crowns[i]}</div>
+          ${avatarHtml}
+          <div class="podium-name">${escapeHtml(user.name)}</div>
+          <div class="podium-xp">${user.xp} XP</div>
+        </div>
+      `;
+    });
+    podiumEl.innerHTML = podiumHtml;
+
+    // 4-o'rin va undan keyingilar
+    const rest = list.slice(3);
+    let listHtml = '';
+    rest.forEach((user, idx) => {
+      const avatarHtml = user.photoUrl
+        ? `<img class="lb-avatar" src="${user.photoUrl}" alt="">`
+        : `<div class="lb-avatar">${(user.name || 'F')[0].toUpperCase()}</div>`;
+
+      listHtml += `
+        <div class="lb-item">
+          <div class="lb-left">
+            <span class="lb-rank">#${idx + 4}</span>
+            ${avatarHtml}
+            <span class="lb-name">${escapeHtml(user.name)}</span>
+          </div>
+          <span class="lb-xp">${user.xp} XP</span>
+        </div>
+      `;
+    });
+    listEl.innerHTML = listHtml;
+
+  } catch(e){}
 }
 
 // ---------- I18N DICTIONARY ----------
@@ -1086,6 +1257,7 @@ const I18N = {
     profBadgesTitle: "🏅 Yutuqlar va Nishonlar",
     badgeFirst10: "Dastlabki 10 so'z", badgeStreak3: "3 Kunlik Streak", badgeMaster: "Xotira Ustasi", badgeNight: "Tungi Bilimdon",
     profSettingsTitle: "⚙️ Sozlamalar",
+    profLbTitle: "🏆 Peshqadamlar Jadvali (Top XP)",
     lblTheme: "Mavzu", lblLang: "Ilova tili",
     themeLight: "Kunduzgi ☀️", themeDark: "Tungi 🌙"
   },
@@ -1125,6 +1297,7 @@ const I18N = {
     profBadgesTitle: "🏅 Achievements & Badges",
     badgeFirst10: "First 10 words", badgeStreak3: "3 Day Streak", badgeMaster: "Memory Master", badgeNight: "Night Scholar",
     profSettingsTitle: "⚙️ Settings",
+    profLbTitle: "🏆 Leaderboard (Top XP)",
     lblTheme: "Theme", lblLang: "App language",
     themeLight: "Light ☀️", themeDark: "Dark 🌙"
   },
@@ -1164,6 +1337,7 @@ const I18N = {
     profBadgesTitle: "🏅 Достижения и значки",
     badgeFirst10: "Первые 10 слов", badgeStreak3: "3 дня стрика", badgeMaster: "Мастер памяти", badgeNight: "Ночной эрудит",
     profSettingsTitle: "⚙️ Настройки",
+    profLbTitle: "🏆 Таблица лидеров (Top XP)",
     lblTheme: "Тема", lblLang: "Язык приложения",
     themeLight: "Светлая ☀️", themeDark: "Тёмная 🌙"
   }
@@ -1188,7 +1362,6 @@ function updateLangSettingText() {
 function applyStaticI18n(){
   document.documentElement.lang = currentLang;
   
-  // Home Pane
   document.getElementById('appTitle').textContent = t('appTitle');
   document.getElementById('statTotalLabel').textContent = t('statTotal');
   document.getElementById('statMemorizedLabel').textContent = t('statMemorized');
@@ -1201,12 +1374,10 @@ function applyStaticI18n(){
   document.getElementById('colMemorizedLabel').textContent = t('colMemorized');
   document.getElementById('langModalTitle').textContent = t('langModalTitle');
   
-  // Navigation
   document.getElementById('bnHomeLabel').textContent = t('navHome');
   document.getElementById('bnTranslateLabel').textContent = t('navTranslate');
   document.getElementById('bnProfileLabel').textContent = t('navProfile');
   
-  // Translate Pane
   document.getElementById('transTitle').textContent = t('transTitle');
   document.getElementById('ttInput').placeholder = t('ttPlaceholder');
   document.getElementById('ttTranslateBtn').textContent = t('ttTranslateBtnText');
@@ -1219,7 +1390,6 @@ function applyStaticI18n(){
     ttOut.textContent = t('ttResultPlaceholder');
   }
 
-  // Profile Pane & Settings
   document.getElementById('profTitle').textContent = t('profTitle');
   document.getElementById('profStatWords').textContent = t('profStatWords');
   document.getElementById('profStatMemorized').textContent = t('profStatMemorized');
@@ -1230,6 +1400,7 @@ function applyStaticI18n(){
   document.getElementById('badgeMaster').textContent = t('badgeMaster');
   document.getElementById('badgeNight').textContent = t('badgeNight');
   document.getElementById('profSettingsTitle').textContent = t('profSettingsTitle');
+  document.getElementById('profLbTitle').textContent = t('profLbTitle');
   document.getElementById('lblTheme').textContent = t('lblTheme');
   document.getElementById('lblLang').textContent = t('lblLang');
 
@@ -1827,6 +1998,7 @@ function updateProfilePane(){
   document.getElementById('profMemorizedCount').textContent = words.filter(w => w.memorized).length;
 
   updateXPDisplay();
+  renderLeaderboard();
 
   if(!user) return;
 
