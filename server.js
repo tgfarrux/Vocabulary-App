@@ -9,14 +9,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Global Leaderboard Ma'lumotlar bazasi (In-Memory + Sinov uchun Boshlang'ich Foydalanuvchilar)
-let leaderboardData = [
-  { id: '101', name: 'Jasur Bek', username: 'jasur_dev', photoUrl: '', xp: 1420 },
-  { id: '102', name: 'Malika A.', username: 'malika_ing', photoUrl: '', xp: 980 },
-  { id: '103', name: 'Anvar S.', username: 'anvar_uz', photoUrl: '', xp: 750 },
-  { id: '104', name: 'Dilnoza K.', username: 'dilnoza_99', photoUrl: '', xp: 510 },
-  { id: '105', name: 'Sardor M.', username: 'sardor_m', photoUrl: '', xp: 320 }
-];
+// Haqiqiy foydalanuvchilar bazasi (Soxta ismlar olib tashlandi)
+let leaderboardData = [];
 
 const POS_MAP = {
   noun: "ot", verb: "fe'l", adjective: "sifat", adverb: "ravish",
@@ -26,38 +20,40 @@ const POS_MAP = {
 // 1. Leaderboard API lar
 app.post('/api/leaderboard/update', (req, res) => {
   try {
-    const { id, name, username, photoUrl, xp } = req.body;
+    const { id, name, username, photoUrl, xp, wordsCount, memorizedCount, streak } = req.body;
     if (!id) return res.status(400).json({ error: 'ID topilmadi' });
 
     const idx = leaderboardData.findIndex(u => String(u.id) === String(id));
+    const userData = {
+      id: String(id),
+      name: name || 'Foydalanuvchi',
+      username: username || '',
+      photoUrl: photoUrl || '',
+      xp: xp || 0,
+      wordsCount: wordsCount || 0,
+      memorizedCount: memorizedCount || 0,
+      streak: streak || 1
+    };
+
     if (idx !== -1) {
-      leaderboardData[idx].xp = Math.max(leaderboardData[idx].xp, xp || 0);
-      if (name) leaderboardData[idx].name = name;
-      if (username) leaderboardData[idx].username = username;
-      if (photoUrl) leaderboardData[idx].photoUrl = photoUrl;
+      leaderboardData[idx] = { ...leaderboardData[idx], ...userData };
     } else {
-      leaderboardData.push({
-        id: String(id),
-        name: name || 'Foydalanuvchi',
-        username: username || '',
-        photoUrl: photoUrl || '',
-        xp: xp || 0
-      });
+      leaderboardData.push(userData);
     }
 
     leaderboardData.sort((a, b) => b.xp - a.xp);
     res.json({ success: true });
   } catch (e) {
-    res.status(500).json({ error: 'Leaderboard yangilashda xato' });
+    res.status(500).json({ error: 'Leaderboard update error' });
   }
 });
 
 app.get('/api/leaderboard', (req, res) => {
   leaderboardData.sort((a, b) => b.xp - a.xp);
-  res.json(leaderboardData.slice(0, 20));
+  res.json(leaderboardData.slice(0, 50));
 });
 
-// 2. Google Translate bepul xizmati
+// 2. Google Translate serve
 async function translateWithGoogle(text, fromLang, toLang) {
   try {
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
