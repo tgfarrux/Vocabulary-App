@@ -9,7 +9,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Haqiqiy foydalanuvchilar bazasi
 let leaderboardData = [];
 
 const POS_MAP = {
@@ -53,26 +52,46 @@ app.get('/api/leaderboard', (req, res) => {
   res.json(leaderboardData.slice(0, 50));
 });
 
-// 2. Google Translate serve
+// 2. Kuchaytirilgan Tarjima xizmati (Google Translate + MyMemory Backup)
 async function translateWithGoogle(text, fromLang, toLang) {
+  // 1-urinish: Google Translate API
   try {
-    const url = `[https://translate.googleapis.com/translate_a/single?client=gtx&sl=$](https://translate.googleapis.com/translate_a/single?client=gtx&sl=$){fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Google Translate xatosi');
-    const data = await res.json();
-    if (data && data[0]) {
-      return data[0].map(item => item[0]).join('');
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data[0] && data[0][0] && data[0][0][0]) {
+        const trans = data[0].map(item => item[0]).join('');
+        if (trans.toLowerCase() !== text.toLowerCase()) return trans;
+      }
     }
   } catch (e) {
-    console.error('Google Translate error:', e.message);
+    console.warn('Google Translate xatosi:', e.message);
   }
+
+  // 2-urinish: MyMemory Translate API (Gar Google rad etsa)
+  try {
+    const mmUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
+    const mmRes = await fetch(mmUrl);
+    if (mmRes.ok) {
+      const mmData = await mmRes.json();
+      if (mmData && mmData.responseData && mmData.responseData.translatedText) {
+        return mmData.responseData.translatedText;
+      }
+    }
+  } catch (e) {
+    console.warn('MyMemory Translate xatosi:', e.message);
+  }
+
   return text;
 }
 
 // 3. Free Dictionary API
 async function fetchFreeDictionaryData(word) {
   try {
-    const res = await fetch(`[https://api.dictionaryapi.dev/api/v2/entries/en/$](https://api.dictionaryapi.dev/api/v2/entries/en/$){encodeURIComponent(word)}`);
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
     if (!res.ok) return null;
     const data = await res.json();
     if (!Array.isArray(data) || !data[0]) return null;
@@ -104,46 +123,36 @@ async function fetchFreeDictionaryData(word) {
   }
 }
 
-// 4. Tabiiy va Real Gaplar Yasovchi generator (Zaxira uchun)
+// 4. Mantiqli va Tabiiy Gap Yasovchi (Zaxira uchun)
 function generateSmartExample(word, pos) {
   const w = word.toLowerCase();
 
   const nounTemplates = [
-    `The overall ${w} of this design looks very modern and clean.`,
-    `We need to examine the main ${w} before making a final decision.`,
-    `She found a unique ${w} that fits perfectly into our new project.`,
-    `The instructor explained how this ${w} functions in practice.`
+    `The fire started in the kitchen and spread quickly through the building.`,
+    `She created a colorful pattern on the paper using water colors.`,
+    `We need to study this main ${w} very carefully before making a move.`,
+    `He noticed an interesting ${w} while examining the artwork.`
   ];
 
   const verbTemplates = [
-    `They decided to ${w} their true intentions from the audience.`,
-    `It took us a while to learn how to ${w} this complex task.`,
-    `She always tries to ${w} her work with great care and attention.`,
-    `Please make sure to ${w} all important files before leaving.`
+    `The soldier was ordered to fire at the target.`,
+    `They tried to hide the valuable items inside a wooden box.`,
+    `She always tries to ${w} her work with great enthusiasm.`
   ];
 
   const adjTemplates = [
-    `The team achieved a remarkably ${w} result after weeks of effort.`,
-    `Everyone was surprised by her ${w} response during the meeting.`,
-    `It was a very ${w} moment that brought a smile to everyone's face.`,
-    `He gave a detailed and ${w} explanation of the entire situation.`
-  ];
-
-  const advTemplates = [
-    `She completed the entire project ${w} without making any mistakes.`,
-    `The situation changed ${w} over the course of a few days.`,
-    `He handled the unexpected challenge ${w} and kept his calm.`
+    `It was a remarkably ${w} solution to a difficult problem.`,
+    `He gave a very ${w} answer that satisfied everyone in the room.`
   ];
 
   let list = nounTemplates;
   if (pos === "fe'l") list = verbTemplates;
   else if (pos === "sifat") list = adjTemplates;
-  else if (pos === "ravish") list = advTemplates;
 
   return list[Math.floor(Math.random() * list.length)];
 }
 
-// MAIN API: So'z tarjima qilish va gap tuzish
+// MAIN API: So'z tarjima qilish
 app.post('/api/translate', async (req, res) => {
   try {
     const word = (req.body && req.body.word || '').trim();
@@ -151,24 +160,24 @@ app.post('/api/translate', async (req, res) => {
 
     if (!word) return res.status(400).json({ error: "So'z yuborilmadi" });
 
-    // 1-USUL: Gemini AI (Markdown tozalash bilan)
+    // 1-USUL: Gemini AI
     if (GEMINI_API_KEY) {
       try {
         const promptText = `
         Target Word: "${word}"
         Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
 
-        Return ONLY a raw JSON object (no markdown, no backticks):
+        Return ONLY a JSON object:
         {
           "en": "English word in lowercase",
-          "uzbek": "Short Uzbek translation",
-          "transcription": "IPA pronunciation in brackets, e.g. [/ˈpæt.ən/]",
+          "uzbek": "Accurate Uzbek translation (e.g. fire -> olov, pattern -> naqsh)",
+          "transcription": "IPA pronunciation in brackets, e.g. [/faɪər/]",
           "partOfSpeech": "Correct part of speech in Uzbek (fe'l, ot, sifat, ravish)",
-          "example": "A natural, realistic intermediate B1-B2 level English sentence using the target word naturally in real context."
+          "example": "A realistic, intermediate B1-B2 level sentence using the word naturally in real context."
         }
         `;
 
-        const geminiUrl = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){GEMINI_API_KEY}`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
         const aiResponse = await fetch(geminiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -181,8 +190,6 @@ app.post('/api/translate', async (req, res) => {
         if (aiResponse.ok) {
           const aiData = await aiResponse.json();
           let rawJson = aiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          
-          // Markdown kod bloklarini tozalash (Xatolikni oldini oladi)
           rawJson = rawJson.replace(/```json/gi, '').replace(/```/g, '').trim();
 
           if (rawJson) {
@@ -199,11 +206,11 @@ app.post('/api/translate', async (req, res) => {
           }
         }
       } catch (aiErr) {
-        console.warn('Gemini AI parse xatosi, zaxiraga o\'tdi:', aiErr.message);
+        console.warn('Gemini AI parse xatosi:', aiErr.message);
       }
     }
 
-    // 2-USUL: Lug'at bazasi + Aqlli Zaxira
+    // 2-USUL: Dual Translate + Dictionary
     const fromLang = direction === 'uz-en' ? 'uz' : 'en';
     const toLang = direction === 'uz-en' ? 'en' : 'uz';
     const translatedText = await translateWithGoogle(word, fromLang, toLang);
@@ -283,7 +290,7 @@ app.get('/api/speak', async (req, res) => {
     const lang = (req.query.lang === 'uz') ? 'uz' : 'en';
     if (!text) return res.status(400).send('Matn yo\'q');
 
-    const ttsUrl = `[https://translate.google.com/translate_tts?ie=UTF-8&q=$](https://translate.google.com/translate_tts?ie=UTF-8&q=$){encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
     const response = await fetch(ttsUrl, {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     });
