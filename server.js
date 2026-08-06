@@ -124,32 +124,89 @@ async function fetchFreeDictionaryData(word) {
 }
 
 // 4. Mantiqli va Tabiiy Gap Yasovchi (Zaxira uchun)
+function startsWithVowelSound(word) {
+  return /^[aeiou]/i.test(word);
+}
+
+function capitalizeFirst(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function generateSmartExample(word, pos) {
   const w = word.toLowerCase();
+  const article = startsWithVowelSound(w) ? 'an' : 'a';
 
+  // Har bir shablon albatta ${w} ni ishlatadi — so'zga aloqasiz gap chiqmasligi uchun
   const nounTemplates = [
-    `The fire started in the kitchen and spread quickly through the building.`,
-    `She created a colorful pattern on the paper using water colors.`,
-    `We need to study this main ${w} very carefully before making a move.`,
-    `He noticed an interesting ${w} while examining the artwork.`
+    `I saw ${article} ${w} on the table this morning.`,
+    `We need to study this ${w} very carefully before making a decision.`,
+    `Can you explain what a ${w} actually means?`,
+    `The teacher used the ${w} as an example during the lesson.`,
+    `Every ${w} in the report was checked twice for accuracy.`,
+    `She pointed at the ${w} and asked a question about it.`
   ];
 
   const verbTemplates = [
-    `The soldier was ordered to fire at the target.`,
-    `They tried to hide the valuable items inside a wooden box.`,
-    `She always tries to ${w} her work with great enthusiasm.`
+    `She always tries to ${w} her work with great enthusiasm.`,
+    `They decided to ${w} early in the morning before it got busy.`,
+    `Please ${w} the document before you send it to the team.`,
+    `He forgot to ${w} yesterday, so he did it twice today.`,
+    `We should ${w} together so the task is finished faster.`,
+    `I usually ${w} whenever I have free time on weekends.`
   ];
 
   const adjTemplates = [
     `It was a remarkably ${w} solution to a difficult problem.`,
-    `He gave a very ${w} answer that satisfied everyone in the room.`
+    `He gave a very ${w} answer that satisfied everyone in the room.`,
+    `The weather today is unusually ${w} for this time of year.`,
+    `Everyone agreed that the plan sounded ${w} and worth trying.`,
+    `Her ${w} attitude made the whole project easier to finish.`
   ];
 
-  let list = nounTemplates;
-  if (pos === "fe'l") list = verbTemplates;
-  else if (pos === "sifat") list = adjTemplates;
+  const advTemplates = [
+    `She finished the assignment ${w} and moved on to the next task.`,
+    `He spoke so ${w} that everyone in the room could understand him.`,
+    `They ${w} agreed to meet again the following week.`
+  ];
 
-  return list[Math.floor(Math.random() * list.length)];
+  const pronounTemplates = [
+    `${capitalizeFirst(w)} arrived at the office before everyone else.`,
+    `I gave the report to ${w} yesterday afternoon.`,
+    `This idea belongs to ${w}, not to me.`
+  ];
+
+  const prepTemplates = [
+    `The keys are ${w} the table near the door.`,
+    `We walked ${w} the park on our way home.`,
+    `The cat jumped ${w} the fence and ran into the yard.`
+  ];
+
+  const conjTemplates = [
+    `I wanted to go for a walk, ${w} it started to rain.`,
+    `She studied hard ${w} she wanted to pass the exam.`,
+    `We can stay home ${w} go out — it's up to you.`
+  ];
+
+  const interjTemplates = [
+    `"${capitalizeFirst(w)}!" she shouted when she saw the surprise.`,
+    `${capitalizeFirst(w)}, I didn't expect to see you here today.`
+  ];
+
+  const templateMap = {
+    "ot": nounTemplates,
+    "fe'l": verbTemplates,
+    "sifat": adjTemplates,
+    "ravish": advTemplates,
+    "olmosh": pronounTemplates,
+    "predlog": prepTemplates,
+    "bog'lovchi": conjTemplates,
+    "undov": interjTemplates
+  };
+
+  const list = templateMap[pos] || nounTemplates;
+  const sentence = list[Math.floor(Math.random() * list.length)];
+  return capitalizeFirst(sentence);
 }
 
 // MAIN API: So'z tarjima qilish
@@ -164,16 +221,26 @@ app.post('/api/translate', async (req, res) => {
     if (GEMINI_API_KEY) {
       try {
         const promptText = `
-        Target Word: "${word}"
+        You are a precise bilingual (English-Uzbek) lexicographer and example-sentence writer.
+
+        Target word: "${word}"
         Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
 
-        Return ONLY a JSON object:
+        Rules:
+        - "en" must be the correct English base form, lowercase.
+        - "uzbek" must be the single most accurate, natural Uzbek translation (not a literal/robotic one). Example pairs for calibration: fire -> olov, pattern -> naqsh, profile -> profil.
+        - "transcription" must be the real IPA pronunciation of the English word, wrapped in brackets, e.g. [/ˈpæt.ərn/]. Never just repeat the word in brackets.
+        - "partOfSpeech" must be one of exactly these Uzbek labels, matching the word's actual grammatical role: ot, fe'l, sifat, ravish, olmosh, predlog, bog'lovchi, undov.
+        - "example" MUST be a single, grammatically correct, natural English sentence at B1-B2 level that uses the exact English word (or its natural inflected form) in a meaningful, realistic context. It must clearly relate to the word's real meaning — never an unrelated or random sentence about a different topic.
+        - Do not add any explanation, only the JSON object.
+
+        Return ONLY a JSON object with this exact shape:
         {
-          "en": "English word in lowercase",
-          "uzbek": "Accurate Uzbek translation (e.g. fire -> olov, pattern -> naqsh)",
-          "transcription": "IPA pronunciation in brackets, e.g. [/faɪər/]",
-          "partOfSpeech": "Correct part of speech in Uzbek (fe'l, ot, sifat, ravish)",
-          "example": "A realistic, intermediate B1-B2 level sentence using the word naturally in real context."
+          "en": "...",
+          "uzbek": "...",
+          "transcription": "...",
+          "partOfSpeech": "...",
+          "example": "..."
         }
         `;
 
@@ -183,7 +250,7 @@ app.post('/api/translate', async (req, res) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: promptText }] }],
-            generationConfig: { temperature: 0.7, responseMimeType: "application/json" }
+            generationConfig: { temperature: 0.4, responseMimeType: "application/json" }
           })
         });
 
@@ -194,11 +261,12 @@ app.post('/api/translate', async (req, res) => {
 
           if (rawJson) {
             const parsed = JSON.parse(rawJson);
-            if (parsed.en && parsed.uzbek && parsed.example) {
+            const exampleOk = parsed.example && parsed.example.trim().split(/\s+/).length >= 4;
+            if (parsed.en && parsed.uzbek && exampleOk) {
               return res.json({
                 en: parsed.en.toLowerCase(),
                 uzbek: parsed.uzbek,
-                example: parsed.example,
+                example: parsed.example.trim(),
                 transcription: parsed.transcription || `[${parsed.en}]`,
                 partOfSpeech: parsed.partOfSpeech || "so'z"
               });
