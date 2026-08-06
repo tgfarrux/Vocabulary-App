@@ -256,8 +256,31 @@
   .bn-avatar img{width:100%; height:100%; object-fit:cover; display:block;}
   .bn-item.active .bn-avatar{box-shadow:0 0 0 2px var(--gold);}
 
-  /* ---------- HEADERS ---------- */
+  /* ---------- HEADERS VA XP BADGE ---------- */
   .cover{margin-bottom:22px; position:relative;}
+
+  .top-icons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .xp-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    color: var(--gold);
+    border: 1.5px solid var(--paper-line);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13.5px;
+    font-weight: 700;
+    box-shadow: var(--card-shadow);
+  }
 
   .tape{
     display:inline-block;
@@ -656,7 +679,6 @@
   }
   .badge-item .badge-icon { font-size: 26px; display: block; margin-bottom: 4px; }
 
-  /* SOZLAMALAR PANEL STILI */
   .settings-list {
     display: flex;
     flex-direction: column;
@@ -752,6 +774,7 @@
     }
     .tape{grid-area:title; justify-self:start; font-size:16px; padding:5px 12px 6px; margin:0; transform:rotate(0deg);}
     .tape::before, .tape::after{display:none;}
+    .top-icons{grid-area:icons; position:static; justify-self:end;}
     .stats{grid-area:stats;}
   }
 </style>
@@ -788,6 +811,9 @@
         <!-- PANE 1: ASOSIY (LUG'AT) -->
         <div class="view-pane" id="paneHome">
           <header class="cover">
+            <div class="top-icons">
+              <div class="xp-badge" id="xpBadge">⚡ 0 XP</div>
+            </div>
             <div class="tape" id="appTitle">Lug'at</div>
             <div class="stats">
               <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
@@ -880,7 +906,7 @@
                 <span id="profStatMemorized">YODLANGAN</span>
               </div>
               <div class="stat-card-box">
-                <b id="profStreakCount">🔥 3</b>
+                <b id="profStreakCount">🔥 1</b>
                 <span id="profStatStreak">STREAK KUN</span>
               </div>
             </div>
@@ -905,10 +931,9 @@
               </div>
             </div>
 
-            <!-- SOZLAMALAR PANELI -->
+            <!-- SOZLAMALAR -->
             <div class="settings-title" id="profSettingsTitle">⚙️ Sozlamalar</div>
             <div class="settings-list">
-              <!-- Mavzu Almashtirish -->
               <div class="setting-item">
                 <div class="setting-label">
                   <span>🎨</span>
@@ -919,7 +944,6 @@
                 </button>
               </div>
 
-              <!-- Til Almashtirish -->
               <div class="setting-item">
                 <div class="setting-label">
                   <span>🌐</span>
@@ -981,6 +1005,7 @@ setTimeout(() => {
 }, 2000);
 
 const STORAGE_KEY = 'vocab-words-v1';
+const VISITS_KEY = 'vocab-visit-dates-v1';
 let words = [];
 let quizState = null;
 
@@ -991,6 +1016,37 @@ const addBtn = document.getElementById('addBtn');
 const quizBanner = document.getElementById('quizBanner');
 const quizOverlay = document.getElementById('quizOverlay');
 const quizBody = document.getElementById('quizBody');
+
+// ---------- XP VA KUNLARRINI HISOBLASH LOGIKASI ----------
+function updateVisitDays() {
+  let visits = [];
+  try {
+    visits = JSON.parse(localStorage.getItem(VISITS_KEY)) || [];
+  } catch(e) { visits = []; }
+  
+  const today = new Date().toISOString().split('T')[0];
+  if (!visits.includes(today)) {
+    visits.push(today);
+    try { localStorage.setItem(VISITS_KEY, JSON.stringify(visits)); } catch(e){}
+  }
+  return visits.length;
+}
+
+function calculateXP() {
+  const memorizedCount = words.filter(w => w.memorized).length;
+  const visitDays = updateVisitDays();
+  const xp = (memorizedCount * 1) + (visitDays * 10);
+  return { xp, visitDays, memorizedCount };
+}
+
+function updateXPDisplay() {
+  const { xp, visitDays } = calculateXP();
+  const badgeEl = document.getElementById('xpBadge');
+  if (badgeEl) badgeEl.textContent = `⚡ ${xp} XP`;
+  
+  const profStreak = document.getElementById('profStreakCount');
+  if (profStreak) profStreak.textContent = `🔥 ${visitDays}`;
+}
 
 // ---------- I18N DICTIONARY ----------
 const I18N = {
@@ -1469,6 +1525,7 @@ function render(){
   document.getElementById('statReady').textContent = words.filter(w => w.memorized && !w.quizzed).length;
 
   checkQuizReady();
+  updateXPDisplay();
 }
 
 addBtn.addEventListener('click', () => {
@@ -1768,6 +1825,8 @@ function updateProfilePane(){
 
   document.getElementById('profWordsCount').textContent = words.length;
   document.getElementById('profMemorizedCount').textContent = words.filter(w => w.memorized).length;
+
+  updateXPDisplay();
 
   if(!user) return;
 
