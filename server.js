@@ -9,19 +9,55 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// So'z turkumlarini o'zbekchaga o'girish
+// Global Leaderboard Ma'lumotlar bazasi (In-Memory + Sinov uchun Boshlang'ich Foydalanuvchilar)
+let leaderboardData = [
+  { id: '101', name: 'Jasur Bek', username: 'jasur_dev', photoUrl: '', xp: 1420 },
+  { id: '102', name: 'Malika A.', username: 'malika_ing', photoUrl: '', xp: 980 },
+  { id: '103', name: 'Anvar S.', username: 'anvar_uz', photoUrl: '', xp: 750 },
+  { id: '104', name: 'Dilnoza K.', username: 'dilnoza_99', photoUrl: '', xp: 510 },
+  { id: '105', name: 'Sardor M.', username: 'sardor_m', photoUrl: '', xp: 320 }
+];
+
 const POS_MAP = {
-  noun: "ot",
-  verb: "fe'l",
-  adjective: "sifat",
-  adverb: "ravish",
-  pronoun: "olmosh",
-  preposition: "predlog",
-  conjunction: "bog'lovchi",
-  interjection: "undov"
+  noun: "ot", verb: "fe'l", adjective: "sifat", adverb: "ravish",
+  pronoun: "olmosh", preposition: "predlog", conjunction: "bog'lovchi", interjection: "undov"
 };
 
-// 1. Google Translate bepul xizmati
+// 1. Leaderboard API lar
+app.post('/api/leaderboard/update', (req, res) => {
+  try {
+    const { id, name, username, photoUrl, xp } = req.body;
+    if (!id) return res.status(400).json({ error: 'ID topilmadi' });
+
+    const idx = leaderboardData.findIndex(u => String(u.id) === String(id));
+    if (idx !== -1) {
+      leaderboardData[idx].xp = Math.max(leaderboardData[idx].xp, xp || 0);
+      if (name) leaderboardData[idx].name = name;
+      if (username) leaderboardData[idx].username = username;
+      if (photoUrl) leaderboardData[idx].photoUrl = photoUrl;
+    } else {
+      leaderboardData.push({
+        id: String(id),
+        name: name || 'Foydalanuvchi',
+        username: username || '',
+        photoUrl: photoUrl || '',
+        xp: xp || 0
+      });
+    }
+
+    leaderboardData.sort((a, b) => b.xp - a.xp);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Leaderboard yangilashda xato' });
+  }
+});
+
+app.get('/api/leaderboard', (req, res) => {
+  leaderboardData.sort((a, b) => b.xp - a.xp);
+  res.json(leaderboardData.slice(0, 20));
+});
+
+// 2. Google Translate bepul xizmati
 async function translateWithGoogle(text, fromLang, toLang) {
   try {
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
@@ -32,12 +68,12 @@ async function translateWithGoogle(text, fromLang, toLang) {
       return data[0].map(item => item[0]).join('');
     }
   } catch (e) {
-    console.error('Google Translate xabari:', e.message);
+    console.error('Google Translate error:', e.message);
   }
   return text;
 }
 
-// 2. Free Dictionary API orqali ma'lumot olish
+// 3. Free Dictionary API
 async function fetchFreeDictionaryData(word) {
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
@@ -72,46 +108,7 @@ async function fetchFreeDictionaryData(word) {
   }
 }
 
-// 3. Aqlli va Xilma-xil gap tuzuvchi zaxira funksiyasi
-function generateSmartExample(word, pos) {
-  const w = word.toLowerCase();
-
-  const templates = {
-    "ot": [
-      `He turned on the ${w} to light up the quiet room.`,
-      `We bought a new decorative ${w} for our living room.`,
-      `She placed the ${w} carefully on the wooden table.`,
-      `The technician fixed the broken ${w} yesterday afternoon.`
-    ],
-    "fe'l": [
-      `They decided to ${w} behind the building to surprise him.`,
-      `It is not easy to ${w} such an important detail from everyone.`,
-      `She tried her best to ${w} her true feelings during the interview.`,
-      `Please ${w} your bags under the seat before the journey.`
-    ],
-    "sifat": [
-      `She couldn't stop laughing at that funny and ${w} situation.`,
-      `Don't be so ${w}, everything will turn out completely fine.`,
-      `It was a slightly ${w} mistake, but nobody seemed to mind.`,
-      `He gave a very ${w} answer that confused all his friends.`
-    ],
-    "ravish": [
-      `She finished the difficult task ${w} and left the office early.`,
-      `He listened ${w} to the teacher's explanation during class.`,
-      `The car moved ${w} through the narrow mountain road.`
-    ]
-  };
-
-  const list = templates[pos] || [
-    `Understanding how to use "${w}" correctly will improve your vocabulary.`,
-    `She used the word "${w}" in a very creative way during her speech.`,
-    `We discussed the importance of "${w}" in our English lesson today.`
-  ];
-
-  return list[Math.floor(Math.random() * list.length)];
-}
-
-// MAIN API: So'z tarjima qilish
+// MAIN API: So'z tarjima qilish va gap tuzish
 app.post('/api/translate', async (req, res) => {
   try {
     const word = (req.body && req.body.word || '').trim();
@@ -119,7 +116,6 @@ app.post('/api/translate', async (req, res) => {
 
     if (!word) return res.status(400).json({ error: "So'z yuborilmadi" });
 
-    // 1-USUL: Gemini AI
     if (GEMINI_API_KEY) {
       try {
         const promptText = `
@@ -130,9 +126,9 @@ app.post('/api/translate', async (req, res) => {
         {
           "en": "English word in lowercase",
           "uzbek": "Short Uzbek translation",
-          "transcription": "IPA pronunciation, e.g. [/sɪli/]",
-          "partOfSpeech": "Part of speech in Uzbek (fe'l, ot, sifat, ravish)",
-          "example": "A realistic, intermediate level English sentence using the word."
+          "transcription": "IPA pronunciation in brackets, e.g. [/sɪli/]",
+          "partOfSpeech": "Correct part of speech in Uzbek (fe'l, ot, sifat, ravish)",
+          "example": "A natural, realistic intermediate B1-B2 level sentence using the word correctly in context."
         }
         `;
 
@@ -167,7 +163,6 @@ app.post('/api/translate', async (req, res) => {
       }
     }
 
-    // 2-USUL: Google Translate + Free Dictionary API + Smart Example Generator
     const fromLang = direction === 'uz-en' ? 'uz' : 'en';
     const toLang = direction === 'uz-en' ? 'en' : 'uz';
     const translatedText = await translateWithGoogle(word, fromLang, toLang);
@@ -182,7 +177,7 @@ app.post('/api/translate', async (req, res) => {
     let finalExample = dictData?.exampleSentence;
 
     if (!finalExample) {
-      finalExample = generateSmartExample(enWord, finalPos);
+      finalExample = `It is useful to practice how to use "${enWord}" in everyday conversation.`;
     }
 
     res.json({
@@ -199,7 +194,7 @@ app.post('/api/translate', async (req, res) => {
   }
 });
 
-// 2. Katta Matn va Gaplarni Tarjima qilish API
+// Katta Matn Tarjimasi
 app.post('/api/translate-text', async (req, res) => {
   try {
     const text = (req.body && req.body.text || '').trim();
@@ -214,12 +209,11 @@ app.post('/api/translate-text', async (req, res) => {
     res.json({ translation: resultText, translatedText: resultText });
 
   } catch (e) {
-    console.error('Text translate error:', e.message);
     res.status(500).json({ error: 'Server xatosi' });
   }
 });
 
-// 3. Auto-ping (Render uxlab qolmasligi uchun)
+// Auto-ping
 const APP_URL = process.env.MINI_APP_URL || process.env.RENDER_EXTERNAL_URL;
 if (APP_URL) {
   setInterval(() => {
@@ -227,7 +221,7 @@ if (APP_URL) {
   }, 10 * 60 * 1000);
 }
 
-// 4. Telegram Bot
+// Telegram Bot
 const BOT_TOKEN = process.env.BOT_TOKEN;
 if (BOT_TOKEN) {
   const bot = new TelegramBot(BOT_TOKEN, { polling: true });
@@ -241,7 +235,7 @@ if (BOT_TOKEN) {
   });
 }
 
-// 5. Talaffuz (TTS) API
+// TTS API
 app.get('/api/speak', async (req, res) => {
   try {
     const text = (req.query.text || '').toString().trim().slice(0, 300);
