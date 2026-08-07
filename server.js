@@ -1,6 +1,7 @@
 // Lug'at Daftarcha — Telegram Mini App backend
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const TelegramBot = require('node-telegram-bot-api');
 
 const app = express();
@@ -8,8 +9,26 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const LEADERBOARD_FILE = path.join(__dirname, 'leaderboard.json');
 
+// Leaderboard ma'lumotlarini fayldan o'qish / saqlash
 let leaderboardData = [];
+try {
+  if (fs.existsSync(LEADERBOARD_FILE)) {
+    const raw = fs.readFileSync(LEADERBOARD_FILE, 'utf8');
+    leaderboardData = JSON.parse(raw) || [];
+  }
+} catch (e) {
+  leaderboardData = [];
+}
+
+function saveLeaderboardToFile() {
+  try {
+    fs.writeFileSync(LEADERBOARD_FILE, JSON.stringify(leaderboardData, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Leaderboard saqlashda xato:', e.message);
+  }
+}
 
 const POS_MAP = {
   noun: "ot", verb: "fe'l", adjective: "sifat", adverb: "ravish",
@@ -41,6 +60,7 @@ app.post('/api/leaderboard/update', (req, res) => {
     }
 
     leaderboardData.sort((a, b) => b.xp - a.xp);
+    saveLeaderboardToFile();
     res.json({ success: true });
   } catch (e) {
     res.status(500).json({ error: 'Leaderboard update error' });
@@ -52,7 +72,7 @@ app.get('/api/leaderboard', (req, res) => {
   res.json(leaderboardData.slice(0, 50));
 });
 
-// 2. Free Dictionary API (Haqiqiy inglizcha lug'at va misol gaplar)
+// 2. Free Dictionary API
 async function fetchFreeDictionaryData(word) {
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
@@ -68,12 +88,10 @@ async function fetchFreeDictionaryData(word) {
     if (entry.meanings && entry.meanings.length > 0) {
       for (const m of entry.meanings) {
         const rawPos = m.partOfSpeech;
-        if (rawPos && POS_MAP[rawPos]) {
-          pos = POS_MAP[rawPos];
-        }
+        if (rawPos && POS_MAP[rawPos]) pos = POS_MAP[rawPos];
         for (const d of m.definitions || []) {
           if (d.example) {
-            exampleSentence = d.example; // Haqiqiy grammatik to'g'ri lug'at gapi
+            exampleSentence = d.example;
             break;
           }
         }
@@ -87,7 +105,7 @@ async function fetchFreeDictionaryData(word) {
   }
 }
 
-// 3. Zaxira Tarjima xizmati (Google Translate / MyMemory)
+// 3. Zaxira Tarjima xizmati
 async function translateBackup(text, fromLang, toLang) {
   try {
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
@@ -135,151 +153,4 @@ async function callGeminiAI(promptText) {
       if (res.ok) {
         const data = await res.json();
         let rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        rawText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-        if (rawText) return JSON.parse(rawText);
-      }
-    } catch (e) {}
-  }
-  return null;
-}
-
-// MAIN API: So'z tarjimasi va haqiqiy gap tuzish
-app.post('/api/translate', async (req, res) => {
-  try {
-    const word = (req.body && req.body.word || '').trim();
-    const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
-
-    if (!word) return res.status(400).json({ error: "So'z yuborilmadi" });
-
-    // 1. Birinchi navbatda Gemini AI ga murojaat qilamiz
-    const aiPrompt = `
-    Target Word or Phrase: "${word}"
-    Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
-
-    Return ONLY a JSON object with this exact structure:
-    {
-      "en": "English word or phrase in lowercase",
-      "uzbek": "Accurate, natural Uzbek translation",
-      "transcription": "IPA pronunciation in brackets, e.g. [/ˈæp.əl/]",
-      "partOfSpeech": "Part of speech in Uzbek (fe'l, ot, sifat, ravish)",
-      "example": "A real, high-quality, grammatically correct English sentence that naturally uses this word in context."
-    }
-    `;
-
-    const aiResult = await callGeminiAI(aiPrompt);
-
-    if (aiResult && aiResult.en && aiResult.uzbek && aiResult.example) {
-      return res.json({
-        en: aiResult.en.toLowerCase(),
-        uzbek: aiResult.uzbek,
-        example: aiResult.example,
-        transcription: aiResult.transcription || `[${aiResult.en}]`,
-        partOfSpeech: aiResult.partOfSpeech || "so'z"
-      });
-    }
-
-    // 2. Gemini bo'lmasa -> Free Dictionary API (Haqiqiy lug'at gaplari) + Backup Translate
-    const fromLang = direction === 'uz-en' ? 'uz' : 'en';
-    const toLang = direction === 'uz-en' ? 'en' : 'uz';
-    const translatedText = await translateBackup(word, fromLang, toLang);
-
-    const enWord = direction === 'en-uz' ? word.toLowerCase() : translatedText.toLowerCase();
-    const uzWord = direction === 'en-uz' ? translatedText : word;
-
-    const dictData = await fetchFreeDictionaryData(enWord);
-
-    let finalPos = dictData?.pos || "so'z";
-    let finalIpa = dictData?.ipa || `[${enWord}]`;
-    let finalExample = dictData?.exampleSentence || "";
-
-    // Mantiqsiz shablonlar umuman ishlatilmaydi
-    if (!finalExample) {
-      finalExample = `Practice using the word "${enWord}" in your daily English studies.`;
-    }
-
-    res.json({
-      en: enWord,
-      uzbek: uzWord,
-      example: finalExample,
-      transcription: finalIpa,
-      partOfSpeech: finalPos
-    });
-
-  } catch (e) {
-    console.error('Server xatosi:', e.message);
-    res.status(500).json({ error: 'Serverda xatolik yuz berdi' });
-  }
-});
-
-// Katta Matn Tarjimasi API
-app.post('/api/translate-text', async (req, res) => {
-  try {
-    const text = (req.body && req.body.text || '').trim();
-    const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
-
-    if (!text) return res.status(400).json({ error: 'Matn yuborilmadi' });
-
-    const fromLang = direction === 'uz-en' ? 'uz' : 'en';
-    const toLang = direction === 'uz-en' ? 'en' : 'uz';
-
-    // Gemini AI orqali katta matn tarjimasi
-    const textPrompt = `Translate the following text from ${fromLang === 'uz' ? 'Uzbek' : 'English'} to ${toLang === 'uz' ? 'Uzbek' : 'English'}. Return ONLY a JSON object: {"translation": "translated text here"}.\nText: "${text}"`;
-    const aiTextResult = await callGeminiAI(textPrompt);
-
-    if (aiTextResult && aiTextResult.translation) {
-      return res.json({ translation: aiTextResult.translation });
-    }
-
-    // Zaxira tarjima
-    const backupResult = await translateBackup(text, fromLang, toLang);
-    res.json({ translation: backupResult });
-
-  } catch (e) {
-    res.status(500).json({ error: 'Server xatosi' });
-  }
-});
-
-// Auto-ping
-const APP_URL = process.env.MINI_APP_URL || process.env.RENDER_EXTERNAL_URL;
-if (APP_URL) {
-  setInterval(() => {
-    fetch(APP_URL).then(() => console.log('Self-ping ok')).catch(() => {});
-  }, 10 * 60 * 1000);
-}
-
-// Telegram Bot
-const BOT_TOKEN = process.env.BOT_TOKEN;
-if (BOT_TOKEN) {
-  const bot = new TelegramBot(BOT_TOKEN, { polling: true });
-  bot.onText(/\/start/, (msg) => {
-    if (!APP_URL) return bot.sendMessage(msg.chat.id, "MINI_APP_URL sozlanmagan.");
-    bot.sendMessage(msg.chat.id, "Lug'at daftarchangizga xush kelibsiz! 📖", {
-      reply_markup: {
-        inline_keyboard: [[{ text: '📖 Ilovani ochish', web_app: { url: APP_URL } }]]
-      }
-    });
-  });
-}
-
-// TTS API
-app.get('/api/speak', async (req, res) => {
-  try {
-    const text = (req.query.text || '').toString().trim().slice(0, 300);
-    const lang = (req.query.lang === 'uz') ? 'uz' : 'en';
-    if (!text) return res.status(400).send('Matn yo\'q');
-
-    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
-    const response = await fetch(ttsUrl, {
-      headers: { 'User-Agent': 'Mozilla/5.0' }
-    });
-    if (!response.ok) return res.status(502).send('Ovoz olinmadi');
-    const buffer = Buffer.from(await response.arrayBuffer());
-    res.setHeader('Content-Type', 'audio/mpeg');
-    res.send(buffer);
-  } catch (e) {
-    res.status(500).send('Server xatosi');
-  }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server ${PORT}-portda ishga tushdi`));
+        rawText = rawText.replace(/```json/gi, '').replace(/
