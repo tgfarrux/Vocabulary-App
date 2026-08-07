@@ -153,4 +153,142 @@ async function callGeminiAI(promptText) {
       if (res.ok) {
         const data = await res.json();
         let rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        rawText = rawText.replace(/```json/gi, '').replace(/
+        rawText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+        if (rawText) return JSON.parse(rawText);
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
+// MAIN API: So'z tarjimasi
+app.post('/api/translate', async (req, res) => {
+  try {
+    const word = (req.body && req.body.word || '').trim();
+    const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
+
+    if (!word) return res.status(400).json({ error: "So'z yuborilmadi" });
+
+    const aiPrompt = `
+    Target Word or Phrase: "${word}"
+    Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
+
+    Return ONLY a JSON object with this exact structure:
+    {
+      "en": "English word or phrase in lowercase",
+      "uzbek": "Accurate Uzbek translation",
+      "transcription": "IPA pronunciation in brackets, e.g. [/ˈæp.əl/]",
+      "partOfSpeech": "Part of speech in Uzbek (fe'l, ot, sifat, ravish)",
+      "example": "A real, high-quality, grammatically correct English sentence that naturally uses this English word in context."
+    }
+    `;
+
+    const aiResult = await callGeminiAI(aiPrompt);
+
+    if (aiResult && aiResult.en && aiResult.uzbek && aiResult.example) {
+      return res.json({
+        en: aiResult.en.toLowerCase(),
+        uzbek: aiResult.uzbek,
+        example: aiResult.example,
+        transcription: aiResult.transcription || `[${aiResult.en}]`,
+        partOfSpeech: aiResult.partOfSpeech || "so'z"
+      });
+    }
+
+    const fromLang = direction === 'uz-en' ? 'uz' : 'en';
+    const toLang = direction === 'uz-en' ? 'en' : 'uz';
+    const translatedText = await translateBackup(word, fromLang, toLang);
+
+    const enWord = direction === 'en-uz' ? word.toLowerCase() : translatedText.toLowerCase();
+    const uzWord = direction === 'en-uz' ? translatedText : word;
+
+    const dictData = await fetchFreeDictionaryData(enWord);
+
+    let finalPos = dictData?.pos || "so'z";
+    let finalIpa = dictData?.ipa || `[${enWord}]`;
+    let finalExample = dictData?.exampleSentence || `Practice using the word "${enWord}" in daily English studies.`;
+
+    res.json({
+      en: enWord,
+      uzbek: uzWord,
+      example: finalExample,
+      transcription: finalIpa,
+      partOfSpeech: finalPos
+    });
+
+  } catch (e) {
+    console.error('Server xatosi:', e.message);
+    res.status(500).json({ error: 'Serverda xatolik yuz berdi' });
+  }
+});
+
+// Katta Matn Tarjimasi API
+app.post('/api/translate-text', async (req, res) => {
+  try {
+    const text = (req.body && req.body.text || '').trim();
+    const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
+
+    if (!text) return res.status(400).json({ error: 'Matn yuborilmadi' });
+
+    const fromLang = direction === 'uz-en' ? 'uz' : 'en';
+    const toLang = direction === 'uz-en' ? 'en' : 'uz';
+
+    const textPrompt = `Translate text from ${fromLang === 'uz' ? 'Uzbek' : 'English'} to ${toLang === 'uz' ? 'Uzbek' : 'English'}. Return ONLY JSON: {"translation": "result"}.\nText: "${text}"`;
+    const aiTextResult = await callGeminiAI(textPrompt);
+
+    if (aiTextResult && aiTextResult.translation) {
+      return res.json({ translation: aiTextResult.translation });
+    }
+
+    const backupResult = await translateBackup(text, fromLang, toLang);
+    res.json({ translation: backupResult });
+
+  } catch (e) {
+    res.status(500).json({ error: 'Server xatosi' });
+  }
+});
+
+// Auto-ping
+const APP_URL = process.env.MINI_APP_URL || process.env.RENDER_EXTERNAL_URL;
+if (APP_URL) {
+  setInterval(() => {
+    fetch(APP_URL).then(() => console.log('Self-ping ok')).catch(() => {});
+  }, 10 * 60 * 1000);
+}
+
+// Telegram Bot
+const BOT_TOKEN = process.env.BOT_TOKEN;
+if (BOT_TOKEN) {
+  const bot = new TelegramBot(BOT_TOKEN, { polling: true });
+  bot.onText(/\/start/, (msg) => {
+    if (!APP_URL) return bot.sendMessage(msg.chat.id, "MINI_APP_URL sozlanmagan.");
+    bot.sendMessage(msg.chat.id, "Lug'at daftarchangizga xush kelibsiz! 📖", {
+      reply_markup: {
+        inline_keyboard: [[{ text: '📖 Ilovani ochish', web_app: { url: APP_URL } }]]
+      }
+    });
+  });
+}
+
+// TTS API
+app.get('/api/speak', async (req, res) => {
+  try {
+    const text = (req.query.text || '').toString().trim().slice(0, 300);
+    const lang = (req.query.lang === 'uz') ? 'uz' : 'en';
+    if (!text) return res.status(400).send('Matn yo\'q');
+
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+    const response = await fetch(ttsUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    if (!response.ok) return res.status(502).send('Ovoz olinmadi');
+    const buffer = Buffer.from(await response.arrayBuffer());
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.send(buffer);
+  } catch (e) {
+    res.status(500).send('Server xatosi');
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server ${PORT}-portda ishga tushdi`));
