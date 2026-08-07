@@ -16,7 +16,7 @@ const POS_MAP = {
   pronoun: "olmosh", preposition: "predlog", conjunction: "bog'lovchi", interjection: "undov"
 };
 
-// 1. Leaderboard API lar
+// 1. Leaderboard API
 app.post('/api/leaderboard/update', (req, res) => {
   try {
     const { id, name, username, photoUrl, xp, wordsCount, memorizedCount, streak } = req.body;
@@ -52,41 +52,7 @@ app.get('/api/leaderboard', (req, res) => {
   res.json(leaderboardData.slice(0, 50));
 });
 
-// 2. Kuchaytirilgan Tarjima xizmati
-async function translateWithGoogle(text, fromLang, toLang) {
-  try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data[0] && data[0][0] && data[0][0][0]) {
-        const trans = data[0].map(item => item[0]).join('');
-        if (trans.toLowerCase() !== text.toLowerCase()) return trans;
-      }
-    }
-  } catch (e) {
-    console.warn('Google Translate xatosi:', e.message);
-  }
-
-  try {
-    const mmUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
-    const mmRes = await fetch(mmUrl);
-    if (mmRes.ok) {
-      const mmData = await mmRes.json();
-      if (mmData && mmData.responseData && mmData.responseData.translatedText) {
-        return mmData.responseData.translatedText;
-      }
-    }
-  } catch (e) {
-    console.warn('MyMemory Translate xatosi:', e.message);
-  }
-
-  return text;
-}
-
-// 3. Free Dictionary API
+// 2. Free Dictionary API (Haqiqiy inglizcha lug'at va misol gaplar)
 async function fetchFreeDictionaryData(word) {
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
@@ -100,14 +66,14 @@ async function fetchFreeDictionaryData(word) {
     let exampleSentence = "";
 
     if (entry.meanings && entry.meanings.length > 0) {
-      const primaryMeaning = entry.meanings[0];
-      const rawPos = primaryMeaning.partOfSpeech;
-      pos = POS_MAP[rawPos] || rawPos || "so'z";
-
       for (const m of entry.meanings) {
+        const rawPos = m.partOfSpeech;
+        if (rawPos && POS_MAP[rawPos]) {
+          pos = POS_MAP[rawPos];
+        }
         for (const d of m.definitions || []) {
           if (d.example) {
-            exampleSentence = d.example;
+            exampleSentence = d.example; // Haqiqiy grammatik to'g'ri lug'at gapi
             break;
           }
         }
@@ -121,33 +87,63 @@ async function fetchFreeDictionaryData(word) {
   }
 }
 
-function generateSmartExample(word, pos) {
-  const w = word.toLowerCase();
+// 3. Zaxira Tarjima xizmati (Google Translate / MyMemory)
+async function translateBackup(text, fromLang, toLang) {
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data[0] && data[0][0] && data[0][0][0]) {
+        const trans = data[0].map(item => item[0]).join('');
+        if (trans.toLowerCase() !== text.toLowerCase()) return trans;
+      }
+    }
+  } catch (e) {}
 
-  const nounTemplates = [
-    `The overall ${w} of this structure looks very unique and well-designed.`,
-    `We need to evaluate the main ${w} before drawing any conclusions.`,
-    `She found a beautiful ${w} that matched her expectations perfectly.`
-  ];
+  try {
+    const mmUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
+    const mmRes = await fetch(mmUrl);
+    if (mmRes.ok) {
+      const mmData = await mmRes.json();
+      if (mmData?.responseData?.translatedText) {
+        return mmData.responseData.translatedText;
+      }
+    }
+  } catch (e) {}
 
-  const verbTemplates = [
-    `They decided to ${w} behind the building until it was safe.`,
-    `It takes time and patience to ${w} this new skill effectively.`
-  ];
-
-  const adjTemplates = [
-    `It was a remarkably ${w} idea that helped solve the entire issue.`,
-    `He provided a very ${w} response to all of our questions.`
-  ];
-
-  let list = nounTemplates;
-  if (pos === "fe'l") list = verbTemplates;
-  else if (pos === "sifat") list = adjTemplates;
-
-  return list[Math.floor(Math.random() * list.length)];
+  return text;
 }
 
-// MAIN API: Gemini 2.0 Flash va 1.5 Flash modellarini qo'llab-quvvatlaydigan API
+// 4. Gemini AI murojaat funksiyasi
+async function callGeminiAI(promptText) {
+  if (!GEMINI_API_KEY) return null;
+  const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: promptText }] }],
+          generationConfig: { temperature: 0.3, responseMimeType: "application/json" }
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        let rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        rawText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+        if (rawText) return JSON.parse(rawText);
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
+// MAIN API: So'z tarjimasi va haqiqiy gap tuzish
 app.post('/api/translate', async (req, res) => {
   try {
     const word = (req.body && req.body.word || '').trim();
@@ -155,64 +151,37 @@ app.post('/api/translate', async (req, res) => {
 
     if (!word) return res.status(400).json({ error: "So'z yuborilmadi" });
 
-    // 1-USUL: Gemini AI (Gemini 2.0-flash / 1.5-flash)
-    if (GEMINI_API_KEY) {
-      const modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-flash'];
-      
-      for (const modelName of modelsToTry) {
-        try {
-          const promptText = `
-          Target Word: "${word}"
-          Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
+    // 1. Birinchi navbatda Gemini AI ga murojaat qilamiz
+    const aiPrompt = `
+    Target Word or Phrase: "${word}"
+    Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
 
-          Return ONLY a raw JSON object (no markdown formatting, no backticks):
-          {
-            "en": "English word in lowercase",
-            "uzbek": "Accurate, concise Uzbek translation",
-            "transcription": "IPA pronunciation in brackets, e.g. [/ˈpæt.ən/]",
-            "partOfSpeech": "Correct part of speech in Uzbek (fe'l, ot, sifat, ravish)",
-            "example": "A natural, realistic intermediate B1-B2 level English sentence using the target word in context."
-          }
-          `;
+    Return ONLY a JSON object with this exact structure:
+    {
+      "en": "English word or phrase in lowercase",
+      "uzbek": "Accurate, natural Uzbek translation",
+      "transcription": "IPA pronunciation in brackets, e.g. [/ˈæp.əl/]",
+      "partOfSpeech": "Part of speech in Uzbek (fe'l, ot, sifat, ravish)",
+      "example": "A real, high-quality, grammatically correct English sentence that naturally uses this word in context."
+    }
+    `;
 
-          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`;
-          const aiResponse = await fetch(geminiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ role: 'user', parts: [{ text: promptText }] }],
-              generationConfig: { temperature: 0.7, responseMimeType: "application/json" }
-            })
-          });
+    const aiResult = await callGeminiAI(aiPrompt);
 
-          if (aiResponse.ok) {
-            const aiData = await aiResponse.json();
-            let rawJson = aiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            rawJson = rawJson.replace(/```json/gi, '').replace(/```/g, '').trim();
-
-            if (rawJson) {
-              const parsed = JSON.parse(rawJson);
-              if (parsed.en && parsed.uzbek && parsed.example) {
-                return res.json({
-                  en: parsed.en.toLowerCase(),
-                  uzbek: parsed.uzbek,
-                  example: parsed.example,
-                  transcription: parsed.transcription || `[${parsed.en}]`,
-                  partOfSpeech: parsed.partOfSpeech || "so'z"
-                });
-              }
-            }
-          }
-        } catch (mErr) {
-          console.warn(`Model ${modelName} xatosi:`, mErr.message);
-        }
-      }
+    if (aiResult && aiResult.en && aiResult.uzbek && aiResult.example) {
+      return res.json({
+        en: aiResult.en.toLowerCase(),
+        uzbek: aiResult.uzbek,
+        example: aiResult.example,
+        transcription: aiResult.transcription || `[${aiResult.en}]`,
+        partOfSpeech: aiResult.partOfSpeech || "so'z"
+      });
     }
 
-    // 2-USUL: Zaxira manbalar
+    // 2. Gemini bo'lmasa -> Free Dictionary API (Haqiqiy lug'at gaplari) + Backup Translate
     const fromLang = direction === 'uz-en' ? 'uz' : 'en';
     const toLang = direction === 'uz-en' ? 'en' : 'uz';
-    const translatedText = await translateWithGoogle(word, fromLang, toLang);
+    const translatedText = await translateBackup(word, fromLang, toLang);
 
     const enWord = direction === 'en-uz' ? word.toLowerCase() : translatedText.toLowerCase();
     const uzWord = direction === 'en-uz' ? translatedText : word;
@@ -221,10 +190,11 @@ app.post('/api/translate', async (req, res) => {
 
     let finalPos = dictData?.pos || "so'z";
     let finalIpa = dictData?.ipa || `[${enWord}]`;
-    let finalExample = dictData?.exampleSentence;
+    let finalExample = dictData?.exampleSentence || "";
 
+    // Mantiqsiz shablonlar umuman ishlatilmaydi
     if (!finalExample) {
-      finalExample = generateSmartExample(enWord, finalPos);
+      finalExample = `Practice using the word "${enWord}" in your daily English studies.`;
     }
 
     res.json({
@@ -241,7 +211,7 @@ app.post('/api/translate', async (req, res) => {
   }
 });
 
-// Katta Matn Tarjimasi
+// Katta Matn Tarjimasi API
 app.post('/api/translate-text', async (req, res) => {
   try {
     const text = (req.body && req.body.text || '').trim();
@@ -252,8 +222,17 @@ app.post('/api/translate-text', async (req, res) => {
     const fromLang = direction === 'uz-en' ? 'uz' : 'en';
     const toLang = direction === 'uz-en' ? 'en' : 'uz';
 
-    const resultText = await translateWithGoogle(text, fromLang, toLang);
-    res.json({ translation: resultText, translatedText: resultText });
+    // Gemini AI orqali katta matn tarjimasi
+    const textPrompt = `Translate the following text from ${fromLang === 'uz' ? 'Uzbek' : 'English'} to ${toLang === 'uz' ? 'Uzbek' : 'English'}. Return ONLY a JSON object: {"translation": "translated text here"}.\nText: "${text}"`;
+    const aiTextResult = await callGeminiAI(textPrompt);
+
+    if (aiTextResult && aiTextResult.translation) {
+      return res.json({ translation: aiTextResult.translation });
+    }
+
+    // Zaxira tarjima
+    const backupResult = await translateBackup(text, fromLang, toLang);
+    res.json({ translation: backupResult });
 
   } catch (e) {
     res.status(500).json({ error: 'Server xatosi' });
