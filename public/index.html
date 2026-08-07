@@ -660,13 +660,13 @@
     margin: 26px 0 14px;
   }
 
-  /* SHOHSUPA (PODIUM) STILLARI */
+  /* TUZATILGAN SHOHSUPA (PODIUM) */
   .podium-container {
     display: flex;
     align-items: flex-end;
     justify-content: center;
     gap: 10px;
-    margin-top: 18px;
+    margin-top: 22px;
     margin-bottom: 20px;
   }
 
@@ -675,7 +675,7 @@
     background: var(--paper);
     border: 1.5px solid var(--paper-line);
     border-radius: 14px;
-    padding: 12px 6px;
+    padding: 16px 6px 12px;
     text-align: center;
     position: relative;
     cursor: pointer;
@@ -703,29 +703,38 @@
     border: 2px solid #D97706;
   }
 
+  /* RAMKADAN CHIQIB KETMASLIGI UCHUN TOJ STILLARI */
   .podium-crown {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    margin-bottom: 6px;
+    background: var(--surface);
+    border: 1px solid var(--paper-line);
   }
+  .rank-1 .podium-crown { color: var(--gold); border-color: var(--gold); }
+  .rank-2 .podium-crown { color: #64748B; border-color: #94A3B8; }
+  .rank-3 .podium-crown { color: #B45309; border-color: #D97706; }
 
   .podium-avatar {
     width: 48px;
     height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    margin: 6px auto;
+    margin: 2px auto 6px;
     border: 2px solid var(--paper-line);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     background: var(--paper-dark);
   }
 
-  .rank-1 .podium-avatar { border-color: var(--gold); width: 56px; height: 54px; font-size: 26px; }
+  .rank-1 .podium-avatar { border-color: var(--gold); width: 54px; height: 54px; font-size: 24px; }
   .rank-2 .podium-avatar { border-color: #94A3B8; }
   .rank-3 .podium-avatar { border-color: #D97706; }
 
@@ -771,7 +780,6 @@
   .lb-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
   .lb-xp { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: var(--gold); }
 
-  /* TUZATILGAN YUTUQLAR VA NISHONLAR GRIDI */
   .badges-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -794,7 +802,6 @@
   }
   .badge-item .badge-icon { font-size: 24px; flex-shrink: 0; }
 
-  /* SOZLAMALAR PANEL STILI */
   .settings-list {
     display: flex;
     flex-direction: column;
@@ -896,7 +903,6 @@
 </head>
 <body>
 
-<!-- SPLASH ANIMATSIYA -->
 <div id="splashScreen" class="splash-screen">
   <div class="splash-container">
     <svg class="animated-notebook" viewBox="0 0 120 100" fill="none">
@@ -923,7 +929,7 @@
     <div class="views-wrapper">
       <div class="views-slider" id="viewsSlider">
         
-        <!-- PANE 1: ASOSIY (LUG'AT) -->
+        <!-- PANE 1: ASOSIY -->
         <div class="view-pane" id="paneHome">
           <header class="cover">
             <div class="top-icons">
@@ -965,7 +971,7 @@
           </div>
         </div>
 
-        <!-- PANE 2: MATN TARJIMONI -->
+        <!-- PANE 2: TARJIMA -->
         <div class="view-pane" id="paneTranslate">
           <header class="cover">
             <div class="tape" id="transTitle">Matn Tarjimoni</div>
@@ -1026,7 +1032,6 @@
               </div>
             </div>
 
-            <!-- LEADERBOARD BO'LIMI -->
             <div class="leaderboard-title" id="profLbTitle">🏆 Peshqadamlar Jadvali (Top XP)</div>
             <div class="podium-container" id="podiumContainer"></div>
             <div class="lb-list" id="lbList"></div>
@@ -1051,7 +1056,6 @@
               </div>
             </div>
 
-            <!-- SOZLAMALAR -->
             <div class="settings-title" id="profSettingsTitle">⚙️ Sozlamalar</div>
             <div class="settings-list">
               <div class="setting-item">
@@ -1132,7 +1136,7 @@ setTimeout(() => {
 }, 2000);
 
 const STORAGE_KEY = 'vocab-words-v1';
-const VISITS_KEY = 'vocab-visit-dates-v1';
+const STREAK_KEY = 'vocab-streak-data-v1';
 let words = [];
 let quizState = null;
 let currentLeaderboardUsers = [];
@@ -1145,37 +1149,68 @@ const quizBanner = document.getElementById('quizBanner');
 const quizOverlay = document.getElementById('quizOverlay');
 const quizBody = document.getElementById('quizBody');
 
-// ---------- XP VA KUNLARNI HISOBLASH LOGIKASI ----------
-function updateVisitDays() {
-  let visits = [];
+function getTodayString() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function getYesterdayString() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+async function getStreakData() {
+  let data = { lastVisit: '', streak: 1 };
   try {
-    visits = JSON.parse(localStorage.getItem(VISITS_KEY)) || [];
-  } catch(e) { visits = []; }
-  
-  const today = new Date().toISOString().split('T')[0];
-  if (!visits.includes(today)) {
-    visits.push(today);
-    try { localStorage.setItem(VISITS_KEY, JSON.stringify(visits)); } catch(e){}
+    let raw = null;
+    if (hasCloudStorage()) {
+      raw = await cloudGetItem('streak_data');
+    }
+    if (!raw) {
+      raw = localStorage.getItem(STREAK_KEY);
+    }
+    if (raw) data = JSON.parse(raw);
+  } catch(e) {}
+
+  const today = getTodayString();
+  const yesterday = getYesterdayString();
+
+  if (data.lastVisit === today) {
+    // Bugun kiringan
+  } else if (data.lastVisit === yesterday) {
+    data.streak += 1;
+    data.lastVisit = today;
+  } else {
+    data.streak = 1;
+    data.lastVisit = today;
   }
-  return visits.length;
+
+  try {
+    const jsonStr = JSON.stringify(data);
+    if (hasCloudStorage()) await cloudSetItem('streak_data', jsonStr);
+    localStorage.setItem(STREAK_KEY, jsonStr);
+  } catch(e) {}
+
+  return data;
 }
 
-function calculateXP() {
+let cachedStreak = 1;
+
+async function updateXPDisplay() {
+  const streakData = await getStreakData();
+  cachedStreak = streakData.streak || 1;
+
   const memorizedCount = words.filter(w => w.memorized).length;
-  const visitDays = updateVisitDays();
-  const xp = (memorizedCount * 1) + (visitDays * 10);
-  return { xp, visitDays, memorizedCount };
-}
+  const xp = (memorizedCount * 1) + (cachedStreak * 10);
 
-function updateXPDisplay() {
-  const { xp, visitDays, memorizedCount } = calculateXP();
   const badgeEl = document.getElementById('xpBadge');
   if (badgeEl) badgeEl.textContent = `⚡ ${xp} XP`;
   
   const profStreak = document.getElementById('profStreakCount');
-  if (profStreak) profStreak.textContent = `🔥 ${visitDays}`;
+  if (profStreak) profStreak.textContent = `🔥 ${cachedStreak}`;
 
-  syncUserXP(xp, words.length, memorizedCount, visitDays);
+  syncUserXP(xp, words.length, memorizedCount, cachedStreak);
 }
 
 async function syncUserXP(xp, wordsCount, memorizedCount, streak) {
@@ -1217,7 +1252,6 @@ async function renderLeaderboard() {
       return;
     }
 
-    // Dynamic Podium Render
     const top3 = list.slice(0, 3);
     const ranks = ['rank-1', 'rank-2', 'rank-3'];
     const crowns = ['👑 1', '🥈 2', '🥉 3'];
@@ -1239,7 +1273,6 @@ async function renderLeaderboard() {
     });
     podiumEl.innerHTML = podiumHtml;
 
-    // List for 4th onwards
     const rest = list.slice(3);
     let listHtml = '';
     rest.forEach((user, idx) => {
@@ -1287,7 +1320,7 @@ function openLeaderboardUserProfile(userId) {
     <div class="profile-grid-stats">
       <div class="stat-card-box">
         <b>${user.xp}</b>
-        <span>TAJRRIBA (XP)</span>
+        <span>TAJRIBA (XP)</span>
       </div>
       <div class="stat-card-box">
         <b>${user.memorizedCount || 0}</b>
@@ -1603,8 +1636,13 @@ async function fetchTranslation(word, direction){
 async function addWord(rawInput){
   const inputWord = rawInput.trim();
   if(!inputWord) return;
-  const w = { id: uid(), en: currentDirection === 'en-uz' ? inputWord : '', uz: currentDirection === 'uz-en' ? inputWord : '',
-    example: '', transcription: '', partOfSpeech: '', status: 'loading', memorized: false, quizzed: false };
+  const w = {
+    id: uid(),
+    dir: currentDirection,
+    en: currentDirection === 'en-uz' ? inputWord : '',
+    uz: currentDirection === 'uz-en' ? inputWord : '',
+    example: '', transcription: '', partOfSpeech: '', status: 'loading', memorized: false, quizzed: false
+  };
   words.unshift(w);
   render();
   saveWords();
@@ -1654,7 +1692,7 @@ function retryWord(id){
   if(!w) return;
   w.status = 'loading';
   render();
-  fetchTranslation(w.en || w.uz, w.en ? 'en-uz' : 'uz-en').then(result => {
+  fetchTranslation(w.en || w.uz, w.dir || 'en-uz').then(result => {
     w.en = result.en;
     w.uz = result.uzbek;
     w.example = result.example;
@@ -1712,12 +1750,17 @@ function checkQuizReady(){
   quizBanner.classList.toggle('hidden', ready.length < 10);
 }
 
+// KARTOCHKALARDAGI TILLAR O'RNI O'ZGARISHI TUZATILDI
 function cardHtml(w){
-  const headword = w.en || w.uz;
+  const isUzEn = w.dir === 'uz-en';
+  const mainTitle = isUzEn ? w.uz : w.en;
+  const subTitle = isUzEn ? w.en : w.uz;
+  const headwordFallback = mainTitle || w.en || w.uz;
+
   if(w.status === 'loading'){
     return `<div class="card pending">
       <div class="card-top">
-        <div class="en-word">${escapeHtml(headword)}</div>
+        <div class="en-word">${escapeHtml(headwordFallback)}</div>
         <div class="card-actions">
           <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
         </div>
@@ -1728,7 +1771,7 @@ function cardHtml(w){
   if(w.status === 'error'){
     return `<div class="card">
       <div class="card-top">
-        <div class="en-word">${escapeHtml(headword)}</div>
+        <div class="en-word">${escapeHtml(headwordFallback)}</div>
         <div class="card-actions">
           <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
         </div>
@@ -1738,7 +1781,7 @@ function cardHtml(w){
   }
   return `<div class="card">
     <div class="card-top">
-      <div class="en-word">${escapeHtml(w.en)}</div>
+      <div class="en-word">${escapeHtml(mainTitle)}</div>
       <div class="card-actions">
         <button class="icon-btn speak-btn" onclick="speakWord('${escapeJs(w.en)}')" title="${t('titleSpeak')}">🔊</button>
         <button class="icon-btn memorize" onclick="toggleMemorized('${w.id}')" title="${w.memorized ? t('titleUnmemorize') : t('titleMemorize')}">${w.memorized ? '↺' : '✓'}</button>
@@ -1751,8 +1794,8 @@ function cardHtml(w){
       ${w.memorized ? `<span class="memorized-tag">✓ ${t('stamp')}</span>` : ''}
     </div>
     <div class="uz-word">
-      ${escapeHtml(w.uz)}
-      <button class="copy-btn" onclick="copyText('${escapeJs(w.uz)}', this)" title="${t('titleCopy')}">⧉</button>
+      ${escapeHtml(subTitle)}
+      <button class="copy-btn" onclick="copyText('${escapeJs(subTitle)}', this)" title="${t('titleCopy')}">⧉</button>
     </div>
     <div class="example">${escapeHtml(w.example)}</div>
   </div>`;
