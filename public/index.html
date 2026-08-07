@@ -130,55 +130,71 @@
   .stats b{color:var(--ink); font-weight:600;}
   .stat-dot{color:var(--gold);}
 
-  /* GOOGLE TRANSLATE STYLE MULTI-LANG BAR */
-  .gt-lang-bar {
+  /* DROPDOWN SELECT DIZAYNI (RASMGA MOS) */
+  .dropdown-lang-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--surface);
-    border: 1.5px solid var(--paper-line);
-    border-radius: 12px;
-    padding: 6px 8px;
+    gap: 8px;
     margin-top: 18px;
     margin-bottom: 12px;
   }
-  .gt-lang-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    overflow-x: auto;
+
+  .lang-select-wrapper {
+    flex: 1;
+    position: relative;
   }
-  .gt-lang-btn {
-    border: none;
-    background: transparent;
-    color: var(--ink-soft);
+
+  .lang-select {
+    width: 100%;
+    padding: 10px 32px 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
     font-weight: 600;
-    font-size: 13.5px;
-    padding: 6px 12px;
-    border-radius: 8px;
+    color: #3b28b1;
+    background: var(--surface);
+    border: 1.5px solid var(--paper-line);
+    border-radius: 12px;
+    outline: none;
     cursor: pointer;
-    white-space: nowrap;
-    transition: all .15s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: border-color .15s, box-shadow .15s;
   }
-  .gt-lang-btn:hover { background: var(--paper-dark); color: var(--ink); }
-  .gt-lang-btn.active {
-    background: var(--paper-dark);
+  html[data-theme="dark"] .lang-select {
     color: var(--navy);
-    box-shadow: inset 0 -2px 0 var(--gold);
   }
+  .lang-select:focus {
+    border-color: var(--gold);
+  }
+
+  .select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 10px;
+    color: #3b28b1;
+  }
+  html[data-theme="dark"] .select-arrow { color: var(--navy); }
+
   .gt-swap-btn {
     border: 1px solid var(--paper-line);
-    background: var(--paper);
+    background: var(--surface);
     color: var(--navy);
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: background .15s;
   }
   .gt-swap-btn:hover { background: var(--paper-dark); }
 
@@ -364,22 +380,36 @@
             </div>
           </header>
 
-          <!-- MULTI-LANG BAR (GOOGLE TRANSLATE STYLE) -->
-          <div class="gt-lang-bar">
-            <div class="gt-lang-group" id="homeFromGroup">
-              <button class="gt-lang-btn active" data-lang="en">Ingliz</button>
-              <button class="gt-lang-btn" data-lang="uz">O'zbek</button>
-              <button class="gt-lang-btn" data-lang="ru">Rus</button>
-              <button class="gt-lang-btn" data-lang="tr">Turk</button>
+          <!-- DROPDOWN TILLAR MENYUSI (RASMDAGIDEK) -->
+          <div class="dropdown-lang-bar">
+            <div class="lang-select-wrapper">
+              <select class="lang-select" id="homeFromSelect">
+                <option value="en" selected>Inglizcha</option>
+                <option value="uz">O'zbekcha</option>
+                <option value="ru">Ruscha</option>
+                <option value="tr">Turkcha</option>
+                <option value="de">Nemischa</option>
+                <option value="fr">Fransuzcha</option>
+                <option value="es">Ispancha</option>
+                <option value="ar">Arabcha</option>
+              </select>
+              <span class="select-arrow">▼</span>
             </div>
 
             <button class="gt-swap-btn" id="homeSwapBtn" title="Almashtirish">⇄</button>
 
-            <div class="gt-lang-group" id="homeToGroup">
-              <button class="gt-lang-btn active" data-lang="uz">O'zbek</button>
-              <button class="gt-lang-btn" data-lang="en">Ingliz</button>
-              <button class="gt-lang-btn" data-lang="ru">Rus</button>
-              <button class="gt-lang-btn" data-lang="tr">Turk</button>
+            <div class="lang-select-wrapper">
+              <select class="lang-select" id="homeToSelect">
+                <option value="uz" selected>O'zbekcha</option>
+                <option value="en">Inglizcha</option>
+                <option value="ru">Ruscha</option>
+                <option value="tr">Turkcha</option>
+                <option value="de">Nemischa</option>
+                <option value="fr">Fransuzcha</option>
+                <option value="es">Ispancha</option>
+                <option value="ar">Arabcha</option>
+              </select>
+              <span class="select-arrow">▼</span>
             </div>
           </div>
 
@@ -413,21 +443,35 @@
           </header>
 
           <div class="trans-section-card">
-            <div class="gt-lang-bar" style="margin-top:0;">
-              <div class="gt-lang-group" id="ttFromGroup">
-                <button class="gt-lang-btn active" data-lang="en">Ingliz</button>
-                <button class="gt-lang-btn" data-lang="uz">O'zbek</button>
-                <button class="gt-lang-btn" data-lang="ru">Rus</button>
-                <button class="gt-lang-btn" data-lang="tr">Turk</button>
+            <div class="dropdown-lang-bar" style="margin-top:0;">
+              <div class="lang-select-wrapper">
+                <select class="lang-select" id="ttFromSelect">
+                  <option value="en" selected>Inglizcha</option>
+                  <option value="uz">O'zbekcha</option>
+                  <option value="ru">Ruscha</option>
+                  <option value="tr">Turkcha</option>
+                  <option value="de">Nemischa</option>
+                  <option value="fr">Fransuzcha</option>
+                  <option value="es">Ispancha</option>
+                  <option value="ar">Arabcha</option>
+                </select>
+                <span class="select-arrow">▼</span>
               </div>
 
               <button class="gt-swap-btn" id="ttSwapBtn" title="Almashtirish">⇄</button>
 
-              <div class="gt-lang-group" id="ttToGroup">
-                <button class="gt-lang-btn active" data-lang="uz">O'zbek</button>
-                <button class="gt-lang-btn" data-lang="en">Ingliz</button>
-                <button class="gt-lang-btn" data-lang="ru">Rus</button>
-                <button class="gt-lang-btn" data-lang="tr">Turk</button>
+              <div class="lang-select-wrapper">
+                <select class="lang-select" id="ttToSelect">
+                  <option value="uz" selected>O'zbekcha</option>
+                  <option value="en">Inglizcha</option>
+                  <option value="ru">Ruscha</option>
+                  <option value="tr">Turkcha</option>
+                  <option value="de">Nemischa</option>
+                  <option value="fr">Fransuzcha</option>
+                  <option value="es">Ispancha</option>
+                  <option value="ar">Arabcha</option>
+                </select>
+                <span class="select-arrow">▼</span>
               </div>
             </div>
 
@@ -587,11 +631,6 @@ const STREAK_KEY = 'vocab-streak-data-v1';
 let words = [];
 let quizState = null;
 let currentLeaderboardUsers = [];
-
-let homeFromLang = 'en';
-let homeToLang = 'uz';
-let ttFromLang = 'en';
-let ttToLang = 'uz';
 
 const learningList = document.getElementById('learningList');
 const memorizedList = document.getElementById('memorizedList');
@@ -1069,10 +1108,16 @@ async function fetchTranslation(word, fromLang, toLang){
 async function addWord(rawInput){
   const inputWord = rawInput.trim();
   if(!inputWord) return;
+
+  const homeFromSelect = document.getElementById('homeFromSelect');
+  const homeToSelect = document.getElementById('homeToSelect');
+  const fromL = homeFromSelect ? homeFromSelect.value : 'en';
+  const toL = homeToSelect ? homeToSelect.value : 'uz';
+
   const w = {
     id: uid(),
-    fromLang: homeFromLang,
-    toLang: homeToLang,
+    fromLang: fromL,
+    toLang: toL,
     sourceWord: inputWord,
     translatedWord: '',
     example: '', transcription: '', partOfSpeech: '', status: 'loading', memorized: false, quizzed: false
@@ -1082,8 +1127,8 @@ async function addWord(rawInput){
   saveWords();
 
   try{
-    const result = await fetchTranslation(inputWord, homeFromLang, homeToLang);
-    const dupe = words.find(x => x.id !== w.id && x.sourceWord.toLowerCase() === result.sourceWord.toLowerCase() && x.fromLang === homeFromLang);
+    const result = await fetchTranslation(inputWord, fromL, toL);
+    const dupe = words.find(x => x.id !== w.id && x.sourceWord.toLowerCase() === result.sourceWord.toLowerCase() && x.fromLang === fromL);
     if(dupe){
       words = words.filter(x => x.id !== w.id);
       render();
@@ -1268,47 +1313,25 @@ addBtn.addEventListener('click', () => {
   addWord(v);
 });
 
-// GOOGLE TRANSLATE MULTI-LANG EVENTS (HOME)
-function setupMultiLangBar(fromGroupKey, toGroupKey, swapBtnKey, onUpdate) {
-  const fromBtns = document.querySelectorAll(`#${fromGroupKey} .gt-lang-btn`);
-  const toBtns = document.querySelectorAll(`#${toGroupKey} .gt-lang-btn`);
-  const swapBtn = document.getElementById(swapBtnKey);
+// DROPDOWN SELECT EVENTS (HOME & TRANSLATE)
+const homeFromSelect = document.getElementById('homeFromSelect');
+const homeToSelect = document.getElementById('homeToSelect');
+const homeSwapBtn = document.getElementById('homeSwapBtn');
 
-  fromBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      fromBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      onUpdate(btn.dataset.lang, null);
-    });
-  });
-
-  toBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      toBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      onUpdate(null, btn.dataset.lang);
-    });
-  });
-
-  swapBtn.addEventListener('click', () => {
-    let currentFrom = document.querySelector(`#${fromGroupKey} .gt-lang-btn.active`)?.dataset.lang;
-    let currentTo = document.querySelector(`#${toGroupKey} .gt-lang-btn.active`)?.dataset.lang;
-
-    fromBtns.forEach(b => b.classList.toggle('active', b.dataset.lang === currentTo));
-    toBtns.forEach(b => b.classList.toggle('active', b.dataset.lang === currentFrom));
-
-    onUpdate(currentTo, currentFrom);
-  });
-}
-
-setupMultiLangBar('homeFromGroup', 'homeToGroup', 'homeSwapBtn', (from, to) => {
-  if (from) homeFromLang = from;
-  if (to) homeToLang = to;
+homeSwapBtn.addEventListener('click', () => {
+  const temp = homeFromSelect.value;
+  homeFromSelect.value = homeToSelect.value;
+  homeToSelect.value = temp;
 });
 
-setupMultiLangBar('ttFromGroup', 'ttToGroup', 'ttSwapBtn', (from, to) => {
-  if (from) ttFromLang = from;
-  if (to) ttToLang = to;
+const ttFromSelect = document.getElementById('ttFromSelect');
+const ttToSelect = document.getElementById('ttToSelect');
+const ttSwapBtn = document.getElementById('ttSwapBtn');
+
+ttSwapBtn.addEventListener('click', () => {
+  const temp = ttFromSelect.value;
+  ttFromSelect.value = ttToSelect.value;
+  ttToSelect.value = temp;
 });
 
 wordInput.addEventListener('keydown', (e) => {
@@ -1504,10 +1527,12 @@ async function runTranslateText(){
   ttOutput.classList.remove('placeholder');
   ttOutput.textContent = t('loadingText');
   try{
+    const fromL = ttFromSelect ? ttFromSelect.value : 'en';
+    const toL = ttToSelect ? ttToSelect.value : 'uz';
     const response = await fetch('/api/translate-text', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, fromLang: ttFromLang, toLang: ttToLang })
+      body: JSON.stringify({ text, fromLang: fromL, toLang: toL })
     });
     if(!response.ok) throw new Error('fail');
     const data = await response.json();
@@ -1528,11 +1553,11 @@ document.getElementById('ttInputClear').addEventListener('click', () => {
 });
 
 document.getElementById('ttInputSpeak').addEventListener('click', () => {
-  if(ttInput.value.trim()) speakWord(ttInput.value.trim(), ttFromLang);
+  if(ttInput.value.trim()) speakWord(ttInput.value.trim(), ttFromSelect.value);
 });
 document.getElementById('ttOutputSpeak').addEventListener('click', () => {
   const text = ttOutput.textContent.trim();
-  if(text && !ttOutput.classList.contains('placeholder')) speakWord(text, ttToLang);
+  if(text && !ttOutput.classList.contains('placeholder')) speakWord(text, ttToSelect.value);
 });
 document.getElementById('ttOutputCopy').addEventListener('click', (e) => {
   const text = ttOutput.textContent.trim();
