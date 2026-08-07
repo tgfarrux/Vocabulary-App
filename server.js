@@ -120,7 +120,7 @@ async function translateBackup(text, fromLang, toLang) {
 // 4. Gemini AI murojaat funksiyasi
 async function callGeminiAI(promptText) {
   if (!GEMINI_API_KEY) return null;
-  const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+  const models = ['gemini-3.5-flash-lite'];
   for (const model of models) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
