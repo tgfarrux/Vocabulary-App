@@ -130,73 +130,34 @@
   .stats b{color:var(--ink); font-weight:600;}
   .stat-dot{color:var(--gold);}
 
-  /* DROPDOWN SELECT DIZAYNI (RASMGA MOS) */
-  .dropdown-lang-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 18px;
-    margin-bottom: 12px;
+  .lang-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:24px;
+    font-family:'Inter', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
   }
-
-  .lang-select-wrapper {
-    flex: 1;
-    position: relative;
+  .lang-row span{
+    padding:6px 12px;
+    border:1.5px solid var(--paper-line);
+    border-radius:8px;
+    background:var(--surface);
   }
-
-  .lang-select {
-    width: 100%;
-    padding: 10px 32px 10px 14px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: #3b28b1;
-    background: var(--surface);
-    border: 1.5px solid var(--paper-line);
-    border-radius: 12px;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    transition: border-color .15s, box-shadow .15s;
+  #swapLangBtn, #ttSwapBtn {
+    border:none;
+    background:none;
+    font-size:16px;
+    cursor:pointer;
+    color:var(--navy);
+    padding:4px 8px;
+    border-radius:8px;
+    transition:transform .15s, background .15s;
   }
-  html[data-theme="dark"] .lang-select {
-    color: var(--navy);
-  }
-  .lang-select:focus {
-    border-color: var(--gold);
-  }
-
-  .select-arrow {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    font-size: 10px;
-    color: #3b28b1;
-  }
-  html[data-theme="dark"] .select-arrow { color: var(--navy); }
-
-  .gt-swap-btn {
-    border: 1px solid var(--paper-line);
-    background: var(--surface);
-    color: var(--navy);
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: background .15s;
-  }
-  .gt-swap-btn:hover { background: var(--paper-dark); }
+  #swapLangBtn:hover, #ttSwapBtn:hover {background:var(--paper-dark);}
+  #swapLangBtn.spin, #ttSwapBtn.spin {transform:rotate(180deg);}
 
   .add-row{ display:flex; gap:10px; margin:10px 0 8px; }
   .add-row input{ flex:1; font-family:'Inter', sans-serif; font-size:15px; padding:13px 16px; border:1.5px solid var(--paper-line); border-radius:10px; background:var(--surface); color:var(--ink); outline:none; transition:border-color .15s; }
@@ -380,37 +341,10 @@
             </div>
           </header>
 
-          <!-- DROPDOWN TILLAR MENYUSI (RASMDAGIDEK) -->
-          <div class="dropdown-lang-bar">
-            <div class="lang-select-wrapper">
-              <select class="lang-select" id="homeFromSelect">
-                <option value="en" selected>Inglizcha</option>
-                <option value="uz">O'zbekcha</option>
-                <option value="ru">Ruscha</option>
-                <option value="tr">Turkcha</option>
-                <option value="de">Nemischa</option>
-                <option value="fr">Fransuzcha</option>
-                <option value="es">Ispancha</option>
-                <option value="ar">Arabcha</option>
-              </select>
-              <span class="select-arrow">▼</span>
-            </div>
-
-            <button class="gt-swap-btn" id="homeSwapBtn" title="Almashtirish">⇄</button>
-
-            <div class="lang-select-wrapper">
-              <select class="lang-select" id="homeToSelect">
-                <option value="uz" selected>O'zbekcha</option>
-                <option value="en">Inglizcha</option>
-                <option value="ru">Ruscha</option>
-                <option value="tr">Turkcha</option>
-                <option value="de">Nemischa</option>
-                <option value="fr">Fransuzcha</option>
-                <option value="es">Ispancha</option>
-                <option value="ar">Arabcha</option>
-              </select>
-              <span class="select-arrow">▼</span>
-            </div>
+          <div class="lang-row">
+            <span id="langFrom">Inglizcha</span>
+            <button id="swapLangBtn" title="Yo'nalishni almashtirish">⇄</button>
+            <span id="langTo">O'zbek</span>
           </div>
 
           <div class="add-row">
@@ -443,36 +377,10 @@
           </header>
 
           <div class="trans-section-card">
-            <div class="dropdown-lang-bar" style="margin-top:0;">
-              <div class="lang-select-wrapper">
-                <select class="lang-select" id="ttFromSelect">
-                  <option value="en" selected>Inglizcha</option>
-                  <option value="uz">O'zbekcha</option>
-                  <option value="ru">Ruscha</option>
-                  <option value="tr">Turkcha</option>
-                  <option value="de">Nemischa</option>
-                  <option value="fr">Fransuzcha</option>
-                  <option value="es">Ispancha</option>
-                  <option value="ar">Arabcha</option>
-                </select>
-                <span class="select-arrow">▼</span>
-              </div>
-
-              <button class="gt-swap-btn" id="ttSwapBtn" title="Almashtirish">⇄</button>
-
-              <div class="lang-select-wrapper">
-                <select class="lang-select" id="ttToSelect">
-                  <option value="uz" selected>O'zbekcha</option>
-                  <option value="en">Inglizcha</option>
-                  <option value="ru">Ruscha</option>
-                  <option value="tr">Turkcha</option>
-                  <option value="de">Nemischa</option>
-                  <option value="fr">Fransuzcha</option>
-                  <option value="es">Ispancha</option>
-                  <option value="ar">Arabcha</option>
-                </select>
-                <span class="select-arrow">▼</span>
-              </div>
+            <div class="lang-row" style="margin-top:0; margin-bottom:14px;">
+              <span id="ttFrom">Inglizcha</span>
+              <button id="ttSwapBtn" title="Yo'nalishni almashtirish">⇄</button>
+              <span id="ttTo">O'zbekcha</span>
             </div>
 
             <textarea id="ttInput" class="trans-textarea-big" placeholder="Matn yoki gapni kiriting..."></textarea>
@@ -631,6 +539,9 @@ const STREAK_KEY = 'vocab-streak-data-v1';
 let words = [];
 let quizState = null;
 let currentLeaderboardUsers = [];
+
+let currentDirection = 'en-uz';
+let ttDirection = 'en-uz';
 
 const learningList = document.getElementById('learningList');
 const memorizedList = document.getElementById('memorizedList');
@@ -834,6 +745,9 @@ const I18N = {
     statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
     addBtn: "Qo'shish",
     hint: "Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.",
+    placeholderEnUz: "Bilmagan inglizcha so'zingizni yozing va Enter bosing...",
+    placeholderUzEn: "O'zbekcha so'zni yozing, inglizchasini topamiz...",
+    langEnglish: "Inglizcha", langUzbek: "O'zbek",
     quizBannerText: "🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.",
     startQuiz: "Testni boshlash",
     colLearning: "O'rganilmoqda", colMemorized: "Yodlangan",
@@ -871,6 +785,9 @@ const I18N = {
     statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
     addBtn: "Add",
     hint: "When you add a word, translation and an example sentence are generated automatically.",
+    placeholderEnUz: "Type an English word you don't know and press Enter...",
+    placeholderUzEn: "Type an Uzbek word, we'll find the English one...",
+    langEnglish: "English", langUzbek: "Uzbek",
     quizBannerText: "🎉 10 new words memorized! Test your knowledge.",
     startQuiz: "Start quiz",
     colLearning: "Learning", colMemorized: "Memorized",
@@ -908,6 +825,9 @@ const I18N = {
     statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
     addBtn: "Добавить",
     hint: "При добавлении слова автоматически создаются перевод и пример предложения.",
+    placeholderEnUz: "Введите незнакомое английское слово и нажмите Enter...",
+    placeholderUzEn: "Введите узбекское слово, найдём английское...",
+    langEnglish: "Английский", langUzbek: "Узбекский",
     quizBannerText: "🎉 Выучено 10 новых слов! Проверьте свои знания.",
     startQuiz: "Начать тест",
     colLearning: "Изучается", colMemorized: "Выучено",
@@ -1009,6 +929,7 @@ function applyStaticI18n(){
   document.querySelectorAll('.lang-option').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === currentLang);
   });
+  updateLangLabels();
   render();
 }
 
@@ -1093,33 +1014,26 @@ async function saveWords(){
   updateProfilePane();
 }
 
-async function fetchTranslation(word, fromLang, toLang){
+async function fetchTranslation(word, direction){
   const response = await fetch("/api/translate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ word, fromLang, toLang })
+    body: JSON.stringify({ word, direction: direction || currentDirection })
   });
   if(!response.ok){ throw new Error('So\'rov muvaffaqiyatsiz'); }
   const data = await response.json();
-  if(!data.sourceWord || !data.translatedWord) throw new Error('Noto\'g\'ri format');
+  if(!data.en || !data.uzbek || !data.example) throw new Error('Noto\'g\'ri format');
   return data;
 }
 
 async function addWord(rawInput){
   const inputWord = rawInput.trim();
   if(!inputWord) return;
-
-  const homeFromSelect = document.getElementById('homeFromSelect');
-  const homeToSelect = document.getElementById('homeToSelect');
-  const fromL = homeFromSelect ? homeFromSelect.value : 'en';
-  const toL = homeToSelect ? homeToSelect.value : 'uz';
-
   const w = {
     id: uid(),
-    fromLang: fromL,
-    toLang: toL,
-    sourceWord: inputWord,
-    translatedWord: '',
+    dir: currentDirection,
+    en: currentDirection === 'en-uz' ? inputWord : '',
+    uz: currentDirection === 'uz-en' ? inputWord : '',
     example: '', transcription: '', partOfSpeech: '', status: 'loading', memorized: false, quizzed: false
   };
   words.unshift(w);
@@ -1127,16 +1041,16 @@ async function addWord(rawInput){
   saveWords();
 
   try{
-    const result = await fetchTranslation(inputWord, fromL, toL);
-    const dupe = words.find(x => x.id !== w.id && x.sourceWord.toLowerCase() === result.sourceWord.toLowerCase() && x.fromLang === fromL);
+    const result = await fetchTranslation(inputWord, currentDirection);
+    const dupe = words.find(x => x.id !== w.id && x.en.toLowerCase() === result.en.toLowerCase());
     if(dupe){
       words = words.filter(x => x.id !== w.id);
       render();
       saveWords();
       return;
     }
-    w.sourceWord = result.sourceWord;
-    w.translatedWord = result.translatedWord;
+    w.en = result.en;
+    w.uz = result.uzbek;
     w.example = result.example;
     w.transcription = result.transcription;
     w.partOfSpeech = result.partOfSpeech;
@@ -1171,9 +1085,9 @@ function retryWord(id){
   if(!w) return;
   w.status = 'loading';
   render();
-  fetchTranslation(w.sourceWord, w.fromLang || 'en', w.toLang || 'uz').then(result => {
-    w.sourceWord = result.sourceWord;
-    w.translatedWord = result.translatedWord;
+  fetchTranslation(w.en || w.uz, w.dir || 'en-uz').then(result => {
+    w.en = result.en;
+    w.uz = result.uzbek;
     w.example = result.example;
     w.transcription = result.transcription;
     w.partOfSpeech = result.partOfSpeech;
@@ -1187,18 +1101,18 @@ function retryWord(id){
 }
 
 let currentAudio = null;
-function speakWord(text, lang){
+function speakWord(text){
   if(currentAudio){
     currentAudio.pause();
     currentAudio = null;
   }
-  const audio = new Audio(`/api/speak?text=${encodeURIComponent(text)}&lang=${lang || 'en'}`);
+  const audio = new Audio(`/api/speak?text=${encodeURIComponent(text)}&lang=en`);
   currentAudio = audio;
   audio.play().catch(() => {
     if('speechSynthesis' in window){
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = lang || 'en-US';
+      utter.lang = 'en-US';
       utter.rate = 0.9;
       window.speechSynthesis.speak(utter);
     }
@@ -1230,13 +1144,15 @@ function checkQuizReady(){
 }
 
 function cardHtml(w){
-  const mainTitle = w.sourceWord || w.en || '';
-  const subTitle = w.translatedWord || w.uz || '';
+  const isUzEn = w.dir === 'uz-en';
+  const mainTitle = isUzEn ? w.uz : w.en;
+  const subTitle = isUzEn ? w.en : w.uz;
+  const headwordFallback = mainTitle || w.en || w.uz;
 
   if(w.status === 'loading'){
     return `<div class="card pending">
       <div class="card-top">
-        <div class="en-word">${escapeHtml(mainTitle)}</div>
+        <div class="en-word">${escapeHtml(headwordFallback)}</div>
         <div class="card-actions">
           <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
         </div>
@@ -1247,7 +1163,7 @@ function cardHtml(w){
   if(w.status === 'error'){
     return `<div class="card">
       <div class="card-top">
-        <div class="en-word">${escapeHtml(mainTitle)}</div>
+        <div class="en-word">${escapeHtml(headwordFallback)}</div>
         <div class="card-actions">
           <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
         </div>
@@ -1259,7 +1175,7 @@ function cardHtml(w){
     <div class="card-top">
       <div class="en-word">${escapeHtml(mainTitle)}</div>
       <div class="card-actions">
-        <button class="icon-btn speak-btn" onclick="speakWord('${escapeJs(mainTitle)}', '${w.fromLang || 'en'}')" title="${t('titleSpeak')}">🔊</button>
+        <button class="icon-btn speak-btn" onclick="speakWord('${escapeJs(w.en)}')" title="${t('titleSpeak')}">🔊</button>
         <button class="icon-btn memorize" onclick="toggleMemorized('${w.id}')" title="${w.memorized ? t('titleUnmemorize') : t('titleMemorize')}">${w.memorized ? '↺' : '✓'}</button>
         <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
       </div>
@@ -1313,25 +1229,53 @@ addBtn.addEventListener('click', () => {
   addWord(v);
 });
 
-// DROPDOWN SELECT EVENTS (HOME & TRANSLATE)
-const homeFromSelect = document.getElementById('homeFromSelect');
-const homeToSelect = document.getElementById('homeToSelect');
-const homeSwapBtn = document.getElementById('homeSwapBtn');
+const langFromEl = document.getElementById('langFrom');
+const langToEl = document.getElementById('langTo');
+const swapLangBtn = document.getElementById('swapLangBtn');
 
-homeSwapBtn.addEventListener('click', () => {
-  const temp = homeFromSelect.value;
-  homeFromSelect.value = homeToSelect.value;
-  homeToSelect.value = temp;
+function updateLangLabels(){
+  if(currentDirection === 'en-uz'){
+    langFromEl.textContent = t('langEnglish');
+    langToEl.textContent = t('langUzbek');
+    wordInput.placeholder = t('placeholderEnUz');
+  } else {
+    langFromEl.textContent = t('langUzbek');
+    langToEl.textContent = t('langEnglish');
+    wordInput.placeholder = t('placeholderUzEn');
+  }
+}
+
+swapLangBtn.addEventListener('click', () => {
+  currentDirection = currentDirection === 'en-uz' ? 'uz-en' : 'en-uz';
+  updateLangLabels();
+  swapLangBtn.classList.add('spin');
+  setTimeout(() => swapLangBtn.classList.remove('spin'), 200);
+  wordInput.focus();
 });
 
-const ttFromSelect = document.getElementById('ttFromSelect');
-const ttToSelect = document.getElementById('ttToSelect');
+const ttFromEl = document.getElementById('ttFrom');
+const ttToEl = document.getElementById('ttTo');
 const ttSwapBtn = document.getElementById('ttSwapBtn');
 
+function updateTtLabels(){
+  if(ttDirection === 'en-uz'){
+    ttFromEl.textContent = t('langEnglish');
+    ttToEl.textContent = t('langUzbek');
+  } else {
+    ttFromEl.textContent = t('langUzbek');
+    ttToEl.textContent = t('langEnglish');
+  }
+}
+
 ttSwapBtn.addEventListener('click', () => {
-  const temp = ttFromSelect.value;
-  ttFromSelect.value = ttToSelect.value;
-  ttToSelect.value = temp;
+  ttDirection = ttDirection === 'en-uz' ? 'uz-en' : 'en-uz';
+  updateTtLabels();
+  ttSwapBtn.classList.add('spin');
+  setTimeout(() => ttSwapBtn.classList.remove('spin'), 200);
+  const oldInput = ttInput.value;
+  ttInput.value = ttOutput.textContent && !ttOutput.classList.contains('placeholder') ? ttOutput.textContent : oldInput;
+  ttOutput.textContent = t('ttResultPlaceholder');
+  ttOutput.classList.add('placeholder');
 });
 
 wordInput.addEventListener('keydown', (e) => {
@@ -1367,11 +1311,9 @@ const FALLBACK_DISTRACTORS = ["kitob","stol","osmon","daryo","tog'","gul","quyos
 
 function buildQuizQuestions(){
   const pool = words.filter(w => w.memorized && !w.quizzed && w.status === 'ready').slice(0, 10);
-  const allUz = words.filter(w => w.status === 'ready').map(w => w.translatedWord || w.uz);
+  const allUz = words.filter(w => w.status === 'ready').map(w => w.uz);
   return pool.map(w => {
-    const mainWord = w.sourceWord || w.en;
-    const correctAns = w.translatedWord || w.uz;
-    let distractorPool = allUz.filter(u => u !== correctAns);
+    let distractorPool = allUz.filter(u => u !== w.uz);
     let distractors = [];
     while(distractors.length < 3){
       if(distractorPool.length){
@@ -1381,11 +1323,11 @@ function buildQuizQuestions(){
       } else {
         const idx = Math.floor(Math.random() * FALLBACK_DISTRACTORS.length);
         const pick = FALLBACK_DISTRACTORS[idx];
-        if(!distractors.includes(pick) && pick !== correctAns) distractors.push(pick);
+        if(!distractors.includes(pick) && pick !== w.uz) distractors.push(pick);
       }
     }
-    const options = [...distractors, correctAns].sort(() => Math.random() - 0.5);
-    return { id: w.id, en: mainWord, correct: correctAns, options };
+    const options = [...distractors, w.uz].sort(() => Math.random() - 0.5);
+    return { id: w.id, en: w.en, correct: w.uz, options };
   });
 }
 
@@ -1527,12 +1469,10 @@ async function runTranslateText(){
   ttOutput.classList.remove('placeholder');
   ttOutput.textContent = t('loadingText');
   try{
-    const fromL = ttFromSelect ? ttFromSelect.value : 'en';
-    const toL = ttToSelect ? ttToSelect.value : 'uz';
     const response = await fetch('/api/translate-text', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, fromLang: fromL, toLang: toL })
+      body: JSON.stringify({ text, direction: ttDirection })
     });
     if(!response.ok) throw new Error('fail');
     const data = await response.json();
@@ -1553,11 +1493,11 @@ document.getElementById('ttInputClear').addEventListener('click', () => {
 });
 
 document.getElementById('ttInputSpeak').addEventListener('click', () => {
-  if(ttInput.value.trim()) speakWord(ttInput.value.trim(), ttFromSelect.value);
+  if(ttInput.value.trim()) speakWord(ttInput.value.trim());
 });
 document.getElementById('ttOutputSpeak').addEventListener('click', () => {
   const text = ttOutput.textContent.trim();
-  if(text && !ttOutput.classList.contains('placeholder')) speakWord(text, ttToSelect.value);
+  if(text && !ttOutput.classList.contains('placeholder')) speakWord(text);
 });
 document.getElementById('ttOutputCopy').addEventListener('click', (e) => {
   const text = ttOutput.textContent.trim();
