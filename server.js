@@ -30,7 +30,12 @@ function saveLeaderboardToFile() {
   }
 }
 
-// Leaderboard API
+const POS_MAP = {
+  noun: "ot", verb: "fe'l", adjective: "sifat", adverb: "ravish",
+  pronoun: "olmosh", preposition: "predlog", conjunction: "bog'lovchi", interjection: "undov"
+};
+
+// 1. Leaderboard API
 app.post('/api/leaderboard/update', (req, res) => {
   try {
     const { id, name, username, photoUrl, xp, wordsCount, memorizedCount, streak } = req.body;
@@ -67,7 +72,40 @@ app.get('/api/leaderboard', (req, res) => {
   res.json(leaderboardData.slice(0, 50));
 });
 
-// Zaxira Tarjima xizmati (Google Translate / MyMemory)
+// 2. Free Dictionary API
+async function fetchFreeDictionaryData(word) {
+  try {
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data) || !data[0]) return null;
+
+    const entry = data[0];
+    let ipa = entry.phonetics?.find(p => p.text)?.text || `[${word}]`;
+    let pos = "so'z";
+    let exampleSentence = "";
+
+    if (entry.meanings && entry.meanings.length > 0) {
+      for (const m of entry.meanings) {
+        const rawPos = m.partOfSpeech;
+        if (rawPos && POS_MAP[rawPos]) pos = POS_MAP[rawPos];
+        for (const d of m.definitions || []) {
+          if (d.example) {
+            exampleSentence = d.example;
+            break;
+          }
+        }
+        if (exampleSentence) break;
+      }
+    }
+
+    return { ipa, pos, exampleSentence };
+  } catch (e) {
+    return null;
+  }
+}
+
+// 3. Zaxira Tarjima xizmati (Google Translate / MyMemory)
 async function translateBackup(text, fromLang, toLang) {
   try {
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
@@ -97,7 +135,7 @@ async function translateBackup(text, fromLang, toLang) {
   return text;
 }
 
-// FAQAT GEMINI 3.5 FLASH LITE MODELI ISHLATILADI
+// 4. FAQAT GEMINI 3.5 FLASH LITE MODELI
 async function callGeminiAI(promptText) {
   if (!GEMINI_API_KEY) return null;
   const modelName = 'gemini-3.5-flash-lite';
@@ -123,50 +161,59 @@ async function callGeminiAI(promptText) {
   return null;
 }
 
-// MAIN API: Ko'p tilli so'z tarjimasi
+// MAIN API: So'z tarjimasi (Ingliz - O'zbek)
 app.post('/api/translate', async (req, res) => {
   try {
     const word = (req.body && req.body.word || '').trim();
-    const fromLang = (req.body && req.body.fromLang) || 'en';
-    const toLang = (req.body && req.body.toLang) || 'uz';
+    const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
 
     if (!word) return res.status(400).json({ error: "So'z yuborilmadi" });
 
     const aiPrompt = `
-    Source Word: "${word}"
-    Source Language Code: "${fromLang}"
-    Target Language Code: "${toLang}"
+    Target Word: "${word}"
+    Direction: ${direction === 'uz-en' ? 'Uzbek to English' : 'English to Uzbek'}.
 
     Return ONLY a JSON object with this exact structure:
     {
-      "sourceWord": "Original word in source language",
-      "translatedWord": "Accurate translation in target language",
-      "transcription": "IPA pronunciation if applicable or brackets",
-      "partOfSpeech": "Short part of speech (noun, verb, adj, etc.)",
-      "example": "A high quality sentence in target/source context using this word naturally."
+      "en": "English word in lowercase",
+      "uzbek": "Accurate Uzbek translation",
+      "transcription": "IPA pronunciation in brackets, e.g. [/ˈæp.əl/]",
+      "partOfSpeech": "Part of speech in Uzbek (fe'l, ot, sifat, ravish)",
+      "example": "A real, high-quality, grammatically correct English sentence that naturally uses this English word in context."
     }
     `;
 
     const aiResult = await callGeminiAI(aiPrompt);
 
-    if (aiResult && aiResult.sourceWord && aiResult.translatedWord) {
+    if (aiResult && aiResult.en && aiResult.uzbek && aiResult.example) {
       return res.json({
-        sourceWord: aiResult.sourceWord,
-        translatedWord: aiResult.translatedWord,
-        example: aiResult.example || `Example with ${aiResult.sourceWord}`,
-        transcription: aiResult.transcription || `[${word}]`,
+        en: aiResult.en.toLowerCase(),
+        uzbek: aiResult.uzbek,
+        example: aiResult.example,
+        transcription: aiResult.transcription || `[${aiResult.en}]`,
         partOfSpeech: aiResult.partOfSpeech || "so'z"
       });
     }
 
-    // Backup Translate
-    const backupTrans = await translateBackup(word, fromLang, toLang);
+    const fromLang = direction === 'uz-en' ? 'uz' : 'en';
+    const toLang = direction === 'uz-en' ? 'en' : 'uz';
+    const translatedText = await translateBackup(word, fromLang, toLang);
+
+    const enWord = direction === 'en-uz' ? word.toLowerCase() : translatedText.toLowerCase();
+    const uzWord = direction === 'en-uz' ? translatedText : word;
+
+    const dictData = await fetchFreeDictionaryData(enWord);
+
+    let finalPos = dictData?.pos || "so'z";
+    let finalIpa = dictData?.ipa || `[${enWord}]`;
+    let finalExample = dictData?.exampleSentence || `Practice using the word "${enWord}" in daily English studies.`;
+
     res.json({
-      sourceWord: word,
-      translatedWord: backupTrans,
-      example: `Practice using "${word}" in your study.`,
-      transcription: `[${word}]`,
-      partOfSpeech: "so'z"
+      en: enWord,
+      uzbek: uzWord,
+      example: finalExample,
+      transcription: finalIpa,
+      partOfSpeech: finalPos
     });
 
   } catch (e) {
@@ -175,16 +222,18 @@ app.post('/api/translate', async (req, res) => {
   }
 });
 
-// Ko'p tilli Katta Matn Tarjimasi
+// Katta Matn Tarjimasi API
 app.post('/api/translate-text', async (req, res) => {
   try {
     const text = (req.body && req.body.text || '').trim();
-    const fromLang = (req.body && req.body.fromLang) || 'en';
-    const toLang = (req.body && req.body.toLang) || 'uz';
+    const direction = (req.body && req.body.direction === 'uz-en') ? 'uz-en' : 'en-uz';
 
     if (!text) return res.status(400).json({ error: 'Matn yuborilmadi' });
 
-    const textPrompt = `Translate this text from language "${fromLang}" to language "${toLang}". Return ONLY JSON: {"translation": "translated string"}.\nText: "${text}"`;
+    const fromLang = direction === 'uz-en' ? 'uz' : 'en';
+    const toLang = direction === 'uz-en' ? 'en' : 'uz';
+
+    const textPrompt = `Translate text from ${fromLang === 'uz' ? 'Uzbek' : 'English'} to ${toLang === 'uz' ? 'Uzbek' : 'English'}. Return ONLY JSON: {"translation": "result"}.\nText: "${text}"`;
     const aiTextResult = await callGeminiAI(textPrompt);
 
     if (aiTextResult && aiTextResult.translation) {
@@ -225,7 +274,7 @@ if (BOT_TOKEN) {
 app.get('/api/speak', async (req, res) => {
   try {
     const text = (req.query.text || '').toString().trim().slice(0, 300);
-    const lang = (req.query.lang || 'en').toString();
+    const lang = (req.query.lang === 'uz') ? 'uz' : 'en';
     if (!text) return res.status(400).send('Matn yo\'q');
 
     const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
