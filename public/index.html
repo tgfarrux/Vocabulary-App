@@ -130,32 +130,9 @@
   .stats b{color:var(--ink); font-weight:600;}
   .stat-dot{color:var(--gold);}
 
-  .lang-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-top:24px;
-    font-family:'Inter', sans-serif;
-    font-size:13px;
-    font-weight:600;
-    color:var(--ink-soft);
-  }
-  .lang-row span{
-    padding:6px 12px;
-    border:1.5px solid var(--paper-line);
-    border-radius:8px;
-    background:var(--surface);
-  }
-  #swapLangBtn, #ttSwapBtn {
-    border:none;
-    background:none;
-    font-size:16px;
-    cursor:pointer;
-    color:var(--navy);
-    padding:4px 8px;
-    border-radius:8px;
-    transition:transform .15s, background .15s;
-  }
+  .lang-row{ display:flex; align-items:center; gap:10px; margin-top:24px; font-family:'Inter', sans-serif; font-size:13px; font-weight:600; color:var(--ink-soft); }
+  .lang-row span{ padding:6px 12px; border:1.5px solid var(--paper-line); border-radius:8px; background:var(--surface); }
+  #swapLangBtn, #ttSwapBtn { border:none; background:none; font-size:16px; cursor:pointer; color:var(--navy); padding:4px 8px; border-radius:8px; transition:transform .15s, background .15s; }
   #swapLangBtn:hover, #ttSwapBtn:hover {background:var(--paper-dark);}
   #swapLangBtn.spin, #ttSwapBtn.spin {transform:rotate(180deg);}
 
@@ -610,24 +587,34 @@ async function updateXPDisplay() {
   syncUserXP(xp, words.length, memorizedCount, cachedStreak);
 }
 
+// BARKAMOL AUTO-SYNC: Bulutli xotiraga va Serverga birdek yuborish
 async function syncUserXP(xp, wordsCount, memorizedCount, streak) {
   const user = getTelegramUser();
   if(!user) return;
+  
+  const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
+  const payload = {
+    id: user.id,
+    name: fullName || 'Foydalanuvchi',
+    username: user.username || '',
+    photoUrl: user.photo_url || '',
+    xp: xp,
+    wordsCount: wordsCount,
+    memorizedCount: memorizedCount,
+    streak: streak
+  };
+
+  // 1. Bulutli xotirada o'z ma'lumotlarini saqlaydi
+  if (hasCloudStorage()) {
+    try { await cloudSetItem('user_profile_sync', JSON.stringify(payload)); } catch(e){}
+  }
+
+  // 2. Serverga yuboradi
   try {
-    const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
     await fetch('/api/leaderboard/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: user.id,
-        name: fullName || 'Foydalanuvchi',
-        username: user.username || '',
-        photoUrl: user.photo_url || '',
-        xp: xp,
-        wordsCount: wordsCount,
-        memorizedCount: memorizedCount,
-        streak: streak
-      })
+      body: JSON.stringify(payload)
     });
   } catch(e){}
 }
