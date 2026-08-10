@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>LexiFlow - Lug'at Mini App</title>
+<title>Lug'at Mini App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -25,7 +25,7 @@
   
   .font-display { font-family: 'Epilogue', sans-serif; }
 
-  /* Liquid Glass Core Utilities */
+  /* Liquid Glass Utilities */
   .glass-panel {
     background-color: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(24px) saturate(200%);
@@ -54,13 +54,7 @@
 
   /* PODIUM STYLES */
   .podium-card {
-    flex: 1;
-    border-radius: 16px;
-    padding: 12px 6px;
-    text-align: center;
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.2s;
+    flex: 1; border-radius: 16px; padding: 12px 6px; text-align: center; position: relative; cursor: pointer; transition: transform 0.2s;
   }
   .podium-card:hover { transform: translateY(-4px); }
   .podium-card.rank-1 { order: 2; background: linear-gradient(180deg, rgba(245, 158, 11, 0.2), rgba(30, 41, 59, 0.6)); border: 1.5px solid #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); transform: translateY(-6px); }
@@ -105,9 +99,8 @@
   <div class="views-wrapper">
     <div class="views-slider" id="viewsSlider">
       
-      <!-- PANE 1: ASOSIY (LUG'AT) -->
+      <!-- PANE 1: ASOSIY -->
       <div class="view-pane px-4 max-w-[900px] mx-auto flex flex-col gap-5">
-        <!-- Search & Language Switcher Panel -->
         <section class="glass-panel rounded-2xl p-5 flex flex-col gap-4">
           <div class="flex items-center justify-between text-slate-300">
             <span class="font-bold text-sm text-amber-400" id="langFrom">Inglizcha</span>
@@ -147,7 +140,6 @@
           </button>
         </div>
 
-        <!-- Dictionary Cards Bento Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="col"><div id="learningList" class="flex flex-col gap-4"></div></div>
           <div class="col"><div id="memorizedList" class="flex flex-col gap-4"></div></div>
@@ -187,7 +179,7 @@
         </section>
       </div>
 
-      <!-- PANE 3: PROFIL, LEADERBOARD VA SOZLAMALAR -->
+      <!-- PANE 3: PROFIL -->
       <div class="view-pane px-4 max-w-[900px] mx-auto flex flex-col gap-5">
         <section class="glass-panel rounded-2xl p-6 text-center relative overflow-hidden">
           <div class="inline-block px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold tracking-wider mb-3">
@@ -219,7 +211,7 @@
           <div class="flex items-end justify-center gap-2 mb-4" id="podiumContainer"></div>
           <div class="flex flex-col gap-2 text-left" id="lbList"></div>
 
-          <!-- YUTUQLAR VA NISHONLAR -->
+          <!-- YUTUQLAR -->
           <h3 class="font-display font-bold text-left text-sm text-slate-200 mt-6 mb-3" id="profBadgesTitle">🏅 Yutuqlar va Nishonlar</h3>
           <div class="grid grid-cols-2 gap-2 text-left">
             <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center gap-3">
@@ -456,6 +448,39 @@ function applyStaticI18n(){
   render();
 }
 
+function hasCloudStorage(){
+  return !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage);
+}
+function cloudGetItem(key){
+  return new Promise((resolve, reject) => {
+    window.Telegram.WebApp.CloudStorage.getItem(key, (err, value) => {
+      if(err) reject(err); else resolve(value);
+    });
+  });
+}
+function cloudSetItem(key, value){
+  return new Promise((resolve, reject) => {
+    window.Telegram.WebApp.CloudStorage.setItem(key, value, (err, success) => {
+      if(err) reject(err); else resolve(success);
+    });
+  });
+}
+function cloudGetItems(keys){
+  return new Promise((resolve, reject) => {
+    if(keys.length === 0){ resolve({}); return; }
+    window.Telegram.WebApp.CloudStorage.getItems(keys, (err, values) => {
+      if(err) reject(err); else resolve(values || {});
+    });
+  });
+}
+function cloudRemoveItem(key){
+  return new Promise((resolve, reject) => {
+    window.Telegram.WebApp.CloudStorage.removeItem(key, (err, success) => {
+      if(err) reject(err); else resolve(success);
+    });
+  });
+}
+
 function getTodayString() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -469,7 +494,9 @@ function getYesterdayString() {
 async function getStreakData() {
   let data = { lastVisit: '', streak: 1 };
   try {
-    let raw = localStorage.getItem(STREAK_KEY);
+    let raw = null;
+    if (hasCloudStorage()) { raw = await cloudGetItem('streak_data'); }
+    if (!raw) { raw = localStorage.getItem(STREAK_KEY); }
     if (raw) data = JSON.parse(raw);
   } catch(e) {}
 
@@ -484,7 +511,11 @@ async function getStreakData() {
     data.streak = 1;
     data.lastVisit = today;
   }
-  try { localStorage.setItem(STREAK_KEY, JSON.stringify(data)); } catch(e) {}
+  try {
+    const jsonStr = JSON.stringify(data);
+    if (hasCloudStorage()) await cloudSetItem('streak_data', jsonStr);
+    localStorage.setItem(STREAK_KEY, jsonStr);
+  } catch(e) {}
   return data;
 }
 
@@ -505,14 +536,20 @@ async function syncUserXP(xp, wordsCount, memorizedCount, streak) {
   const user = getTelegramUser();
   if(!user) return;
   const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
+  const payload = {
+    id: user.id, name: fullName || 'Foydalanuvchi', username: user.username || '',
+    photoUrl: user.photo_url || '', xp, wordsCount, memorizedCount, streak
+  };
+
+  if (hasCloudStorage()) {
+    try { await cloudSetItem('user_profile_sync', JSON.stringify(payload)); } catch(e){}
+  }
+
   try {
     await fetch('/api/leaderboard/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: user.id, name: fullName || 'Foydalanuvchi', username: user.username || '',
-        photoUrl: user.photo_url || '', xp, wordsCount, memorizedCount, streak
-      })
+      body: JSON.stringify(payload)
     });
   } catch(e){}
 }
@@ -559,7 +596,7 @@ async function renderLeaderboard() {
     let listHtml = '';
     rest.forEach((user, idx) => {
       listHtml += `
-        <div class="glass-panel p-2.5 rounded-xl flex items-center justify-between text-xs" onclick="openLeaderboardUserProfile('${user.id}')">
+        <div class="glass-panel p-2.5 rounded-xl flex items-center justify-between text-xs cursor-pointer hover:bg-white/10" onclick="openLeaderboardUserProfile('${user.id}')">
           <div class="flex items-center gap-3">
             <span class="font-mono font-bold text-slate-400">#${idx + 4}</span>
             <span class="font-semibold text-slate-200">${escapeHtml(user.name)}</span>
@@ -617,6 +654,39 @@ document.getElementById('userProfileClose').addEventListener('click', () => {
   document.getElementById('userProfileOverlay').classList.add('hidden');
 });
 
+async function loadWords(){
+  if(hasCloudStorage()){
+    try{
+      const idsRaw = await cloudGetItem('word_index');
+      const ids = idsRaw ? JSON.parse(idsRaw) : [];
+      if(ids.length === 0){ words = []; render(); return; }
+      const items = await cloudGetItems(ids.map(id => 'word_' + id));
+      words = ids.map(id => items['word_' + id] ? JSON.parse(items['word_' + id]) : null).filter(Boolean);
+    }catch(e){ words = []; }
+  } else {
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      words = raw ? JSON.parse(raw) : [];
+    }catch(e){ words = []; }
+  }
+  render();
+  updateProfilePane();
+}
+
+async function saveWords(){
+  if(hasCloudStorage()){
+    try{
+      await cloudSetItem('word_index', JSON.stringify(words.map(w => w.id)));
+      for(const w of words){
+        await cloudSetItem('word_' + w.id, JSON.stringify(w));
+      }
+    }catch(e){}
+  } else {
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(words)); }catch(e){}
+  }
+  updateProfilePane();
+}
+
 function cardHtml(w){
   const isUzEn = w.dir === 'uz-en';
   const mainTitle = isUzEn ? w.uz : w.en;
@@ -659,8 +729,8 @@ function render(){
   const learning = words.filter(w => !w.memorized);
   const memorized = words.filter(w => w.memorized);
 
-  learningList.innerHTML = learning.length ? learning.map(cardHtml).join('') : `<div class="text-xs text-slate-400 text-center py-6 border border-dashed border-white/10 rounded-2xl">O'rganilayotgan so'zlar yo'q</div>`;
-  memorizedList.innerHTML = memorized.length ? memorized.map(cardHtml).join('') : `<div class="text-xs text-slate-400 text-center py-6 border border-dashed border-white/10 rounded-2xl">Yodlangan so'zlar yo'q</div>`;
+  learningList.innerHTML = learning.length ? learning.map(cardHtml).join('') : `<div class="text-xs text-slate-400 text-center py-6 border border-dashed border-white/10 rounded-2xl">${t('emptyLearning')}</div>`;
+  memorizedList.innerHTML = memorized.length ? memorized.map(cardHtml).join('') : `<div class="text-xs text-slate-400 text-center py-6 border border-dashed border-white/10 rounded-2xl">${t('emptyMemorized')}</div>`;
 
   document.getElementById('learningCount').textContent = `(${learning.length})`;
   document.getElementById('memorizedCount').textContent = `(${memorized.length})`;
@@ -703,25 +773,12 @@ function toggleMemorized(id){
 function deleteWord(id){
   words = words.filter(x => x.id !== id);
   render(); saveWords();
+  if(hasCloudStorage()){ cloudRemoveItem('word_' + id).catch(e=>{}); }
 }
 
 function speakWord(text){
   const audio = new Audio(`/api/speak?text=${encodeURIComponent(text)}&lang=en`);
   audio.play().catch(() => {});
-}
-
-function loadWords(){
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    words = raw ? JSON.parse(raw) : [];
-  } catch(e){ words = []; }
-  render();
-  updateProfilePane();
-}
-
-function saveWords(){
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(words)); } catch(e){}
-  updateProfilePane();
 }
 
 addBtn.addEventListener('click', () => { addWord(wordInput.value); wordInput.value = ''; });
