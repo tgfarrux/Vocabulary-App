@@ -1,681 +1,303 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html class="dark" lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LexiFlow - Lug'at Mini App</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600;700&family=Manrope:wght@400;500;600;700&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>LexiFlow - Dictionary Mini App</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
-  :root{
-    --paper: #1e293b;
-    --paper-dark: #0f172a;
-    --paper-line: rgba(255, 255, 255, 0.1);
-    --ink: #f0e0d1;
-    --ink-soft: #94a3b8;
-    --red: #f87171;
-    --red-soft: rgba(248, 113, 113, 0.15);
-    --gold: #f59e0b;
-    --green: #34d399;
-    --green-soft: rgba(52, 211, 153, 0.15);
-    --navy: #60a5fa;
-    --surface: rgba(255, 255, 255, 0.05);
-    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    --btn-text: #0f172a;
-  }
-  
-  html[data-theme="light"]{
-    --paper: #f1f5f9;
-    --paper-dark: #e2e8f0;
-    --paper-line: rgba(0, 0, 0, 0.1);
-    --ink: #0f172a;
-    --ink-soft: #64748b;
-    --red: #dc2626;
-    --red-soft: rgba(220, 38, 38, 0.1);
-    --gold: #d97706;
-    --green: #059669;
-    --green-soft: rgba(5, 150, 105, 0.1);
-    --navy: #2563eb;
-    --surface: rgba(255, 255, 255, 0.6);
-    --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-    --btn-text: #ffffff;
-  }
+    body {
+        background-color: #1e293b;
+        background-image: 
+            radial-gradient(circle at 15% 50%, rgba(167, 243, 208, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 85% 30%, rgba(167, 243, 208, 0.1) 0%, transparent 50%);
+        background-attachment: fixed;
+        font-family: 'Manrope', sans-serif;
+        min-height: 100vh;
+    }
+    
+    .font-display { font-family: 'Epilogue', sans-serif; }
 
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0; overflow-x:hidden;}
-  body{
-    background-color: #1e293b;
-    background-image: 
-      radial-gradient(circle at 15% 50%, rgba(167, 243, 208, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 85% 30%, rgba(167, 243, 208, 0.08) 0%, transparent 50%);
-    background-attachment: fixed;
-    font-family:'Manrope', sans-serif;
-    color:var(--ink);
-    min-height:100vh;
-  }
+    /* Liquid Glass Core Utilities */
+    .glass-panel {
+        background-color: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+    }
 
-  input::placeholder, textarea::placeholder {
-    color: var(--ink-soft);
-    opacity: 0.75;
-  }
+    .glow-amber {
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    }
 
-  .splash-screen {
-    position: fixed; inset: 0;
-    background: #1e293b;
-    z-index: 99999; display: flex; align-items: center; justify-content: center;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-  }
-  .splash-container {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    animation: splashPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  .splash-text { font-family: 'Epilogue', sans-serif; font-size: 26px; font-weight: 700; color: #f59e0b; margin-top: 18px; }
-  .splash-screen.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+    /* SPLASH SCREEN */
+    .splash-screen {
+        position: fixed; inset: 0;
+        background: #1e293b;
+        z-index: 99999; display: flex; align-items: center; justify-content: center;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    .splash-screen.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
 
-  .app{ display:flex; max-width:900px; margin:0 auto; min-height:100vh; }
+    /* VIEWS SLIDER */
+    .views-wrapper { width: 100%; overflow: hidden; }
+    .views-slider { display: flex; width: 300%; transition: transform 0.38s cubic-bezier(0.25, 1, 0.35, 1); align-items: flex-start; }
+    .view-pane { width: 33.33333%; flex-shrink: 0; box-sizing: border-box; min-height: 100vh; }
 
-  main { flex: 1; min-width: 0; overflow: hidden; position: relative; }
-  .views-wrapper { width: 100%; overflow: hidden; }
-  .views-slider { display: flex; width: 300%; transition: transform 0.38s cubic-bezier(0.25, 1, 0.35, 1); align-items: flex-start; }
-  .view-pane { width: 33.33333%; flex-shrink: 0; padding: 24px 20px 120px; box-sizing: border-box; min-height: 100vh; }
-
-  /* STITCH GLASS PANEL DIZAYNI */
-  .glass-panel {
-    background-color: var(--surface);
-    backdrop-filter: blur(24px) saturate(200%);
-    -webkit-backdrop-filter: blur(24px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: var(--card-shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-  }
-
-  /* BOTTOM NAV */
-  .bottom-nav{
-    position:fixed;
-    left:50%;
-    bottom:16px;
-    transform:translateX(-50%);
-    width:calc(100% - 32px);
-    max-width:420px;
-    display:flex;
-    align-items:stretch;
-    justify-content:space-between;
-    gap:4px;
-    background: rgba(30, 41, 59, 0.6);
-    backdrop-filter: blur(24px) saturate(200%);
-    -webkit-backdrop-filter: blur(24px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius:30px;
-    padding:6px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    z-index:40;
-    transition: all .25s ease;
-  }
-
-  .bn-item{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:3px;
-    background:none;
-    border:none;
-    border-radius:20px;
-    padding:8px 4px;
-    cursor:pointer;
-    color: var(--ink-soft);
-    font-family:'Manrope', sans-serif;
-    font-size:11.5px;
-    font-weight:600;
-    transition:all .2s ease;
-  }
-  .bn-item:hover{ color: var(--ink); background: rgba(255, 255, 255, 0.1); }
-  .bn-item.active{
-    background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
-  }
-  .bn-icon{display:flex; align-items:center; justify-content:center; height:22px;}
-  .bn-emoji{font-size:19px; line-height:1;}
-  .bn-avatar{
-    width:22px; height:22px;
-    border-radius:50%;
-    overflow:hidden;
-    background: var(--paper-line);
-    color: var(--ink);
-  }
-  .bn-avatar img{width:100%; height:100%; object-fit:cover; display:block;}
-  .bn-item.active .bn-avatar{box-shadow:0 0 0 2px #f59e0b;}
-
-  /* HEADERS VA XP BADGE */
-  .cover{margin-bottom:20px; position:relative; display: flex; align-items: center; justify-content: space-between;}
-
-  .xp-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--surface);
-    color: var(--gold);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    font-weight: 700;
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
-  }
-
-  .tape{
-    font-family:'Epilogue', sans-serif;
-    font-weight:700;
-    font-size:24px;
-    color: var(--gold);
-  }
-
-  .stats{
-    margin-top:10px;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
-    color:var(--ink-soft);
-    display:flex;
-    gap:16px;
-    flex-wrap:wrap;
-  }
-  .stats b{color:var(--ink); font-weight:600;}
-  .stat-dot{color:var(--gold);}
-
-  .lang-row{
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    font-size:13.5px;
-    font-weight:700;
-    color:var(--gold);
-    background: var(--surface);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 16px;
-    margin-bottom: 12px;
-  }
-  #swapLangBtn, #ttSwapBtn {
-    border:none;
-    background: rgba(255, 255, 255, 0.1);
-    font-size:16px;
-    cursor:pointer;
-    color:var(--gold);
-    width: 32px; height: 32px;
-    border-radius:50%;
-    display: flex; align-items: center; justify-content: center;
-    transition:transform .15s, background .15s;
-  }
-  #swapLangBtn:hover, #ttSwapBtn:hover {background:rgba(255, 255, 255, 0.2);}
-  #swapLangBtn.spin, #ttSwapBtn.spin {transform:rotate(180deg);}
-
-  .add-row{
-    display:flex;
-    gap:10px;
-    margin:10px 0 8px;
-    position: relative;
-  }
-  .add-row input{
-    flex:1;
-    font-family:'Manrope', sans-serif;
-    font-size:14.5px;
-    padding:14px 48px 14px 16px;
-    border:1px solid rgba(255,255,255,0.18);
-    border-radius:16px;
-    background: rgba(15, 23, 42, 0.6);
-    color:var(--ink);
-    outline:none;
-    transition:border-color .15s;
-  }
-  .add-row input:focus{border-color:var(--gold);}
-  .add-row button{
-    position: absolute; right: 6px; top: 6px; bottom: 6px;
-    font-family:'Manrope', sans-serif;
-    font-weight:700;
-    font-size:14px;
-    padding:0 16px;
-    border:none;
-    border-radius:12px;
-    background:var(--gold);
-    color:#0f172a;
-    cursor:pointer;
-    transition:background .15s, transform .1s;
-  }
-  .add-row button:hover{background:#fbbf24;}
-  .add-row button:active{transform:scale(0.97);}
-  .hint{font-size:12px; color:var(--ink-soft); margin-bottom:18px;}
-
-  .quiz-banner{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    background:var(--green-soft);
-    border:1px solid var(--green);
-    border-radius:16px;
-    padding:12px 16px;
-    margin-bottom:20px;
-    font-size:13.5px;
-    color:var(--ink);
-  }
-  .quiz-banner.hidden{display:none;}
-  .quiz-banner button{
-    font-weight:700;
-    font-size:12.5px;
-    background:var(--green);
-    color:#0f172a;
-    border:none;
-    padding:8px 14px;
-    border-radius:10px;
-    cursor:pointer;
-  }
-
-  .lists{display:flex; gap:20px; align-items:flex-start;}
-  .col{flex:1; min-width:0;}
-  .col h2{
-    font-family:'Epilogue', sans-serif;
-    font-size:16px;
-    font-weight:700;
-    margin:0 0 12px;
-    padding-bottom:8px;
-    border-bottom:2px solid var(--gold);
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    color: var(--gold);
-  }
-  .col h2 span{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); font-weight:400;}
-  .cards{display:flex; flex-direction:column; gap:12px;}
-
-  /* KARTOCHKA DIZAYNI */
-  .card{
-    background: var(--surface);
-    backdrop-filter: blur(24px) saturate(200%);
-    -webkit-backdrop-filter: blur(24px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: var(--card-shadow);
-    position: relative;
-    overflow: hidden;
-  }
-  .card.pending{opacity:0.6;}
-  .card-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
-  .en-word{font-family:'Epilogue', serif; font-weight:700; font-size:18px; color: var(--gold);}
-  .card-actions{display:flex; gap:6px; flex-shrink:0;}
-  .icon-btn{
-    border:none; background: rgba(255, 255, 255, 0.08); cursor:pointer;
-    width:30px; height:30px; border-radius:10px;
-    display:flex; align-items:center; justify-content:center;
-    color:var(--ink-soft); font-size:14px;
-    transition:background .15s, color .15s;
-  }
-  .icon-btn:hover{background:rgba(255, 255, 255, 0.2); color:var(--ink);}
-  .icon-btn.memorize:hover{color:var(--green);}
-  .icon-btn.del:hover{color:var(--red);}
-
-  .uz-word{color:var(--red); font-weight:600; font-size:14.5px; margin-top:4px;}
-  .word-meta{display:flex; align-items:center; gap:8px; margin-top:4px; flex-wrap:wrap;}
-  .transcription{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft);}
-  .pos-tag{
-    font-size:10px;
-    font-weight:700;
-    color:var(--gold);
-    background:rgba(245, 158, 11, 0.15);
-    padding:2px 8px;
-    border-radius:12px;
-  }
-
-  .memorized-tag {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--green);
-    background: var(--green-soft);
-    border: 1px solid var(--green);
-    padding: 2px 8px;
-    border-radius: 12px;
-  }
-
-  .example{
-    font-style:italic;
-    color:var(--ink-soft);
-    font-size:13px;
-    margin-top:8px;
-    line-height:1.45;
-    border-left:2px solid var(--gold);
-    padding-left:10px;
-  }
-
-  .empty{
-    color:var(--ink-soft);
-    font-size:13px;
-    padding:24px 10px;
-    text-align:center;
-    border:1px dashed rgba(255,255,255,0.15);
-    border-radius:18px;
-  }
-
-  /* TARJIMA BO'LIMI */
-  .trans-section-card {
-    background: var(--surface);
-    backdrop-filter: blur(24px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: var(--card-shadow);
-  }
-
-  .trans-textarea-big {
-    width: 100%;
-    min-height: 120px;
-    padding: 14px;
-    font-family: 'Manrope', sans-serif;
-    font-size: 15px;
-    color: var(--ink);
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 14px;
-    outline: none;
-    resize: vertical;
-  }
-  .trans-textarea-big:focus { border-color: var(--gold); }
-
-  .trans-result-big {
-    min-height: 100px;
-    padding: 14px;
-    font-size: 15px;
-    color: var(--ink);
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 14px;
-    white-space: pre-wrap;
-    word-break: break-word;
-    margin-top: 14px;
-  }
-  .trans-result-big.placeholder { color: var(--ink-soft); font-style: italic; }
-
-  .btn-submit-big {
-    font-weight: 700;
-    font-size: 13.5px;
-    padding: 10px 22px;
-    background: var(--gold);
-    color: #0f172a;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-  }
-
-  /* PROFIL VA LEADERBOARD */
-  .profile-page-card {
-    background: var(--surface);
-    backdrop-filter: blur(24px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 22px;
-    padding: 24px;
-    text-align: center;
-  }
-
-  .profile-page-avatar {
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin: 0 auto 12px;
-    border: 2px solid var(--gold);
-    display: block;
-  }
-  .profile-page-avatar.avatar-fallback {
-    display: flex; align-items: center; justify-content: center; font-size: 32px; background: rgba(255,255,255,0.1);
-  }
-
-  .profile-level-badge {
-    display: inline-block;
-    background: rgba(245, 158, 11, 0.15);
-    color: var(--gold);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    font-family: 'IBM Plex Mono', monospace;
-    margin-bottom: 8px;
-  }
-
-  .profile-fullname { font-family: 'Epilogue', sans-serif; font-size: 20px; font-weight: 700; }
-  .profile-user-handle { color: var(--ink-soft); font-size: 13px; font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
-
-  .profile-grid-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 18px;
-    padding-top: 18px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.15);
-  }
-
-  .stat-card-box {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 14px;
-    padding: 10px 6px;
-    text-align: center;
-  }
-  .stat-card-box b { display: block; font-size: 18px; font-weight: 700; color: var(--ink); }
-  .stat-card-box span { font-size: 10px; color: var(--ink-soft); font-family: 'IBM Plex Mono', monospace; }
-
-  .podium-container { display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-top: 18px; margin-bottom: 16px; }
-  .podium-card { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 12px 4px; text-align: center; position: relative; cursor: pointer; }
-  .podium-card.rank-1 { order: 2; background: linear-gradient(180deg, rgba(245, 158, 11, 0.22), var(--surface)); border: 1.5px solid var(--gold); box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); transform: translateY(-6px); }
-  .podium-card.rank-2 { order: 1; background: linear-gradient(180deg, rgba(148, 163, 184, 0.2), var(--surface)); border: 1.5px solid #94a3b8; }
-  .podium-card.rank-3 { order: 3; background: linear-gradient(180deg, rgba(217, 119, 6, 0.2), var(--surface)); border: 1.5px solid #d97706; }
-
-  .badges-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .badge-item { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; font-size: 12px; font-weight: 600; text-align: left; }
-
-  .settings-list { display: flex; flex-direction: column; gap: 8px; }
-  .setting-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 12px; }
-
-  /* MODALS */
-  .overlay{ position:fixed; inset:0; background:rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px; }
-  .overlay.hidden{display:none;}
-  .quiz-modal{ background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.2); width:100%; max-width:480px; border-radius:20px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.5); position:relative; }
-
-  @media (max-width: 720px){
-    .binder{display:none;}
-    .view-pane{padding: 20px 16px 110px;}
-    .lists{flex-direction:column;}
-  }
+    /* PODIUM STYLES */
+    .podium-card {
+        flex: 1; border-radius: 16px; padding: 12px 6px; text-align: center; position: relative; cursor: pointer; transition: transform 0.2s;
+    }
+    .podium-card:hover { transform: translateY(-4px); }
+    .podium-card.rank-1 { order: 2; background: linear-gradient(180deg, rgba(245, 158, 11, 0.2), rgba(30, 41, 59, 0.6)); border: 1.5px solid #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); transform: translateY(-6px); }
+    .podium-card.rank-2 { order: 1; background: linear-gradient(180deg, rgba(148, 163, 184, 0.2), rgba(30, 41, 59, 0.6)); border: 1.5px solid #94a3b8; }
+    .podium-card.rank-3 { order: 3; background: linear-gradient(180deg, rgba(217, 119, 6, 0.2), rgba(30, 41, 59, 0.6)); border: 1.5px solid #d97706; }
 </style>
 </head>
-<body>
+<body class="text-slate-100 min-h-screen pb-32">
 
+<!-- SPLASH SCREEN -->
 <div id="splashScreen" class="splash-screen">
-  <div class="splash-container">
-    <h1 class="splash-text">LexiFlow</h1>
+  <div class="flex flex-col items-center animate-pulse">
+    <div class="w-16 h-16 rounded-2xl bg-amber-500/20 flex items-center justify-center border border-amber-500/40 glow-amber mb-4">
+      <span class="material-symbols-outlined text-amber-400 text-3xl">auto_stories</span>
+    </div>
+    <h1 class="font-display font-bold text-2xl text-amber-400">LexiFlow</h1>
+    <p class="text-xs text-slate-400 mt-1">Suyuq shisha lug'at daftari</p>
   </div>
 </div>
 
-<div class="app">
-  <main>
-    <div class="views-wrapper">
-      <div class="views-slider" id="viewsSlider">
-        
-        <!-- PANE 1: ASOSIY -->
-        <div class="view-pane" id="paneHome">
-          <header class="cover">
-            <div class="tape" id="appTitle">LexiFlow</div>
-            <div class="xp-badge" id="xpBadge">⚡ 0 XP</div>
-          </header>
-
-          <div class="stats" style="margin-bottom: 16px;">
-            <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
-            <span><span class="stat-dot">●</span> <span id="statMemorizedLabel">Yodlangan</span>: <b id="statMemorized">0</b></span>
-            <span><span class="stat-dot">●</span> <span id="statReadyLabel">Testga tayyor</span>: <b id="statReady">0</b></span>
-          </div>
-
-          <div class="lang-row">
-            <span id="langFrom">Inglizcha</span>
-            <button id="swapLangBtn" title="Yo'nalishni almashtirish">⇄</button>
-            <span id="langTo">O'zbek</span>
-          </div>
-
-          <div class="add-row">
-            <input id="wordInput" type="text" placeholder="Bilmagan so'zingizni yozing va Enter bosing..." autocomplete="off">
-            <button id="addBtn">Qo'shish</button>
-          </div>
-          <div class="hint" id="hintText">Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.</div>
-
-          <div id="quizBanner" class="quiz-banner hidden">
-            <span id="quizBannerText">🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.</span>
-            <button id="startQuizBtn">Testni boshlash</button>
-          </div>
-
-          <div class="lists">
-            <section class="col">
-              <h2><span id="colLearningLabel">O'rganilmoqda</span> <span id="learningCount">(0)</span></h2>
-              <div id="learningList" class="cards"></div>
-            </section>
-            <section class="col">
-              <h2><span id="colMemorizedLabel">Yodlangan</span> <span id="memorizedCount">(0)</span></h2>
-              <div id="memorizedList" class="cards"></div>
-            </section>
-          </div>
-        </div>
-
-        <!-- PANE 2: TARJIMA -->
-        <div class="view-pane" id="paneTranslate">
-          <header class="cover">
-            <div class="tape" id="transTitle">Matn Tarjimoni</div>
-          </header>
-
-          <div class="trans-section-card">
-            <div class="lang-row" style="margin-top:0; margin-bottom:14px;">
-              <span id="ttFrom">Inglizcha</span>
-              <button id="ttSwapBtn" title="Yo'nalishni almashtirish">⇄</button>
-              <span id="ttTo">O'zbekcha</span>
-            </div>
-
-            <textarea id="ttInput" class="trans-textarea-big" placeholder="Matn yoki gapni kiriting..."></textarea>
-            
-            <div class="trans-bar-actions" style="display:flex; justify-content:space-between; margin-top:12px;">
-              <div class="trans-action-btn-group" style="display:flex; gap:8px;">
-                <button class="action-pill-btn" id="ttInputSpeak" style="padding:6px 12px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; color:var(--ink); cursor:pointer;">🔊 <span id="lblBtnListen1">Eshitish</span></button>
-                <button class="action-pill-btn" id="ttInputClear" style="padding:6px 12px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; color:var(--ink); cursor:pointer;">✕ <span id="lblBtnClear">Tozalash</span></button>
-              </div>
-              <button id="ttTranslateBtn" class="btn-submit-big">Tarjima qilish</button>
-            </div>
-
-            <div id="ttOutput" class="trans-result-big placeholder">Tarjima natijasi shu yerda ko'rinadi...</div>
-
-            <div class="trans-bar-actions" style="display:flex; justify-content:flex-end; margin-top:12px;">
-              <div class="trans-action-btn-group" style="display:flex; gap:8px;">
-                <button class="action-pill-btn" id="ttOutputSpeak" style="padding:6px 12px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; color:var(--ink); cursor:pointer;">🔊 <span id="lblBtnListen2">Eshitish</span></button>
-                <button class="action-pill-btn" id="ttOutputCopy" style="padding:6px 12px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; color:var(--ink); cursor:pointer;">⧉ <span id="lblBtnCopy">Nusxalash</span></button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PANE 3: PROFIL -->
-        <div class="view-pane" id="paneProfile">
-          <header class="cover">
-            <div class="tape" id="profTitle">Mening Profilim</div>
-          </header>
-
-          <div class="profile-page-card">
-            <div class="profile-level-badge">LEVEL 5 • WORD EXPLORER</div>
-            <div id="profAvatarWrap" class="profile-page-avatar avatar-fallback">👤</div>
-            <div id="profFullName" class="profile-fullname">Foydalanuvchi</div>
-            <div id="profUserHandle" class="profile-user-handle">@username</div>
-
-            <div class="profile-grid-stats">
-              <div class="stat-card-box">
-                <b id="profWordsCount">0</b>
-                <span id="profStatWords">SO'ZLAR</span>
-              </div>
-              <div class="stat-card-box">
-                <b id="profMemorizedCount">0</b>
-                <span id="profStatMemorized">YODLANGAN</span>
-              </div>
-              <div class="stat-card-box">
-                <b id="profStreakCount">🔥 1</b>
-                <span id="profStatStreak">STREAK KUN</span>
-              </div>
-            </div>
-
-            <div class="leaderboard-title" id="profLbTitle">🏆 Peshqadamlar Jadvali (Top XP)</div>
-            <div class="podium-container" id="podiumContainer"></div>
-            <div class="lb-list" id="lbList"></div>
-
-            <div class="badges-title" id="profBadgesTitle">🏅 Yutuqlar va Nishonlar</div>
-            <div class="badges-container">
-              <div class="badge-item"><span class="badge-icon">🎯</span> <span id="badgeFirst10">Dastlabki 10 so'z</span></div>
-              <div class="badge-item"><span class="badge-icon">🔥</span> <span id="badgeStreak3">3 Kunlik Streak</span></div>
-              <div class="badge-item"><span class="badge-icon">🧠</span> <span id="badgeMaster">Xotira Ustasi</span></div>
-              <div class="badge-item"><span class="badge-icon">⚡</span> <span id="badgeNight">Tungi Bilimdon</span></div>
-            </div>
-
-            <div class="settings-title" id="profSettingsTitle">⚙️ Sozlamalar</div>
-            <div class="settings-list">
-              <div class="setting-item">
-                <div class="setting-label"><span>🎨</span> <span id="lblTheme">Mavzu</span></div>
-                <button class="setting-btn" id="themeToggleBtn" style="padding:4px 10px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; color:var(--gold); cursor:pointer;"><span id="themeBtnText">Tungi rejim 🌙</span></button>
-              </div>
-              <div class="setting-item">
-                <div class="setting-label"><span>🌐</span> <span id="lblLang">Ilova tili</span></div>
-                <button class="setting-btn" id="langSwitchBtn" style="padding:4px 10px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; color:var(--gold); cursor:pointer;"><span id="currentLangText">🇺🇿 O'zbekcha</span></button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
+<!-- TOP HEADER -->
+<header class="fixed top-0 w-full z-50 px-4 h-16 flex items-center justify-between glass-panel rounded-b-2xl border-b border-white/20" style="background-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(24px) saturate(200%);">
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 rounded-full bg-slate-800 overflow-hidden border border-white/20" id="topAvatarWrap">
+      <div class="w-full h-full flex items-center justify-center text-amber-400 font-bold text-xs" id="topAvatarFallback">👤</div>
     </div>
-  </main>
-</div>
+    <h1 class="font-display text-lg font-bold text-amber-400" id="appTitle">LexiFlow</h1>
+  </div>
+  <div class="flex items-center gap-3">
+    <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 glow-amber border border-white/10">
+      <span class="material-symbols-outlined text-amber-400" style="font-size: 16px;">local_fire_department</span>
+      <span class="text-xs font-bold text-slate-100" id="statStreak">1</span>
+    </div>
+    <div class="text-xs font-bold text-amber-400 bg-white/10 px-3 py-1 rounded-full border border-white/10" id="xpBadge">
+      ⚡ 0 XP
+    </div>
+  </div>
+</header>
 
-<nav class="bottom-nav">
-  <button class="bn-item active" id="bnHomeBtn" title="Asosiy">
-    <span class="bn-icon bn-emoji">🔍</span>
-    <span id="bnHomeLabel">Asosiy</span>
+<main class="pt-20">
+  <div class="views-wrapper">
+    <div class="views-slider" id="viewsSlider">
+      
+      <!-- PANE 1: ASOSIY -->
+      <div class="view-pane px-4 max-w-[900px] mx-auto flex flex-col gap-4">
+        <!-- Search & Language Switcher Panel -->
+        <section class="glass-panel rounded-2xl p-5 flex flex-col gap-4" style="background-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(24px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.2);">
+          <div class="flex items-center justify-between text-slate-300 font-bold text-sm">
+            <span class="text-amber-400" id="langFrom">Inglizcha</span>
+            <button id="swapLangBtn" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/10">
+              <span class="material-symbols-outlined text-amber-400">swap_horiz</span>
+            </button>
+            <span class="text-amber-400" id="langTo">O'zbekcha</span>
+          </div>
+
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span class="material-symbols-outlined text-slate-400 group-focus-within:text-amber-400 transition-colors">search</span>
+            </div>
+            <input id="wordInput" type="text" class="block w-full pl-11 pr-12 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl text-sm text-slate-100 placeholder-slate-400 focus:ring-1 focus:ring-amber-400 focus:border-amber-400 transition-all outline-none" placeholder="So'z yoki iborani kiriting..." autocomplete="off">
+            <div class="absolute inset-y-0 right-0 pr-1.5 flex items-center">
+              <button id="addBtn" class="w-9 h-9 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-bold shadow-lg hover:bg-amber-400 transition-colors">
+                <span class="material-symbols-outlined" data-weight="fill">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-400" id="hintText">Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.</div>
+        </section>
+
+        <!-- Quiz Banner -->
+        <div id="quizBanner" class="glass-panel rounded-2xl p-4 flex items-center justify-between border-emerald-500/40 bg-emerald-950/20 hidden">
+          <span class="text-xs text-emerald-200 font-semibold" id="quizBannerText">🎉 10 ta so'z yodlandi! Test topshirasizmi?</span>
+          <button id="startQuizBtn" class="px-3 py-1.5 bg-emerald-500 text-slate-950 rounded-xl font-bold text-xs hover:bg-emerald-400">Testni boshlash</button>
+        </div>
+
+        <!-- Learning Tabs -->
+        <div class="flex gap-6 border-b border-white/10 pb-1 mt-2">
+          <button id="tabLearningBtn" class="pb-2 font-display text-sm font-bold text-amber-400 border-b-2 border-amber-400">
+            <span id="colLearningLabel">O'rganilmoqda</span> <span id="learningCount">(0)</span>
+          </button>
+          <button id="tabMemorizedBtn" class="pb-2 font-display text-sm font-semibold text-slate-400 hover:text-slate-200 transition-colors">
+            <span id="colMemorizedLabel">Yodlangan</span> <span id="memorizedCount">(0)</span>
+          </button>
+        </div>
+
+        <!-- Cards Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="col"><div id="learningList" class="flex flex-col gap-4"></div></div>
+          <div class="col"><div id="memorizedList" class="flex flex-col gap-4"></div></div>
+        </div>
+      </div>
+
+      <!-- PANE 2: MATN TARJIMONI -->
+      <div class="view-pane px-4 max-w-[900px] mx-auto flex flex-col gap-4">
+        <section class="glass-panel rounded-2xl p-5 flex flex-col gap-4" style="background-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(24px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.2);">
+          <h2 class="font-display font-bold text-base text-amber-400" id="transTitle">Matn Tarjimoni</h2>
+          <div class="flex items-center justify-between text-slate-300 font-bold text-sm">
+            <span class="text-amber-400" id="ttFrom">Inglizcha</span>
+            <button id="ttSwapBtn" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/10">
+              <span class="material-symbols-outlined text-amber-400">swap_horiz</span>
+            </button>
+            <span class="text-amber-400" id="ttTo">O'zbekcha</span>
+          </div>
+
+          <textarea id="ttInput" class="w-full h-32 p-3.5 bg-slate-900/50 border border-white/10 rounded-xl text-sm text-slate-100 placeholder-slate-400 focus:ring-1 focus:ring-amber-400 outline-none resize-none" placeholder="Matnni shu yerga kiriting..."></textarea>
+
+          <div class="flex items-center justify-between">
+            <div class="flex gap-2">
+              <button id="ttInputSpeak" class="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"><span class="material-symbols-outlined text-sm">volume_up</span></button>
+              <button id="ttInputClear" class="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"><span class="material-symbols-outlined text-sm">close</span></button>
+            </div>
+            <button id="ttTranslateBtn" class="px-5 py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs hover:bg-amber-400 transition-colors">Tarjima qilish</button>
+          </div>
+
+          <div id="ttOutput" class="min-h-[90px] p-3.5 bg-slate-900/80 border border-white/10 rounded-xl text-slate-300 text-sm italic">
+            Tarjima natijasi shu yerda ko'rinadi...
+          </div>
+
+          <div class="flex justify-end gap-2">
+            <button id="ttOutputSpeak" class="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"><span class="material-symbols-outlined text-sm">volume_up</span></button>
+            <button id="ttOutputCopy" class="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"><span class="material-symbols-outlined text-sm">content_copy</span></button>
+          </div>
+        </section>
+      </div>
+
+      <!-- PANE 3: PROFIL -->
+      <div class="view-pane px-4 max-w-[900px] mx-auto flex flex-col gap-4">
+        <section class="glass-panel rounded-2xl p-6 text-center relative overflow-hidden" style="background-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(24px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.2);">
+          <div class="inline-block px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold tracking-wider mb-3">
+            LEVEL 5 • WORD EXPLORER
+          </div>
+          <div id="profAvatarWrap" class="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-amber-400 overflow-hidden bg-slate-800 flex items-center justify-center text-3xl font-bold text-amber-400">
+            👤
+          </div>
+          <h2 class="font-display font-bold text-xl text-slate-100" id="profFullName">Foydalanuvchi</h2>
+          <p class="text-xs text-slate-400 font-mono" id="profUserHandle">@username</p>
+
+          <div class="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-white/10">
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
+              <b class="block text-lg font-bold text-slate-100" id="profWordsCount">0</b>
+              <span class="text-[10px] text-slate-400" id="profStatWords">SO'ZLAR</span>
+            </div>
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
+              <b class="block text-lg font-bold text-slate-100" id="profMemorizedCount">0</b>
+              <span class="text-[10px] text-slate-400" id="profStatMemorized">YODLANGAN</span>
+            </div>
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
+              <b class="block text-lg font-bold text-amber-400" id="profStreakCount">🔥 1</b>
+              <span class="text-[10px] text-slate-400" id="profStatStreak">STREAK KUN</span>
+            </div>
+          </div>
+
+          <!-- LEADERBOARD -->
+          <h3 class="font-display font-bold text-left text-sm text-slate-200 mt-6 mb-3" id="profLbTitle">🏆 Peshqadamlar Jadvali (Top XP)</h3>
+          <div class="flex items-end justify-center gap-2 mb-4" id="podiumContainer"></div>
+          <div class="flex flex-col gap-2 text-left" id="lbList"></div>
+
+          <!-- YUTUQLAR -->
+          <h3 class="font-display font-bold text-left text-sm text-slate-200 mt-6 mb-3" id="profBadgesTitle">🏅 Yutuqlar va Nishonlar</h3>
+          <div class="grid grid-cols-2 gap-2 text-left">
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center gap-3">
+              <span class="text-2xl">🎯</span>
+              <span class="text-xs text-slate-200 font-medium" id="badgeFirst10">Dastlabki 10 so'z</span>
+            </div>
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center gap-3">
+              <span class="text-2xl">🔥</span>
+              <span class="text-xs text-slate-200 font-medium" id="badgeStreak3">3 Kunlik Streak</span>
+            </div>
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center gap-3">
+              <span class="text-2xl">🧠</span>
+              <span class="text-xs text-slate-200 font-medium" id="badgeMaster">Xotira Ustasi</span>
+            </div>
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center gap-3">
+              <span class="text-2xl">⚡</span>
+              <span class="text-xs text-slate-200 font-medium" id="badgeNight">Tungi Bilimdon</span>
+            </div>
+          </div>
+
+          <!-- SOZLAMALAR -->
+          <h3 class="font-display font-bold text-left text-sm text-slate-200 mt-6 mb-3" id="profSettingsTitle">⚙️ Sozlamalar</h3>
+          <div class="flex flex-col gap-2 text-left">
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center justify-between">
+              <div class="flex items-center gap-2 text-xs font-semibold text-slate-200">
+                <span>🎨</span> <span id="lblTheme">Mavzu</span>
+              </div>
+              <button id="themeToggleBtn" class="px-3 py-1.5 bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-amber-400 hover:bg-white/20">
+                <span id="themeBtnText">Tungi rejim 🌙</span>
+              </button>
+            </div>
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center justify-between">
+              <div class="flex items-center gap-2 text-xs font-semibold text-slate-200">
+                <span>🌐</span> <span id="lblLang">Ilova tili</span>
+              </div>
+              <button id="langSwitchBtn" class="px-3 py-1.5 bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-amber-400 hover:bg-white/20">
+                <span id="currentLangText">🇺🇿 O'zbekcha</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- BOTTOM NAV (RASMDA KO'RSATILGAN DUMALOQ OYNA) -->
+<nav class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] max-w-[420px] z-50 flex justify-around items-center p-1.5 glass-panel rounded-full border border-white/20" style="background-color: rgba(30, 41, 59, 0.6); backdrop-filter: blur(24px) saturate(200%);">
+  <button id="bnHomeBtn" class="bn-item flex flex-col items-center justify-center px-5 py-2 rounded-full text-amber-400 bg-amber-500/20 shadow-[0_0_8px_rgba(245,158,11,0.3)] active:scale-95 transition-all">
+    <span class="material-symbols-outlined text-lg" data-weight="fill">search</span>
+    <span class="text-[11px] font-bold" id="bnHomeLabel">Asosiy</span>
   </button>
-  <button class="bn-item" id="bnTranslateBtn" title="Tarjima">
-    <span class="bn-icon bn-emoji">🌐</span>
-    <span id="bnTranslateLabel">Tarjima</span>
+  <button id="bnTranslateBtn" class="bn-item flex flex-col items-center justify-center px-5 py-2 rounded-full text-slate-400 hover:text-amber-400 active:scale-95 transition-all">
+    <span class="material-symbols-outlined text-lg">translate</span>
+    <span class="text-[11px] font-bold" id="bnTranslateLabel">Tarjima</span>
   </button>
-  <button class="bn-item" id="bnProfileBtn" title="Profil">
-    <span class="bn-icon bn-avatar" id="bnAvatarWrap">👤</span>
-    <span id="bnProfileLabel">Profil</span>
+  <button id="bnProfileBtn" class="bn-item flex flex-col items-center justify-center px-5 py-2 rounded-full text-slate-400 hover:text-amber-400 active:scale-95 transition-all">
+    <span class="material-symbols-outlined text-lg">person</span>
+    <span class="text-[11px] font-bold" id="bnProfileLabel">Profil</span>
   </button>
 </nav>
 
 <!-- MODALS -->
-<div id="quizOverlay" class="overlay hidden">
-  <div class="quiz-modal">
-    <button class="quiz-close" id="quizClose" style="position:absolute; top:12px; right:16px; background:none; border:none; color:var(--ink-soft); cursor:pointer;">✕</button>
+<div id="quizOverlay" class="overlay fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+  <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative">
+    <button id="quizClose" class="absolute top-4 right-4 text-slate-400 hover:text-slate-100">✕</button>
     <div id="quizBody"></div>
   </div>
 </div>
 
-<div id="userProfileOverlay" class="overlay hidden">
-  <div class="quiz-modal profile-modal">
-    <button class="quiz-close" id="userProfileClose" style="position:absolute; top:12px; right:16px; background:none; border:none; color:var(--ink-soft); cursor:pointer;">✕</button>
+<div id="userProfileOverlay" class="overlay fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+  <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative text-center">
+    <button id="userProfileClose" class="absolute top-4 right-4 text-slate-400 hover:text-slate-100">✕</button>
     <div id="userProfileBody"></div>
   </div>
 </div>
 
-<div id="langOverlay" class="overlay hidden">
-  <div class="quiz-modal lang-modal">
-    <button class="quiz-close" id="langClose" style="position:absolute; top:12px; right:16px; background:none; border:none; color:var(--ink-soft); cursor:pointer;">✕</button>
-    <h3 id="langModalTitle" style="color:var(--gold); margin-top:0;">Ilova tilini tanlang</h3>
-    <div class="lang-options" style="display:flex; flex-direction:column; gap:8px; margin-top:16px;">
-      <button class="lang-option" data-lang="uz" style="padding:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:var(--ink); cursor:pointer;">🇺🇿 O'zbekcha</button>
-      <button class="lang-option" data-lang="en" style="padding:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:var(--ink); cursor:pointer;">🇬🇧 English</button>
-      <button class="lang-option" data-lang="ru" style="padding:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:var(--ink); cursor:pointer;">🇷🇺 Русский</button>
+<div id="langOverlay" class="overlay fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+  <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative text-center">
+    <button id="langClose" class="absolute top-4 right-4 text-slate-400 hover:text-slate-100">✕</button>
+    <h3 class="font-display font-bold text-lg text-amber-400 mb-4" id="langModalTitle">Ilova tilini tanlang</h3>
+    <div class="flex flex-col gap-2">
+      <button class="lang-option w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10" data-lang="uz">🇺🇿 O'zbekcha</button>
+      <button class="lang-option w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10" data-lang="en">🇬🇧 English</button>
+      <button class="lang-option w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10" data-lang="ru">🇷🇺 Русский</button>
     </div>
   </div>
 </div>
@@ -762,6 +384,7 @@ async function updateXPDisplay() {
   syncUserXP(xp, words.length, memorizedCount, cachedStreak);
 }
 
+// BARKAMOL AUTO-SYNC: Bulutli xotiraga va Serverga birdek yuborish
 async function syncUserXP(xp, wordsCount, memorizedCount, streak) {
   const user = getTelegramUser();
   if(!user) return;
@@ -803,7 +426,7 @@ async function renderLeaderboard() {
     currentLeaderboardUsers = list || [];
 
     if (!list || list.length === 0) {
-      podiumEl.innerHTML = `<div class="empty" style="width:100%;">Hozircha foydalanuvchilar yo'q. Birinchi bo'ling!</div>`;
+      podiumEl.innerHTML = `<div class="text-xs text-slate-400 py-4 w-full text-center">Hozircha foydalanuvchilar yo'q. Birinchi bo'ling!</div>`;
       listEl.innerHTML = '';
       return;
     }
@@ -815,15 +438,15 @@ async function renderLeaderboard() {
     let podiumHtml = '';
     top3.forEach((user, i) => {
       const avatarHtml = user.photoUrl
-        ? `<img class="podium-avatar" src="${user.photoUrl}" alt="">`
-        : `<div class="podium-avatar">${(user.name || 'F')[0].toUpperCase()}</div>`;
+        ? `<img class="w-10 h-10 rounded-full mx-auto my-1 border border-white/20" src="${user.photoUrl}" alt="">`
+        : `<div class="w-10 h-10 rounded-full mx-auto my-1 bg-slate-800 flex items-center justify-center font-bold text-amber-400 border border-white/20">${(user.name || 'F')[0].toUpperCase()}</div>`;
 
       podiumHtml += `
         <div class="podium-card ${ranks[i]}" onclick="openLeaderboardUserProfile('${user.id}')">
-          <div class="podium-crown">${crowns[i]}</div>
+          <div class="text-[11px] font-bold">${crowns[i]}</div>
           ${avatarHtml}
-          <div class="podium-name">${escapeHtml(user.name)}</div>
-          <div class="podium-xp">${user.xp} XP</div>
+          <div class="text-[11px] font-bold truncate text-slate-100">${escapeHtml(user.name)}</div>
+          <div class="text-[10px] font-mono font-bold text-amber-400 mt-0.5">${user.xp} XP</div>
         </div>
       `;
     });
@@ -832,23 +455,17 @@ async function renderLeaderboard() {
     const rest = list.slice(3);
     let listHtml = '';
     rest.forEach((user, idx) => {
-      const avatarHtml = user.photoUrl
-        ? `<img class="lb-avatar" src="${user.photoUrl}" alt="">`
-        : `<div class="lb-avatar">${(user.name || 'F')[0].toUpperCase()}</div>`;
-
       listHtml += `
-        <div class="lb-item" onclick="openLeaderboardUserProfile('${user.id}')">
-          <div class="lb-left">
-            <span class="lb-rank">#${idx + 4}</span>
-            ${avatarHtml}
-            <span class="lb-name">${escapeHtml(user.name)}</span>
+        <div class="glass-panel p-2.5 rounded-xl flex items-center justify-between text-xs cursor-pointer hover:bg-white/10" onclick="openLeaderboardUserProfile('${user.id}')">
+          <div class="flex items-center gap-3">
+            <span class="font-mono font-bold text-slate-400">#${idx + 4}</span>
+            <span class="font-semibold text-slate-200">${escapeHtml(user.name)}</span>
           </div>
-          <span class="lb-xp">${user.xp} XP</span>
+          <span class="font-mono font-bold text-amber-400">${user.xp} XP</span>
         </div>
       `;
     });
     listEl.innerHTML = listHtml;
-
   } catch(e){}
 }
 
@@ -860,31 +477,31 @@ function openLeaderboardUserProfile(userId) {
   const body = document.getElementById('userProfileBody');
 
   const avatarHtml = user.photoUrl
-    ? `<img class="profile-page-avatar" src="${user.photoUrl}" alt="">`
-    : `<div class="profile-page-avatar avatar-fallback">${(user.name || 'F')[0].toUpperCase()}</div>`;
+    ? `<img class="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-amber-400 overflow-hidden" src="${user.photoUrl}" alt="">`
+    : `<div class="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-amber-400 overflow-hidden bg-slate-800 flex items-center justify-center text-3xl font-bold text-amber-400">${(user.name || 'F')[0].toUpperCase()}</div>`;
 
   const tgLinkBtn = user.username
-    ? `<a href="https://t.me/${escapeHtml(user.username)}" target="_blank" class="btn-submit-big" style="display:inline-block; margin-top:16px; text-decoration:none;">💬 Telegramda yozish</a>`
+    ? `<a href="https://t.me/${escapeHtml(user.username)}" target="_blank" class="px-5 py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs inline-block mt-4">💬 Telegramda yozish</a>`
     : '';
 
   body.innerHTML = `
-    <h3>Foydalanuvchi Profili</h3>
+    <h3 class="font-display font-bold text-lg text-amber-400 mb-3">Foydalanuvchi Profili</h3>
     ${avatarHtml}
-    <div class="profile-fullname">${escapeHtml(user.name)}</div>
-    ${user.username ? `<div class="profile-user-handle">@${escapeHtml(user.username)}</div>` : ''}
+    <div class="font-bold text-slate-100 text-base">${escapeHtml(user.name)}</div>
+    ${user.username ? `<div class="text-xs text-slate-400 font-mono mt-0.5">@${escapeHtml(user.username)}</div>` : ''}
     
-    <div class="profile-grid-stats">
-      <div class="stat-card-box">
-        <b>${user.xp}</b>
-        <span>TAJRIBA (XP)</span>
+    <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-white/10">
+      <div class="bg-white/5 p-2 rounded-xl border border-white/5">
+        <b class="block text-sm font-bold text-slate-100">${user.xp}</b>
+        <span class="text-[9px] text-slate-400">TAJRIBA (XP)</span>
       </div>
-      <div class="stat-card-box">
-        <b>${user.memorizedCount || 0}</b>
-        <span>YODLANGAN</span>
+      <div class="bg-white/5 p-2 rounded-xl border border-white/5">
+        <b class="block text-sm font-bold text-slate-100">${user.memorizedCount || 0}</b>
+        <span class="text-[9px] text-slate-400">YODLANGAN</span>
       </div>
-      <div class="stat-card-box">
-        <b>🔥 ${user.streak || 1}</b>
-        <span>STREAK KUN</span>
+      <div class="bg-white/5 p-2 rounded-xl border border-white/5">
+        <b class="block text-sm font-bold text-amber-400">🔥 ${user.streak || 1}</b>
+        <span class="text-[9px] text-slate-400">STREAK KUN</span>
       </div>
     </div>
     ${tgLinkBtn}
@@ -897,7 +514,7 @@ document.getElementById('userProfileClose').addEventListener('click', () => {
   document.getElementById('userProfileOverlay').classList.add('hidden');
 });
 
-// I18N DICTIONARY
+// ---------- I18N DICTIONARY ----------
 const I18N = {
   uz: {
     appTitle: "LexiFlow",
@@ -1042,10 +659,6 @@ function applyStaticI18n(){
   document.documentElement.lang = currentLang;
   
   document.getElementById('appTitle').textContent = t('appTitle');
-  document.getElementById('statTotalLabel').textContent = t('statTotal');
-  document.getElementById('statMemorizedLabel').textContent = t('statMemorized');
-  document.getElementById('statReadyLabel').textContent = t('statReady');
-  addBtn.textContent = t('addBtn');
   document.getElementById('hintText').textContent = t('hint');
   document.getElementById('quizBannerText').textContent = t('quizBannerText');
   document.getElementById('startQuizBtn').textContent = t('startQuiz');
@@ -1060,16 +673,7 @@ function applyStaticI18n(){
   document.getElementById('transTitle').textContent = t('transTitle');
   document.getElementById('ttInput').placeholder = t('ttPlaceholder');
   document.getElementById('ttTranslateBtn').textContent = t('ttTranslateBtnText');
-  document.getElementById('lblBtnListen1').textContent = t('btnListen');
-  document.getElementById('lblBtnListen2').textContent = t('btnListen');
-  document.getElementById('lblBtnClear').textContent = t('btnClear');
-  document.getElementById('lblBtnCopy').textContent = t('btnCopy');
-  const ttOut = document.getElementById('ttOutput');
-  if(ttOut.classList.contains('placeholder')){
-    ttOut.textContent = t('ttResultPlaceholder');
-  }
 
-  document.getElementById('profTitle').textContent = t('profTitle');
   document.getElementById('profStatWords').textContent = t('profStatWords');
   document.getElementById('profStatMemorized').textContent = t('profStatMemorized');
   document.getElementById('profStatStreak').textContent = t('profStatStreak');
@@ -1084,12 +688,6 @@ function applyStaticI18n(){
   document.getElementById('lblLang').textContent = t('lblLang');
 
   updateLangSettingText();
-  applyTheme(localStorage.getItem('ui-theme') || 'dark');
-
-  document.querySelectorAll('.lang-option').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === currentLang);
-  });
-  updateLangLabels();
   render();
 }
 
@@ -1301,6 +899,7 @@ function checkQuizReady(){
   quizBanner.classList.toggle('hidden', ready.length < 10);
 }
 
+// RASMDA KO'RSATILGAN YANGI STITCH KARTOCHKA STILI
 function cardHtml(w){
   const isUzEn = w.dir === 'uz-en';
   const mainTitle = isUzEn ? w.uz : w.en;
@@ -1308,55 +907,43 @@ function cardHtml(w){
   const headwordFallback = mainTitle || w.en || w.uz;
 
   if(w.status === 'loading'){
-    return `<div class="card pending">
-      <div class="card-top">
-        <div class="en-word">${escapeHtml(headwordFallback)}</div>
-        <div class="card-actions">
-          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
-        </div>
-      </div>
-      <div class="loading-text">${t('loadingText')}</div>
+    return `<div class="glass-panel p-4 rounded-2xl flex justify-between items-center text-xs opacity-60">
+      <span>${escapeHtml(headwordFallback)} — ${t('loadingText')}</span>
+      <button class="text-rose-400 font-bold" onclick="deleteWord('${w.id}')">✕</button>
     </div>`;
   }
   if(w.status === 'error'){
-    return `<div class="card">
-      <div class="card-top">
-        <div class="en-word">${escapeHtml(headwordFallback)}</div>
-        <div class="card-actions">
-          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
-        </div>
-      </div>
-      <div class="error-text">${t('errorText')} <span class="retry-link" onclick="retryWord('${w.id}')">${t('retryLink')}</span></div>
+    return `<div class="glass-panel p-4 rounded-2xl flex justify-between items-center text-xs border-rose-500/50">
+      <span class="text-rose-400">${t('errorText')}</span>
+      <span class="underline cursor-pointer font-bold text-amber-400" onclick="retryWord('${w.id}')">${t('retryLink')}</span>
+      <button class="text-rose-400 font-bold" onclick="deleteWord('${w.id}')">✕</button>
     </div>`;
   }
-  return `<div class="card">
-    <div class="card-top">
-      <div class="en-word">${escapeHtml(mainTitle)}</div>
-      <div class="card-actions">
-        <button class="icon-btn speak-btn" onclick="speakWord('${escapeJs(w.en)}')" title="${t('titleSpeak')}">🔊</button>
-        <button class="icon-btn memorize" onclick="toggleMemorized('${w.id}')" title="${w.memorized ? t('titleUnmemorize') : t('titleMemorize')}">${w.memorized ? '↺' : '✓'}</button>
-        <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
+  return `<article class="glass-panel rounded-2xl p-5 flex flex-col gap-3 relative overflow-hidden group" style="background-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(24px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.2);">
+    <div class="flex justify-between items-start">
+      <div>
+        <h2 class="font-display font-bold text-lg text-amber-400">${escapeHtml(mainTitle)}</h2>
+        <p class="text-xs text-slate-400 italic mt-0.5">${escapeHtml(w.transcription || '')}</p>
+      </div>
+      <div class="flex gap-1.5">
+        <button class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-amber-400 hover:bg-amber-400/20 transition-all" onclick="speakWord('${escapeJs(w.en)}')" title="${t('titleSpeak')}">
+          <span class="material-symbols-outlined text-sm">play_arrow</span>
+        </button>
+        <button class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-emerald-400 hover:bg-emerald-400/20 transition-all" onclick="toggleMemorized('${w.id}')" title="${w.memorized ? t('titleUnmemorize') : t('titleMemorize')}">
+          ${w.memorized ? '↺' : '✓'}
+        </button>
+        <button class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-rose-400 hover:bg-rose-400/20 transition-all" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
       </div>
     </div>
-    <div class="word-meta">
-      ${w.transcription ? `<span class="transcription">${escapeHtml(w.transcription)}</span>` : ''}
-      ${w.partOfSpeech ? `<span class="pos-tag">${escapeHtml(w.partOfSpeech)}</span>` : ''}
-      ${w.memorized ? `<span class="memorized-tag">✓ ${t('stamp')}</span>` : ''}
+    <p class="text-sm font-semibold text-rose-300">${escapeHtml(subTitle)}</p>
+    <p class="text-xs text-slate-300 italic border-l-2 border-amber-400 pl-2.5 py-0.5">${escapeHtml(w.example || '')}</p>
+    <div class="flex items-center justify-between pt-2 border-t border-white/10 text-[10px]">
+      <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">${escapeHtml(w.partOfSpeech || 'so\'z')}</span>
+      <div class="w-1/3 bg-slate-800 rounded-full h-1 overflow-hidden">
+        <div class="bg-amber-400 h-1 rounded-full ${w.memorized ? 'w-full bg-emerald-400' : 'w-1/3'}"></div>
+      </div>
     </div>
-    <div class="uz-word">
-      ${escapeHtml(subTitle)}
-      <button class="copy-btn" onclick="copyText('${escapeJs(subTitle)}', this)" title="${t('titleCopy')}">⧉</button>
-    </div>
-    <div class="example">${escapeHtml(w.example)}</div>
-  </div>`;
-}
-
-function escapeJs(s){
-  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-}
-
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  </article>`;
 }
 
 function render(){
@@ -1373,9 +960,6 @@ function render(){
 
   document.getElementById('learningCount').textContent = `(${learning.length})`;
   document.getElementById('memorizedCount').textContent = `(${memorized.length})`;
-  document.getElementById('statTotal').textContent = words.length;
-  document.getElementById('statMemorized').textContent = memorized.length;
-  document.getElementById('statReady').textContent = words.filter(w => w.memorized && !w.quizzed).length;
 
   checkQuizReady();
   updateXPDisplay();
@@ -1452,8 +1036,14 @@ const bnProfileBtn = document.getElementById('bnProfileBtn');
 
 function switchToPane(index, btnEl){
   viewsSlider.style.transform = `translateX(-${index * 33.33333}%)`;
-  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-  if(btnEl) btnEl.classList.add('active');
+  document.querySelectorAll('.bn-item').forEach(b => {
+    b.classList.remove('active', 'bg-amber-500/20', 'text-amber-400');
+    b.classList.add('text-slate-400');
+  });
+  if(btnEl) {
+    btnEl.classList.add('active', 'bg-amber-500/20', 'text-amber-400');
+    btnEl.classList.remove('text-slate-400');
+  }
   window.scrollTo({top:0, behavior:'smooth'});
   if(index === 2) updateProfilePane();
 }
@@ -1518,14 +1108,14 @@ function renderQuizQuestion(){
   const q = quizState.questions[quizState.index];
   quizState.answered = false;
   quizBody.innerHTML = `
-    <h3>${t('quizTitle')}</h3>
-    <div class="quiz-progress">${t('quizQuestion')} ${quizState.index + 1} / ${quizState.questions.length} &nbsp;•&nbsp; ${t('quizScore')}: ${quizState.score}</div>
-    <div class="quiz-word">${escapeHtml(q.en)}</div>
-    <div class="quiz-options" id="quizOptions">
-      ${q.options.map((opt) => `<button type="button" class="quiz-option">${escapeHtml(opt)}</button>`).join('')}
+    <h3 class="font-display font-bold text-lg text-amber-400 mb-2">${t('quizTitle')}</h3>
+    <div class="text-xs text-slate-400 mb-4">${t('quizQuestion')} ${quizState.index + 1} / ${quizState.questions.length} &nbsp;•&nbsp; ${t('quizScore')}: ${quizState.score}</div>
+    <div class="glass-panel p-4 rounded-xl text-center font-bold text-lg text-amber-400 mb-4">${escapeHtml(q.en)}</div>
+    <div class="flex flex-col gap-2" id="quizOptions">
+      ${q.options.map((opt) => `<button type="button" class="quiz-option p-3 bg-white/5 border border-white/10 rounded-xl text-left text-xs font-semibold text-slate-200 hover:bg-white/10">${escapeHtml(opt)}</button>`).join('')}
     </div>
-    <div class="quiz-footer">
-      <button class="next-btn" id="nextBtn" disabled>${t('quizNext')}</button>
+    <div class="flex justify-end mt-4">
+      <button class="next-btn px-4 py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs hover:bg-amber-400" id="nextBtn" disabled>${t('quizNext')}</button>
     </div>
   `;
   const optionButtons = Array.from(document.querySelectorAll('#quizOptions .quiz-option'));
@@ -1541,8 +1131,8 @@ function answerQuiz(btn, chosen, correct, optionButtons, options){
   quizState.answered = true;
   optionButtons.forEach((b, i) => {
     b.disabled = true;
-    if(options[i] === correct) b.classList.add('correct');
-    else if(b === btn) b.classList.add('wrong');
+    if(options[i] === correct) { b.style.borderColor = '#34d399'; b.style.backgroundColor = 'rgba(52, 211, 153, 0.2)'; }
+    else if(b === btn) { b.style.borderColor = '#f87171'; b.style.backgroundColor = 'rgba(248, 113, 113, 0.2)'; }
   });
   if(chosen === correct) quizState.score++;
   document.getElementById('nextBtn').disabled = false;
@@ -1569,12 +1159,12 @@ function finishQuiz(){
   const pct = Math.round((score/total)*100);
   const label = pct === 100 ? t('resultExcellent') : pct >= 70 ? t('resultGreat') : pct >= 40 ? t('resultGood') : t('resultRetry');
   quizBody.innerHTML = `
-    <div class="quiz-result">
-      <h3>${t('quizFinished')}</h3>
-      <div class="big-stamp">${label}</div>
-      <div class="quiz-score">${score} / ${total} ${t('quizCorrect')} (${pct}%)</div>
-      <div class="quiz-footer" style="justify-content:center; margin-top:22px;">
-        <button class="next-btn" onclick="closeQuiz()">${t('quizClose')}</button>
+    <div class="text-center">
+      <h3 class="font-display font-bold text-lg text-amber-400">${t('quizFinished')}</h3>
+      <div class="text-3xl font-bold text-emerald-400 my-4">${label}</div>
+      <div class="text-xs text-slate-300">${score} / ${total} ${t('quizCorrect')} (${pct}%)</div>
+      <div class="flex justify-center mt-6">
+        <button class="px-5 py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs" onclick="closeQuiz()">${t('quizClose')}</button>
       </div>
     </div>
   `;
