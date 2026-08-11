@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0d1520" />
-    <title>LexiFlow · Lug'at</title>
+    <title>Lug'at Mini App</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -45,6 +45,30 @@
 
     <style>
       :root {
+        color-scheme: light;
+        --amb-1: #d8b4f8;
+        --amb-2: #a7f3d0;
+        --amb-3: #fde9c8;
+        --amb-4: #b7d8c4;
+
+        --background: #eef1f4;
+        --foreground: #1e293b;
+
+        --glass: rgba(255, 255, 255, 0.45);
+        --glass-strong: rgba(255, 255, 255, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.6);
+        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+
+        --card: rgba(255, 255, 255, 0.5);
+        --muted: rgba(30, 41, 59, 0.08);
+        --muted-foreground: #52617a;
+
+        --gold: #d97706;
+        --gold-strong: #b45309;
+        --gold-foreground: #ffffff;
+      }
+
+      .dark {
         color-scheme: dark;
         --amb-1: #2e4036;
         --amb-2: #1e293b;
@@ -57,7 +81,6 @@
         --glass: rgba(255, 255, 255, 0.08);
         --glass-strong: rgba(255, 255, 255, 0.14);
         --glass-border: rgba(255, 255, 255, 0.16);
-        --glass-highlight: rgba(255, 255, 255, 0.28);
         --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
 
         --card: rgba(255, 255, 255, 0.07);
@@ -95,7 +118,7 @@
         backdrop-filter: blur(16px) saturate(180%);
         -webkit-backdrop-filter: blur(16px) saturate(180%);
         border: 1px solid var(--glass-border);
-        box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-highlight);
+        box-shadow: var(--glass-shadow);
       }
 
       .glass-strong {
@@ -103,14 +126,13 @@
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
         border: 1px solid var(--glass-border);
-        box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-highlight);
+        box-shadow: var(--glass-shadow);
       }
 
       .glass-gold {
         background: linear-gradient(135deg, var(--gold), var(--gold-strong));
         color: var(--gold-foreground);
-        box-shadow: 0 6px 20px -4px color-mix(in srgb, var(--gold) 60%, transparent),
-          inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+        box-shadow: 0 6px 20px -4px color-mix(in srgb, var(--gold) 60%, transparent);
       }
 
       .icon {
@@ -124,7 +146,7 @@
       }
 
       .splash-screen {
-        position: fixed; inset: 0; background: #0d1520; z-index: 99999;
+        position: fixed; inset: 0; background: var(--background); z-index: 99999;
         display: flex; align-items: center; justify-content: center;
         transition: opacity 0.5s ease, visibility 0.5s ease;
       }
@@ -148,7 +170,7 @@
     <!-- SPLASH SCREEN -->
     <div id="splashScreen" class="splash-screen">
       <div class="flex flex-col items-center animate-pulse">
-        <h1 class="text-2xl font-extrabold text-gold tracking-tight">LexiFlow</h1>
+        <h1 class="text-2xl font-extrabold text-gold tracking-tight">Lug'at</h1>
         <p class="text-xs text-muted-foreground mt-1">Xush kelibsiz</p>
       </div>
     </div>
@@ -165,12 +187,18 @@
             <header class="flex flex-col gap-4">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-muted-foreground" id="profFullName">Foydalanuvchi</p>
-                  <h1 class="text-2xl font-extrabold tracking-tight" id="appTitle">LexiFlow</h1>
+                  <p class="text-xs font-mono text-muted-foreground" id="headerUserHandle">@username</p>
+                  <h1 class="text-2xl font-extrabold tracking-tight text-gold" id="appTitle">Lug'at</h1>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-xs text-muted-foreground font-mono" id="profUserHandle">@username</span>
-                </div>
+                <!-- O'NG BURCHAKDAGI YORUGLIK TOGGLE TUGMASI -->
+                <button
+                  type="button"
+                  id="topThemeToggle"
+                  aria-label="Toggle theme"
+                  class="glass-strong flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-transform active:scale-90"
+                >
+                  🌙
+                </button>
               </div>
 
               <div class="glass flex items-stretch rounded-xl p-2">
@@ -204,7 +232,7 @@
             <section class="glass-strong flex flex-col gap-4 rounded-xl p-4">
               <div class="flex items-center justify-between gap-2">
                 <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
-                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Manba</span>
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">MANBA</span>
                   <span id="langFrom" class="text-base font-bold">Inglizcha</span>
                 </div>
 
@@ -218,7 +246,7 @@
                 </button>
 
                 <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
-                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Nishon</span>
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">NISHON</span>
                   <span id="langTo" class="text-base font-bold">O'zbekcha</span>
                 </div>
               </div>
@@ -228,12 +256,12 @@
                 <input
                   type="text"
                   id="wordInput"
-                  placeholder="So'z yoki iborani kiriting…"
+                  placeholder="Bilmagan inglizcha so'zingizni yozing..."
                   aria-label="Word to translate"
                   class="w-full bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground"
                   autocomplete="off"
                 />
-                <button type="button" id="addBtn" class="glass-gold px-3 py-1 rounded-full text-xs font-bold shrink-0">Qo'shish</button>
+                <button type="button" id="addBtn" class="glass-gold px-4 py-1.5 rounded-full text-xs font-bold shrink-0">Qo'shish</button>
               </div>
               <p class="text-[11px] text-muted-foreground text-center" id="hintText">Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.</p>
             </section>
@@ -272,14 +300,14 @@
               <h2 class="text-base font-bold text-gold" id="transTitle">Matn Tarjimoni</h2>
               <div class="flex items-center justify-between gap-2">
                 <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
-                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Manba</span>
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">MANBA</span>
                   <span id="ttFrom" class="text-base font-bold">Inglizcha</span>
                 </div>
                 <button type="button" id="ttSwapBtn" class="glass-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
                   <svg class="icon" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></svg>
                 </button>
                 <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
-                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Nishon</span>
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">NISHON</span>
                   <span id="ttTo" class="text-base font-bold">O'zbekcha</span>
                 </div>
               </div>
@@ -310,7 +338,12 @@
                 LEVEL 5 • WORD EXPLORER
               </div>
               <div id="profAvatarWrap" class="w-20 h-20 rounded-full mx-auto border-2 border-gold flex items-center justify-center text-3xl font-bold text-gold" style="background:var(--muted)">👤</div>
-              <h2 class="text-xl font-bold text-foreground" id="profFullName">Foydalanuvchi</h2>
+              
+              <!-- PROFILDA ISM VA TAGIDA USERNAME -->
+              <div>
+                <h2 class="text-xl font-bold text-foreground" id="profFullName">Foydalanuvchi Ismi</h2>
+                <p class="text-xs text-muted-foreground font-mono mt-0.5" id="profUserHandle">@username</p>
+              </div>
 
               <div class="grid grid-cols-2 gap-2 mt-2">
                 <div class="glass p-3 rounded-lg text-center">
@@ -346,7 +379,7 @@
                 </div>
                 <div class="glass p-3 rounded-lg flex justify-between items-center">
                   <span>🌐 <span id="lblLang">Ilova tili</span></span>
-                  <button id="langSwitchBtn" class="glass-gold px-3 py-1 rounded-full font-bold text-[11px]"><span id="currentLangText">🇺🇿 O'zbekcha</span></button>
+                  <button id="langSwitchBtn" class="glass-gold px-3 py-1 rounded-full font-bold text-[11px]"><span id="currentLangText">uz O'zbekcha</span></button>
                 </div>
               </div>
             </section>
@@ -355,7 +388,7 @@
         </div>
       </div>
 
-      <!-- Bottom Nav -->
+      <!-- Bottom Nav (PASTKI PANEL ICON'I TUZATILDI) -->
       <nav
         class="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center"
         style="padding-bottom:max(1rem, env(safe-area-inset-bottom))"
@@ -365,9 +398,11 @@
             class="nav-btn flex h-11 w-11 items-center justify-center rounded-full transition-colors" style="background:var(--muted);color:var(--foreground)">
             <svg class="icon" viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /></svg>
           </button>
-          <button type="button" id="bnTranslateBtn" data-nav="library" aria-label="Library"
+          
+          <!-- ANIQ VA MA'NOLI TARJIMA ICONKA (GLOBUS 🌐) -->
+          <button type="button" id="bnTranslateBtn" data-nav="library" aria-label="Translate"
             class="nav-btn flex h-11 w-11 items-center justify-center rounded-full transition-colors" style="color:var(--muted-foreground)">
-            <svg class="icon" viewBox="0 0 24 24"><path d="m5 8 6 6 6-6"/><path d="M4 14h16"/></svg>
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
           </button>
 
           <button type="button" aria-label="Add a new word" onclick="document.getElementById('wordInput').focus()"
@@ -404,7 +439,7 @@
         <h3 id="langModalTitle" class="font-bold text-gold text-base">Ilova tilini tanlang</h3>
         <button class="lang-option glass p-2.5 rounded-lg text-xs font-semibold" data-lang="uz">🇺🇿 O'zbekcha</button>
         <button class="lang-option glass p-2.5 rounded-lg text-xs font-semibold" data-lang="en">🇬🇧 English</button>
-        <button class="lang-option glass p-2.5 rounded-lang text-xs font-semibold" data-lang="ru">🇷🇺 Русский</button>
+        <button class="lang-option glass p-2.5 rounded-lg text-xs font-semibold" data-lang="ru">🇷🇺 Русский</button>
       </div>
     </div>
 
@@ -434,7 +469,7 @@
       // I18N DICTIONARY
       const I18N = {
         uz: {
-          appTitle: "LexiFlow",
+          appTitle: "Lug'at",
           statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
           addBtn: "Qo'shish", hint: "Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.",
           placeholderEnUz: "Bilmagan inglizcha so'zingizni yozing...", placeholderUzEn: "O'zbekcha so'zni yozing...",
@@ -459,7 +494,7 @@
           themeLight: "Kunduzgi ☀️", themeDark: "Tungi 🌙"
         },
         en: {
-          appTitle: "LexiFlow",
+          appTitle: "Dictionary",
           statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
           addBtn: "Add", hint: "When you add a word, translation and an example sentence are generated automatically.",
           placeholderEnUz: "Type an English word you don't know...", placeholderUzEn: "Type an Uzbek word...",
@@ -484,7 +519,7 @@
           themeLight: "Light ☀️", themeDark: "Dark 🌙"
         },
         ru: {
-          appTitle: "LexiFlow",
+          appTitle: "Словарь",
           statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
           addBtn: "Добавить", hint: "При добавлении слова автоматически создаются перевод и пример предложения.",
           placeholderEnUz: "Введите незнакомое английское слово...", placeholderUzEn: "Введите узбекское слово...",
@@ -1193,20 +1228,28 @@
         `;
       }
 
-      // Theme toggle
-      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      // MAVZU (YORUGLIK/TUNGI) ALMASHTIRISH TOGGLE
+      function toggleTheme() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const newTheme = isDark ? 'light' : 'dark';
+        applyTheme(newTheme);
+      }
+
       function applyTheme(theme){
         document.documentElement.classList.toggle('dark', theme === 'dark');
+        
+        // Tepa o'ng va sozlamalardagi tugma matnini yangilash
+        const topBtn = document.getElementById('topThemeToggle');
         const btnText = document.getElementById('themeBtnText');
-        if(btnText){
-          btnText.textContent = theme === 'dark' ? t('themeLight') : t('themeDark');
-        }
+        
+        if (topBtn) topBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        if (btnText) btnText.textContent = theme === 'dark' ? t('themeLight') : t('themeDark');
+        
         localStorage.setItem('ui-theme', theme);
       }
-      themeToggleBtn.addEventListener('click', () => {
-        const isDark = document.documentElement.classList.contains('dark');
-        applyTheme(isDark ? 'light' : 'dark');
-      });
+
+      document.getElementById('topThemeToggle').addEventListener('click', toggleTheme);
+      document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
 
       // Language switcher
       const langOverlay = document.getElementById('langOverlay');
@@ -1282,6 +1325,7 @@
         const avatarWrap = document.getElementById('profAvatarWrap');
         const profName = document.getElementById('profFullName');
         const profHandle = document.getElementById('profUserHandle');
+        const headerHandle = document.getElementById('headerUserHandle');
 
         document.getElementById('profWordsCount').textContent = words.length;
         document.getElementById('profMemorizedCount').textContent = words.filter(w => w.memorized).length;
@@ -1292,8 +1336,9 @@
         if(!user) return;
 
         const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
-        profName.textContent = fullName || 'Foydalanuvchi';
+        if(profName) profName.textContent = fullName || 'Foydalanuvchi';
         if(profHandle) profHandle.textContent = user.username ? `@${user.username}` : '';
+        if(headerHandle) headerHandle.textContent = user.username ? `@${user.username}` : '';
 
         if(user.photo_url){
           avatarWrap.outerHTML = `<img id="profAvatarWrap" class="w-20 h-20 rounded-full mx-auto border-2 border-gold object-cover" src="${user.photo_url}" alt="">`;
@@ -1312,6 +1357,10 @@
         tg.ready();
         tg.expand();
       }
+
+      // Boshlanishda saqlangan mavzuni qo'llash
+      const savedTheme = localStorage.getItem('ui-theme') || 'dark';
+      applyTheme(savedTheme);
 
       applyStaticI18n();
       loadWords();
