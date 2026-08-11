@@ -1,1542 +1,1320 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lug'at</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-  :root{
-    --paper: #F6F1E4;
-    --paper-dark: #ECE2C8;
-    --paper-line: #D8CBA8;
-    --ink: #24211B;
-    --ink-soft: #6b6455;
-    --red: #B23A2E;
-    --red-soft: #c9584c;
-    --gold: #C9971F;
-    --green: #4F7A5D;
-    --green-soft: #dbe7dd;
-    --navy: #2D3A55;
-    --surface: #fffdf7;
-    --binder-a: #E9DFC4;
-    --binder-b: #E2D6B4;
-    --binder-border: #c8b98a;
-    --ring-a: #fff8e8;
-    --ring-b: #cbb87e;
-    --ring-c: #9c8a54;
-    --ring-shadow: #efe6c9;
-    --tape-overlay: rgba(255,255,255,0.55);
-    --card-shadow: 0 1px 0 rgba(36,33,27,0.06), 0 6px 16px -8px rgba(36,33,27,0.25);
-    --btn-text: #F6F1E4;
-  }
-  
-  html[data-theme="dark"]{
-    --paper: #12151C;
-    --paper-dark: #1C222E;
-    --paper-line: #262D3B;
-    --ink: #F1F5F9;
-    --ink-soft: #94A3B8;
-    --red: #F87171;
-    --red-soft: #3A1E20;
-    --gold: #F59E0B;
-    --green: #34D399;
-    --green-soft: #133829;
-    --navy: #60A5FA;
-    --surface: #1A1E29;
-    --binder-a: #1C212B;
-    --binder-b: #141720;
-    --binder-border: #2D3646;
-    --ring-a: #475569;
-    --ring-b: #334155;
-    --ring-c: #1E293B;
-    --ring-shadow: #0F172A;
-    --tape-overlay: rgba(255,255,255,0.06);
-    --card-shadow: 0 4px 20px rgba(0,0,0,0.35);
-    --btn-text: #12151C;
-  }
+<!doctype html>
+<html lang="uz" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d1520" />
+    <title>LexiFlow · Lug'at</title>
 
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0; overflow-x:hidden;}
-  body{
-    background:
-      repeating-linear-gradient(0deg, transparent, transparent 34px, var(--paper-line) 35px),
-      var(--paper);
-    font-family:'Inter', sans-serif;
-    color:var(--ink);
-    min-height:100vh;
-  }
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              background: "var(--background)",
+              foreground: "var(--foreground)",
+              card: "var(--card)",
+              muted: "var(--muted)",
+              "muted-foreground": "var(--muted-foreground)",
+              border: "var(--glass-border)",
+              gold: "var(--gold)",
+            },
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+            },
+            borderRadius: {
+              sm: "12px",
+              md: "16px",
+              lg: "20px",
+              xl: "24px",
+            },
+          },
+        },
+      };
+    </script>
 
-  input::placeholder, textarea::placeholder {
-    color: var(--ink-soft);
-    opacity: 0.75;
-  }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
-  .splash-screen {
-    position: fixed; inset: 0;
-    background: var(--paper);
-    background-image: repeating-linear-gradient(0deg, transparent, transparent 34px, var(--paper-line) 35px);
-    z-index: 99999; display: flex; align-items: center; justify-content: center;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-  }
-  .splash-container {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    animation: splashPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); perspective: 500px;
-  }
-  .animated-notebook { width: 110px; height: 110px; overflow: visible; }
-  .flipping-page { transform-origin: 20px 45px; transform-box: fill-box; animation: pageTurn 1.8s ease-in-out infinite; }
-  .line-1 { animation: lineDraw 1.8s ease-in-out infinite; }
-  .line-2 { animation: lineDraw 1.8s ease-in-out 0.2s infinite; }
-  .line-3 { animation: lineDraw 1.8s ease-in-out 0.4s infinite; }
-  .splash-text { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: var(--ink); margin-top: 18px; letter-spacing: -0.01em; animation: textPulse 1.8s ease-in-out infinite; }
-  @keyframes splashPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-  @keyframes pageTurn { 0% { transform: rotateY(0deg); opacity: 1; } 50% { transform: rotateY(-90deg); opacity: 0.5; } 100% { transform: rotateY(-180deg); opacity: 0; } }
-  @keyframes lineDraw { 0% { stroke-dasharray: 0 100; opacity: 0; } 40% { stroke-dasharray: 100 0; opacity: 1; } 100% { stroke-dasharray: 100 0; opacity: 1; } }
-  @keyframes textPulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
-  .splash-screen.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+    <style>
+      :root {
+        color-scheme: dark;
+        --amb-1: #2e4036;
+        --amb-2: #1e293b;
+        --amb-3: #3b2f52;
+        --amb-4: #10352c;
 
-  .app{ display:flex; max-width:1180px; margin:0 auto; min-height:100vh; }
-  .binder{ width:64px; flex-shrink:0; background:linear-gradient(180deg, var(--binder-a), var(--binder-b)); border-right:2px dashed var(--binder-border); display:flex; flex-direction:column; align-items:center; padding:28px 0; position:relative; gap:22px; }
-  .ring{ width:20px;height:20px;border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--ring-a), var(--ring-b) 55%, var(--ring-c) 100%); box-shadow: inset 0 0 0 3px var(--ring-shadow), 0 1px 2px rgba(0,0,0,0.25); flex-shrink:0; }
+        --background: #0d1520;
+        --foreground: #f8fafc;
 
-  main { flex: 1; min-width: 0; overflow: hidden; position: relative; }
-  .views-wrapper { width: 100%; overflow: hidden; }
-  .views-slider { display: flex; width: 300%; transition: transform 0.38s cubic-bezier(0.25, 1, 0.35, 1); align-items: flex-start; }
-  .view-pane { width: 33.33333%; flex-shrink: 0; padding: 34px 40px 110px; box-sizing: border-box; min-height: 100vh; }
+        --glass: rgba(255, 255, 255, 0.08);
+        --glass-strong: rgba(255, 255, 255, 0.14);
+        --glass-border: rgba(255, 255, 255, 0.16);
+        --glass-highlight: rgba(255, 255, 255, 0.28);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
 
-  .bottom-nav{ position:fixed; left:50%; bottom:16px; transform:translateX(-50%); width:calc(100% - 32px); max-width:420px; display:flex; align-items:stretch; justify-content:space-between; gap:4px; background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.6); border-radius:24px; padding:6px; box-shadow: 0 12px 32px 0 rgba(31, 38, 135, 0.12), inset 0 1px 1px 0 rgba(255, 255, 255, 0.8); z-index:40; transition: all .25s ease; }
-  html[data-theme="dark"] .bottom-nav { background: rgba(26, 30, 41, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1); }
-  .bn-item{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:none; border:none; border-radius:18px; padding:8px 4px; cursor:pointer; color: var(--ink-soft); font-family:'Inter', sans-serif; font-size:11.5px; font-weight:600; transition:all .2s ease; }
-  .bn-item:hover{ color: var(--ink); background: rgba(255, 255, 255, 0.15); }
-  .bn-item.active{ background: rgba(255, 255, 255, 0.7); color: var(--navy); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
-  html[data-theme="dark"] .bn-item.active { background: rgba(255, 255, 255, 0.12); color: var(--gold); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
-  .bn-icon{display:flex; align-items:center; justify-content:center; height:22px;}
-  .bn-emoji{font-size:19px; line-height:1;}
-  .bn-avatar{ width:22px; height:22px; border-radius:50%; overflow:hidden; background: var(--paper-line); color: var(--ink); }
-  .bn-avatar img{width:100%; height:100%; object-fit:cover; display:block;}
-  .bn-item.active .bn-avatar{box-shadow:0 0 0 2px var(--gold);}
+        --card: rgba(255, 255, 255, 0.07);
+        --muted: rgba(255, 255, 255, 0.06);
+        --muted-foreground: #a7b4c4;
 
-  .cover{margin-bottom:22px; position:relative;}
-  .top-icons { position: absolute; top: 0; right: 0; display: flex; align-items: center; }
-  .xp-badge { display: flex; align-items: center; gap: 6px; background: var(--surface); color: var(--gold); border: 1.5px solid var(--paper-line); padding: 6px 14px; border-radius: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; font-weight: 700; box-shadow: var(--card-shadow); }
-  .tape{ display:inline-block; font-family:'Fraunces', serif; font-weight:700; font-size:30px; background: linear-gradient(180deg, rgba(201,151,31,0.22), rgba(201,151,31,0.22)); padding:6px 18px 8px; transform:rotate(-1.2deg); position:relative; box-shadow: inset 0 -2px 0 rgba(178,58,46,0.35); }
-  .tape::before, .tape::after{ content:""; position:absolute; top:-6px; width:26px;height:14px; background:var(--tape-overlay); border:1px solid rgba(0,0,0,0.04); }
-  .tape::before{left:-8px; transform:rotate(-8deg);}
-  .tape::after{right:-8px; transform:rotate(8deg);}
+        --gold: #fbbf24;
+        --gold-strong: #f59e0b;
+        --gold-foreground: #2a1c04;
+      }
 
-  .stats{ margin-top:14px; font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft); display:flex; gap:22px; flex-wrap:wrap; }
-  .stats b{color:var(--ink); font-weight:600;}
-  .stat-dot{color:var(--gold);}
+      * { border-color: var(--glass-border); }
 
-  .lang-row{ display:flex; align-items:center; gap:10px; margin-top:24px; font-family:'Inter', sans-serif; font-size:13px; font-weight:600; color:var(--ink-soft); }
-  .lang-row span{ padding:6px 12px; border:1.5px solid var(--paper-line); border-radius:8px; background:var(--surface); }
-  #swapLangBtn, #ttSwapBtn { border:none; background:none; font-size:16px; cursor:pointer; color:var(--navy); padding:4px 8px; border-radius:8px; transition:transform .15s, background .15s; }
-  #swapLangBtn:hover, #ttSwapBtn:hover {background:var(--paper-dark);}
-  #swapLangBtn.spin, #ttSwapBtn.spin {transform:rotate(180deg);}
+      body {
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
 
-  .add-row{ display:flex; gap:10px; margin:10px 0 8px; }
-  .add-row input{ flex:1; font-family:'Inter', sans-serif; font-size:15px; padding:13px 16px; border:1.5px solid var(--paper-line); border-radius:10px; background:var(--surface); color:var(--ink); outline:none; transition:border-color .15s; }
-  .add-row input:focus{border-color:var(--gold);}
-  .add-row button{ font-family:'Inter', sans-serif; font-weight:600; font-size:14.5px; padding:0 22px; border:none; border-radius:10px; background:var(--ink); color:var(--btn-text); cursor:pointer; transition:background .15s, transform .1s; }
-  .add-row button:hover{background:var(--navy);}
-  .add-row button:active{transform:scale(0.97);}
-  .add-row button:disabled{opacity:0.5; cursor:default;}
-  .hint{font-size:12.5px; color:var(--ink-soft); margin-bottom:18px;}
+      .ambient-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-color: var(--background);
+        background-image: radial-gradient(60% 55% at 12% 8%, var(--amb-1) 0%, transparent 60%),
+          radial-gradient(55% 50% at 92% 12%, var(--amb-3) 0%, transparent 55%),
+          radial-gradient(70% 65% at 82% 88%, var(--amb-2) 0%, transparent 60%),
+          radial-gradient(60% 55% at 8% 92%, var(--amb-4) 0%, transparent 60%);
+        filter: saturate(1.05);
+      }
 
-  .quiz-banner{ display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--green-soft); border:1.5px dashed var(--green); border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:14.5px; color:var(--ink); }
-  .quiz-banner.hidden{display:none;}
-  .quiz-banner button{ font-family:'Inter'; font-weight:700; font-size:13.5px; background:var(--green); color:#fff; border:none; padding:9px 16px; border-radius:8px; cursor:pointer; white-space:nowrap; }
+      .glass {
+        background: var(--glass);
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-highlight);
+      }
 
-  .lists{display:flex; gap:28px; align-items:flex-start;}
-  .col{flex:1; min-width:0;}
-  .col h2{ font-family:'Fraunces', serif; font-size:17px; font-weight:600; margin:0 0 12px; padding-bottom:8px; border-bottom:2px solid var(--ink); display:flex; justify-content:space-between; align-items:baseline; }
-  .col h2 span{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); font-weight:400;}
-  .cards{display:flex; flex-direction:column; gap:12px;}
+      .glass-strong {
+        background: var(--glass-strong);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-highlight);
+      }
 
-  .card{ background:var(--surface); border:1px solid var(--paper-line); border-radius:10px; padding:14px 16px; box-shadow:var(--card-shadow); position:relative; overflow:hidden; }
-  .card.pending{opacity:0.6;}
-  .card-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
-  .en-word{font-family:'Fraunces', serif; font-weight:600; font-size:19px;}
-  .card-actions{display:flex; gap:6px; flex-shrink:0;}
-  .icon-btn{ border:none; background:transparent; cursor:pointer; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-size:14px; transition:background .15s, color .15s; }
-  .icon-btn:hover{background:var(--paper-dark); color:var(--ink);}
-  .icon-btn.memorize:hover{color:var(--green);}
-  .icon-btn.del:hover{color:var(--red);}
+      .glass-gold {
+        background: linear-gradient(135deg, var(--gold), var(--gold-strong));
+        color: var(--gold-foreground);
+        box-shadow: 0 6px 20px -4px color-mix(in srgb, var(--gold) 60%, transparent),
+          inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+      }
 
-  .uz-word{color:var(--red); font-weight:600; font-size:14.5px; margin-top:4px;}
-  .word-meta{display:flex; align-items:center; gap:8px; margin-top:2px; flex-wrap:wrap;}
-  .transcription{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft);}
-  .pos-tag{ font-family:'Inter', sans-serif; font-size:11px; font-weight:600; color:var(--navy); background:var(--paper-dark); padding:2px 8px; border-radius:20px; }
-  .memorized-tag { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; color: var(--green); background: var(--green-soft); border: 1px solid var(--green); padding: 2px 8px; border-radius: 20px; display: inline-flex; align-items: center; gap: 3px; }
+      .icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
 
-  .speak-btn, .copy-btn{ border:none; background:none; cursor:pointer; color:var(--ink-soft); font-size:14px; padding:2px 4px; border-radius:6px; transition:color .15s, background .15s; }
-  .speak-btn:hover, .copy-btn:hover{color:var(--navy); background:var(--paper-dark);}
-  .copy-btn.copied{color:var(--green);}
-  .example{ font-style:italic; color:var(--ink-soft); font-size:13.5px; margin-top:6px; line-height:1.45; border-left:2px solid var(--gold); padding-left:10px; }
-  .loading-text{font-size:13px; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace;}
-  .error-text{font-size:12.5px; color:var(--red); margin-top:4px;}
-  .retry-link{color:var(--navy); cursor:pointer; text-decoration:underline; font-weight:600;}
+      .splash-screen {
+        position: fixed; inset: 0; background: #0d1520; z-index: 99999;
+        display: flex; align-items: center; justify-content: center;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      .splash-screen.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
 
-  .empty{ color:var(--ink-soft); font-size:13.5px; padding:20px 10px; text-align:center; border:1.5px dashed var(--paper-line); border-radius:10px; }
+      .views-wrapper { width: 100%; overflow: hidden; }
+      .views-slider { display: flex; width: 300%; transition: transform 0.38s cubic-bezier(0.25, 1, 0.35, 1); align-items: flex-start; }
+      .view-pane { width: 33.33333%; flex-shrink: 0; box-sizing: border-box; min-height: 100vh; }
 
-  .trans-section-card { background: var(--surface); border: 1.5px solid var(--paper-line); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); margin-top: 10px; }
-  .trans-textarea-big { width: 100%; min-height: 120px; padding: 14px; font-family: 'Inter', sans-serif; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1.5px solid var(--paper-line); border-radius: 12px; outline: none; resize: vertical; transition: border-color .15s; }
-  .trans-textarea-big:focus { border-color: var(--gold); }
-  .trans-result-big { min-height: 110px; padding: 14px; font-family: 'Inter', sans-serif; font-size: 15.5px; color: var(--ink); background: var(--paper-dark); border: 1.5px solid var(--paper-line); border-radius: 12px; white-space: pre-wrap; word-break: break-word; margin-top: 14px; }
-  .trans-result-big.placeholder { color: var(--ink-soft); font-style: italic; }
-  .trans-bar-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-  .trans-action-btn-group { display: flex; gap: 8px; }
-  .action-pill-btn { border: 1px solid var(--paper-line); background: var(--surface); color: var(--ink); padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background .15s; }
-  .action-pill-btn:hover { background: var(--paper-dark); }
-  .action-pill-btn.copied { color: var(--green); border-color: var(--green); }
-  .btn-submit-big { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; padding: 11px 26px; background: var(--ink); color: var(--btn-text); border: none; border-radius: 10px; cursor: pointer; }
+      .podium-card { flex: 1; border-radius: 16px; padding: 12px 6px; text-align: center; position: relative; cursor: pointer; }
+      .podium-card.rank-1 { order: 2; background: rgba(245, 158, 11, 0.2); border: 1.5px solid var(--gold); transform: translateY(-6px); }
+      .podium-card.rank-2 { order: 1; background: rgba(255, 255, 255, 0.05); border: 1.5px solid #94a3b8; }
+      .podium-card.rank-3 { order: 3; background: rgba(255, 255, 255, 0.05); border: 1.5px solid #d97706; }
 
-  .profile-page-card { background: var(--surface); border: 1.5px solid var(--paper-line); border-radius: 18px; padding: 24px; box-shadow: var(--card-shadow); text-align: center; margin-top: 10px; }
-  .profile-page-avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px; border: 3px solid var(--gold); display: block; box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
-  .profile-page-avatar.avatar-fallback { display: flex; align-items: center; justify-content: center; font-size: 40px; background: var(--paper-dark); }
-  .profile-level-badge { display: inline-block; background: var(--paper-dark); color: var(--gold); border: 1px solid var(--paper-line); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; }
-  .profile-fullname { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; }
-  .profile-user-handle { color: var(--ink-soft); font-size: 13.5px; font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
-  .profile-grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1.5px dashed var(--paper-line); }
-  .stat-card-box { background: var(--paper); border: 1px solid var(--paper-line); border-radius: 12px; padding: 12px 8px; text-align: center; }
-  .stat-card-box b { display: block; font-size: 20px; font-weight: 700; color: var(--ink); }
-  .stat-card-box span { font-size: 11.5px; color: var(--ink-soft); font-family: 'IBM Plex Mono', monospace; }
+      .overlay{ position:fixed; inset:0; background:rgba(13, 21, 32, 0.85); backdrop-filter: blur(8px); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px; }
+      .overlay.hidden{display:none;}
+    </style>
+  </head>
 
-  .badges-title, .settings-title, .leaderboard-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; text-align: left; margin: 26px 0 14px; }
+  <body>
+    <!-- SPLASH SCREEN -->
+    <div id="splashScreen" class="splash-screen">
+      <div class="flex flex-col items-center animate-pulse">
+        <h1 class="text-2xl font-extrabold text-gold tracking-tight">LexiFlow</h1>
+        <p class="text-xs text-muted-foreground mt-1">Xush kelibsiz</p>
+      </div>
+    </div>
 
-  .podium-container { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin-top: 22px; margin-bottom: 20px; }
-  .podium-card { flex: 1; background: var(--paper); border: 1.5px solid var(--paper-line); border-radius: 14px; padding: 16px 6px 12px; text-align: center; position: relative; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-  .podium-card:hover { transform: translateY(-3px); }
-  .podium-card.rank-1 { order: 2; background: linear-gradient(180deg, rgba(245, 158, 11, 0.22), var(--surface)); border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(245, 158, 11, 0.35); transform: translateY(-8px); }
-  .podium-card.rank-2 { order: 1; background: linear-gradient(180deg, rgba(148, 163, 184, 0.22), var(--surface)); border: 2px solid #94A3B8; }
-  .podium-card.rank-3 { order: 3; background: linear-gradient(180deg, rgba(217, 119, 6, 0.22), var(--surface)); border: 2px solid #D97706; }
+    <div class="ambient-bg" aria-hidden="true"></div>
 
-  .podium-crown { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; font-size: 13px; padding: 2px 10px; border-radius: 12px; margin-bottom: 6px; background: var(--surface); border: 1px solid var(--paper-line); }
-  .rank-1 .podium-crown { color: var(--gold); border-color: var(--gold); }
-  .rank-2 .podium-crown { color: #64748B; border-color: #94A3B8; }
-  .rank-3 .podium-crown { color: #B45309; border-color: #D97706; }
+    <main class="relative mx-auto min-h-[100dvh] w-full max-w-md pb-28 pt-6">
+      <div class="views-wrapper">
+        <div class="views-slider" id="viewsSlider">
 
-  .podium-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin: 2px auto 6px; border: 2px solid var(--paper-line); display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--paper-dark); }
-  .rank-1 .podium-avatar { border-color: var(--gold); width: 54px; height: 54px; font-size: 24px; }
-  .rank-2 .podium-avatar { border-color: #94A3B8; }
-  .rank-3 .podium-avatar { border-color: #D97706; }
+          <!-- PANE 1: ASOSIY -->
+          <div class="view-pane px-4 flex flex-col gap-6">
+            <!-- Header Stats -->
+            <header class="flex flex-col gap-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-muted-foreground" id="profFullName">Foydalanuvchi</p>
+                  <h1 class="text-2xl font-extrabold tracking-tight" id="appTitle">LexiFlow</h1>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-muted-foreground font-mono" id="profUserHandle">@username</span>
+                </div>
+              </div>
 
-  .podium-name { font-weight: 700; font-size: 12px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .podium-xp { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 700; color: var(--gold); margin-top: 2px; }
+              <div class="glass flex items-stretch rounded-xl p-2">
+                <div class="flex flex-1 flex-col items-center gap-1 px-2 py-1">
+                  <div class="flex items-center gap-1.5 text-foreground">
+                    <svg class="icon" style="color:var(--gold)" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" /></svg>
+                    <span class="text-lg font-bold leading-none" id="statStreak">1</span>
+                  </div>
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground" id="profStatStreak">STREAK KUN</span>
+                </div>
+                <div class="my-1 w-px bg-border"></div>
+                <div class="flex flex-1 flex-col items-center gap-1 px-2 py-1">
+                  <div class="flex items-center gap-1.5 text-foreground">
+                    <svg class="icon" style="color:var(--gold)" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z" /><path d="M20 3v4" /><path d="M22 5h-4" /></svg>
+                    <span class="text-lg font-bold leading-none" id="xpBadge">0 XP</span>
+                  </div>
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">JAMI XP</span>
+                </div>
+                <div class="my-1 w-px bg-border"></div>
+                <div class="flex flex-1 flex-col items-center gap-1 px-2 py-1">
+                  <div class="flex items-center gap-1.5 text-foreground">
+                    <svg class="icon" style="color:var(--gold)" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+                    <span class="text-lg font-bold leading-none" id="statTotal">0</span>
+                  </div>
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground" id="statTotalLabel">Jami so'z</span>
+                </div>
+              </div>
+            </header>
 
-  .lb-list { display: flex; flex-direction: column; gap: 8px; }
-  .lb-item { display: flex; align-items: center; justify-content: space-between; background: var(--paper); border: 1px solid var(--paper-line); border-radius: 10px; padding: 10px 14px; cursor: pointer; transition: background .15s; }
-  .lb-item:hover { background: var(--paper-dark); }
-  .lb-left { display: flex; align-items: center; gap: 12px; }
-  .lb-rank { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 13px; color: var(--ink-soft); width: 22px; }
-  .lb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--paper-dark); display: flex; align-items: center; justify-content: center; font-size: 14px; object-fit: cover; }
-  .lb-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
-  .lb-xp { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: var(--gold); }
+            <!-- Language Switcher Panel -->
+            <section class="glass-strong flex flex-col gap-4 rounded-xl p-4">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Manba</span>
+                  <span id="langFrom" class="text-base font-bold">Inglizcha</span>
+                </div>
 
-  .badges-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
-  .badge-item { display: flex; align-items: center; gap: 10px; background: var(--paper); border: 1px solid var(--paper-line); border-radius: 12px; padding: 12px; font-size: 12.5px; font-weight: 600; color: var(--ink); text-align: left; }
-  .badge-item .badge-icon { font-size: 24px; flex-shrink: 0; }
+                <button
+                  type="button"
+                  id="swapLangBtn"
+                  aria-label="Swap languages"
+                  class="glass-gold flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform active:scale-90"
+                >
+                  <svg class="icon" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></svg>
+                </button>
 
-  .settings-list { display: flex; flex-direction: column; gap: 10px; }
-  .setting-item { display: flex; align-items: center; justify-content: space-between; background: var(--paper); border: 1px solid var(--paper-line); border-radius: 12px; padding: 12px 14px; }
-  .setting-label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--ink); }
-  .setting-btn { border: 1px solid var(--paper-line); background: var(--surface); color: var(--ink); padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s, border-color .15s; }
-  .setting-btn:hover { background: var(--paper-dark); border-color: var(--gold); }
+                <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Nishon</span>
+                  <span id="langTo" class="text-base font-bold">O'zbekcha</span>
+                </div>
+              </div>
 
-  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.65); backdrop-filter: blur(4px); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px; }
-  .overlay.hidden{display:none;}
-  .quiz-modal{ background:var(--paper); background-image: repeating-linear-gradient(0deg, transparent, transparent 30px, var(--paper-line) 31px); width:100%; max-width:520px; border-radius:16px; padding:30px 32px 26px; box-shadow:0 20px 60px rgba(0,0,0,0.5); position:relative; border: 1px solid var(--paper-line); }
-  .quiz-modal h3{ font-family:'Fraunces', serif; font-size:22px; margin:0 0 4px; }
-  .quiz-progress{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft); margin-bottom:18px; }
-  .quiz-word{ font-family:'Fraunces', serif; font-size:28px; font-weight:600; text-align:center; margin:18px 0 22px; padding:18px; background:var(--surface); border-radius:10px; border:1px solid var(--paper-line); }
-  .quiz-options{display:flex; flex-direction:column; gap:10px;}
-  .quiz-option{ font-family:'Inter'; font-size:14.5px; text-align:left; padding:12px 16px; border:1.5px solid var(--paper-line); background:var(--surface); color:var(--ink); border-radius:9px; cursor:pointer; transition:border-color .12s, background .12s; }
-  .quiz-option:hover{border-color:var(--navy);}
-  .quiz-option.correct{border-color:var(--green); background:var(--green-soft);}
-  .quiz-option.wrong{border-color:var(--red); background:var(--red-soft);}
-  .quiz-option:disabled{cursor:default;}
-  .quiz-close{ position:absolute; top:16px; right:18px; border:none; background:transparent; font-size:18px; cursor:pointer; color:var(--ink-soft); }
-  .quiz-footer{margin-top:20px; display:flex; justify-content:flex-end;}
-  .next-btn{ font-family:'Inter'; font-weight:700; font-size:13.5px; background:var(--ink); color:var(--btn-text); border:none; padding:10px 20px; border-radius:8px; cursor:pointer; }
-  .next-btn:disabled{opacity:0.35; cursor:default;}
-  .quiz-result{text-align:center;}
-  .quiz-result .big-stamp{ font-family:'Caveat', cursive; font-size:52px; color:var(--red); border:4px solid var(--red); border-radius:14px; display:inline-block; padding:6px 26px 10px; transform:rotate(-4deg); margin:10px 0 16px; }
-  .quiz-score{font-family:'IBM Plex Mono', monospace; font-size:15px; color:var(--ink-soft);}
+              <div class="flex items-center gap-3 rounded-full px-4 py-2" style="border:1px solid var(--glass-border);background:var(--glass)">
+                <svg class="icon shrink-0 text-muted-foreground" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                <input
+                  type="text"
+                  id="wordInput"
+                  placeholder="So'z yoki iborani kiriting…"
+                  aria-label="Word to translate"
+                  class="w-full bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground"
+                  autocomplete="off"
+                />
+                <button type="button" id="addBtn" class="glass-gold px-3 py-1 rounded-full text-xs font-bold shrink-0">Qo'shish</button>
+              </div>
+              <p class="text-[11px] text-muted-foreground text-center" id="hintText">Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.</p>
+            </section>
 
-  @media (max-width: 720px){
-    .binder{display:none;}
-    .view-pane{padding: 20px 16px 100px;}
-    .lists{flex-direction:column;}
-    .cover{ display:grid; grid-template-columns:1fr auto; grid-template-areas:"title icons" "stats stats"; align-items:center; column-gap:10px; row-gap:10px; }
-    .tape{grid-area:title; justify-self:start; font-size:16px; padding:5px 12px 6px; margin:0; transform:rotate(0deg);}
-    .tape::before, .tape::after{display:none;}
-    .stats{grid-area:stats;}
-  }
-</style>
-</head>
-<body>
+            <!-- Quiz Banner -->
+            <div id="quizBanner" class="glass-strong rounded-xl p-3 flex items-center justify-between border-gold/40 hidden">
+              <span class="text-xs font-semibold text-gold" id="quizBannerText">🎉 10 ta so'z yodlandi! Test topshirasizmi?</span>
+              <button id="startQuizBtn" class="glass-gold px-3 py-1 rounded-lg font-bold text-xs">Testni boshlash</button>
+            </div>
 
-<div id="splashScreen" class="splash-screen">
-  <div class="splash-container">
-    <svg class="animated-notebook" viewBox="0 0 120 100" fill="none">
-      <rect x="15" y="15" width="90" height="70" rx="6" fill="#E2D6B4" stroke="#24211B" stroke-width="3"/>
-      <rect x="20" y="10" width="80" height="70" rx="4" fill="#F6F1E4" stroke="#24211B" stroke-width="3"/>
-      <line x1="20" y1="18" x2="20" y2="72" stroke="#C9971F" stroke-width="4" stroke-dasharray="3 5" stroke-linecap="round"/>
-      <path class="flipping-page" d="M25 12 H95 V78 H25 Z" fill="#FFFDF7" stroke="#24211B" stroke-width="2.5"/>
-      <line class="line-1" x1="35" y1="28" x2="85" y2="28" stroke="#D8CBA8" stroke-width="3" stroke-linecap="round"/>
-      <line class="line-2" x1="35" y1="42" x2="75" y2="42" stroke="#B23A2E" stroke-width="3" stroke-linecap="round"/>
-      <line class="line-3" x1="35" y1="56" x2="80" y2="56" stroke="#2D3A55" stroke-width="3" stroke-linecap="round"/>
-    </svg>
-    <h1 class="splash-text">Xush kelibsiz</h1>
-  </div>
-</div>
+            <!-- Word Lists -->
+            <div id="word-lists" class="flex flex-col gap-6">
+              <section class="flex flex-col gap-3">
+                <div class="flex items-center gap-2 px-1">
+                  <svg class="icon" style="color:var(--gold)" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+                  <h2 class="text-base font-bold" id="colLearningLabel">O'rganilmoqda</h2>
+                  <span class="rounded-full px-2 py-0.5 text-xs font-semibold text-muted-foreground" style="background:var(--muted)" id="learningCount">0</span>
+                </div>
+                <div id="learningList" class="flex flex-col gap-2.5"></div>
+              </section>
 
-<div class="app">
-  <div class="binder">
-    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-  </div>
+              <section class="flex flex-col gap-3">
+                <div class="flex items-center gap-2 px-1">
+                  <svg class="icon" style="color:var(--gold)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  <h2 class="text-base font-bold" id="colMemorizedLabel">Yodlangan</h2>
+                  <span class="rounded-full px-2 py-0.5 text-xs font-semibold text-muted-foreground" style="background:var(--muted)" id="memorizedCount">0</span>
+                </div>
+                <div id="memorizedList" class="flex flex-col gap-2.5"></div>
+              </section>
+            </div>
+          </div>
 
-  <main>
-    <div class="views-wrapper">
-      <div class="views-slider" id="viewsSlider">
+          <!-- PANE 2: TARJIMA -->
+          <div class="view-pane px-4 flex flex-col gap-6">
+            <section class="glass-strong flex flex-col gap-4 rounded-xl p-4">
+              <h2 class="text-base font-bold text-gold" id="transTitle">Matn Tarjimoni</h2>
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Manba</span>
+                  <span id="ttFrom" class="text-base font-bold">Inglizcha</span>
+                </div>
+                <button type="button" id="ttSwapBtn" class="glass-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+                  <svg class="icon" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></svg>
+                </button>
+                <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
+                  <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Nishon</span>
+                  <span id="ttTo" class="text-base font-bold">O'zbekcha</span>
+                </div>
+              </div>
+
+              <textarea id="ttInput" class="w-full h-28 p-3 rounded-lg bg-transparent border border-white/10 text-sm outline-none resize-none placeholder:text-muted-foreground" placeholder="Matn yoki gapni kiriting..."></textarea>
+
+              <div class="flex justify-between items-center">
+                <div class="flex gap-2">
+                  <button id="ttInputSpeak" class="p-2 rounded-lg glass"><svg class="icon" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></button>
+                  <button id="ttInputClear" class="p-2 rounded-lg glass"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+                </div>
+                <button id="ttTranslateBtn" class="glass-gold px-4 py-2 rounded-full text-xs font-bold">Tarjima qilish</button>
+              </div>
+
+              <div id="ttOutput" class="min-h-[80px] p-3 rounded-lg glass text-sm italic text-muted-foreground">Tarjima natijasi shu yerda ko'rinadi...</div>
+
+              <div class="flex justify-end gap-2">
+                <button id="ttOutputSpeak" class="p-2 rounded-lg glass"><svg class="icon" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></button>
+                <button id="ttOutputCopy" class="p-2 rounded-lg glass"><svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button>
+              </div>
+            </section>
+          </div>
+
+          <!-- PANE 3: PROFIL & LEADERBOARD -->
+          <div class="view-pane px-4 flex flex-col gap-6">
+            <section class="glass-strong rounded-xl p-5 text-center flex flex-col gap-4">
+              <div class="inline-block self-center px-3 py-1 rounded-full text-[10px] font-bold text-gold border border-gold/30" style="background:var(--muted)">
+                LEVEL 5 • WORD EXPLORER
+              </div>
+              <div id="profAvatarWrap" class="w-20 h-20 rounded-full mx-auto border-2 border-gold flex items-center justify-center text-3xl font-bold text-gold" style="background:var(--muted)">👤</div>
+              <h2 class="text-xl font-bold text-foreground" id="profFullName">Foydalanuvchi</h2>
+
+              <div class="grid grid-cols-2 gap-2 mt-2">
+                <div class="glass p-3 rounded-lg text-center">
+                  <b class="block text-lg font-bold text-foreground" id="profWordsCount">0</b>
+                  <span class="text-[10px] text-muted-foreground uppercase" id="profStatWords">SO'ZLAR</span>
+                </div>
+                <div class="glass p-3 rounded-lg text-center">
+                  <b class="block text-lg font-bold text-foreground" id="profMemorizedCount">0</b>
+                  <span class="text-[10px] text-muted-foreground uppercase" id="profStatMemorized">YODLANGAN</span>
+                </div>
+              </div>
+
+              <!-- LEADERBOARD -->
+              <h3 class="text-base font-bold text-left text-gold mt-4" id="profLbTitle">🏆 Peshqadamlar Jadvali (Top XP)</h3>
+              <div class="flex items-end justify-center gap-2" id="podiumContainer"></div>
+              <div class="flex flex-col gap-2 text-left" id="lbList"></div>
+
+              <!-- YUTUQLAR -->
+              <h3 class="text-base font-bold text-left text-gold mt-4" id="profBadgesTitle">🏅 Yutuqlar va Nishonlar</h3>
+              <div class="grid grid-cols-2 gap-2 text-left text-xs">
+                <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>🎯</span> <span id="badgeFirst10">Dastlabki 10 so'z</span></div>
+                <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>🔥</span> <span id="badgeStreak3">3 Kunlik Streak</span></div>
+                <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>🧠</span> <span id="badgeMaster">Xotira Ustasi</span></div>
+                <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>⚡</span> <span id="badgeNight">Tungi Bilimdon</span></div>
+              </div>
+
+              <!-- SOZLAMALAR -->
+              <h3 class="text-base font-bold text-left text-gold mt-4" id="profSettingsTitle">⚙️ Sozlamalar</h3>
+              <div class="flex flex-col gap-2 text-left text-xs">
+                <div class="glass p-3 rounded-lg flex justify-between items-center">
+                  <span>🎨 <span id="lblTheme">Mavzu</span></span>
+                  <button id="themeToggleBtn" class="glass-gold px-3 py-1 rounded-full font-bold text-[11px]"><span id="themeBtnText">Tungi rejim 🌙</span></button>
+                </div>
+                <div class="glass p-3 rounded-lg flex justify-between items-center">
+                  <span>🌐 <span id="lblLang">Ilova tili</span></span>
+                  <button id="langSwitchBtn" class="glass-gold px-3 py-1 rounded-full font-bold text-[11px]"><span id="currentLangText">🇺🇿 O'zbekcha</span></button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <nav
+        class="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center"
+        style="padding-bottom:max(1rem, env(safe-area-inset-bottom))"
+      >
+        <div class="glass-strong pointer-events-auto flex items-center gap-1 rounded-full px-2 py-2">
+          <button type="button" id="bnHomeBtn" data-nav="home" aria-label="Home" aria-current="page"
+            class="nav-btn flex h-11 w-11 items-center justify-center rounded-full transition-colors" style="background:var(--muted);color:var(--foreground)">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /></svg>
+          </button>
+          <button type="button" id="bnTranslateBtn" data-nav="library" aria-label="Library"
+            class="nav-btn flex h-11 w-11 items-center justify-center rounded-full transition-colors" style="color:var(--muted-foreground)">
+            <svg class="icon" viewBox="0 0 24 24"><path d="m5 8 6 6 6-6"/><path d="M4 14h16"/></svg>
+          </button>
+
+          <button type="button" aria-label="Add a new word" onclick="document.getElementById('wordInput').focus()"
+            class="glass-gold mx-1 flex h-12 w-12 items-center justify-center rounded-full transition-transform active:scale-90">
+            <svg class="icon" style="width:1.5rem;height:1.5rem" viewBox="0 0 24 24"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+          </button>
+
+          <button type="button" id="bnProfileBtn" data-nav="profile" aria-label="Profile"
+            class="nav-btn flex h-11 w-11 items-center justify-center rounded-full transition-colors" style="color:var(--muted-foreground)">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 0 0-16 0" /></svg>
+          </button>
+        </div>
+      </nav>
+    </main>
+
+    <!-- MODALS -->
+    <div id="quizOverlay" class="overlay hidden">
+      <div class="glass-strong p-6 rounded-2xl w-full max-w-sm relative">
+        <button id="quizClose" class="absolute top-3 right-3 text-muted-foreground">✕</button>
+        <div id="quizBody"></div>
+      </div>
+    </div>
+
+    <div id="userProfileOverlay" class="overlay hidden">
+      <div class="glass-strong p-6 rounded-2xl w-full max-w-sm relative text-center">
+        <button id="userProfileClose" class="absolute top-3 right-3 text-muted-foreground">✕</button>
+        <div id="userProfileBody"></div>
+      </div>
+    </div>
+
+    <div id="langOverlay" class="overlay hidden">
+      <div class="glass-strong p-6 rounded-2xl w-full max-w-sm relative text-center flex flex-col gap-3">
+        <button id="langClose" class="absolute top-3 right-3 text-muted-foreground">✕</button>
+        <h3 id="langModalTitle" class="font-bold text-gold text-base">Ilova tilini tanlang</h3>
+        <button class="lang-option glass p-2.5 rounded-lg text-xs font-semibold" data-lang="uz">🇺🇿 O'zbekcha</button>
+        <button class="lang-option glass p-2.5 rounded-lg text-xs font-semibold" data-lang="en">🇬🇧 English</button>
+        <button class="lang-option glass p-2.5 rounded-lang text-xs font-semibold" data-lang="ru">🇷🇺 Русский</button>
+      </div>
+    </div>
+
+    <script>
+      setTimeout(() => {
+        const splash = document.getElementById('splashScreen');
+        if (splash) splash.classList.add('fade-out');
+      }, 1500);
+
+      const STORAGE_KEY = 'vocab-words-v1';
+      const STREAK_KEY = 'vocab-streak-data-v1';
+      let words = [];
+      let quizState = null;
+      let currentLeaderboardUsers = [];
+
+      let currentDirection = 'en-uz';
+      let ttDirection = 'en-uz';
+
+      const learningList = document.getElementById('learningList');
+      const memorizedList = document.getElementById('memorizedList');
+      const wordInput = document.getElementById('wordInput');
+      const addBtn = document.getElementById('addBtn');
+      const quizBanner = document.getElementById('quizBanner');
+      const quizOverlay = document.getElementById('quizOverlay');
+      const quizBody = document.getElementById('quizBody');
+
+      // I18N DICTIONARY
+      const I18N = {
+        uz: {
+          appTitle: "LexiFlow",
+          statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
+          addBtn: "Qo'shish", hint: "Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.",
+          placeholderEnUz: "Bilmagan inglizcha so'zingizni yozing...", placeholderUzEn: "O'zbekcha so'zni yozing...",
+          langEnglish: "Inglizcha", langUzbek: "O'zbekcha",
+          quizBannerText: "🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.", startQuiz: "Testni boshlash",
+          colLearning: "O'rganilmoqda", colMemorized: "Yodlangan",
+          emptyLearning: "Hozircha bo'sh. Yangi so'z qo'shing.", emptyMemorized: "Yodlagan so'zlaringiz shu yerda to'planadi.",
+          loadingText: "tarjima qilinmoqda...", errorText: "Tarjima olinmadi.", retryLink: "qayta urinish",
+          stamp: "yodlandi", titleSpeak: "Talaffuzni eshitish", titleMemorize: "Yodladim deb belgilash",
+          titleUnmemorize: "Yodlanmagan deb belgilash", titleDelete: "O'chirish", titleCopy: "Nusxalash",
+          quizNotReadyTitle: "Test hali tayyor emas", quizNotReadyText: (n) => `Test boshlash uchun kamida 10 ta so'zni "yodladim" deb belgilashingiz kerak. Hozircha: ${n}/10.`,
+          quizTitle: "So'z testi", quizQuestion: "Savol", quizScore: "Ball", quizNext: "Keyingisi",
+          quizFinished: "Test yakunlandi", quizCorrect: "to'g'ri javob", quizClose: "Yopish",
+          resultExcellent: "A'LO!", resultGreat: "ZO'R!", resultGood: "YAXSHI", resultRetry: "YANA URINING",
+          langModalTitle: "Ilova tilini tanlang", navHome: "Asosiy", navTranslate: "Tarjima", navProfile: "Profil",
+          transTitle: "Matn Tarjimoni", ttPlaceholder: "Matn yoki gapni kiriting...", ttResultPlaceholder: "Tarjima natijasi shu yerda ko'rinadi...",
+          ttTranslateBtnText: "Tarjima qilish", btnListen: "Eshitish", btnClear: "Tozalash", btnCopy: "Nusxalash",
+          profTitle: "Mening Profilim", profStatWords: "SO'ZLAR", profStatMemorized: "YODLANGAN", profStatStreak: "STREAK KUN",
+          profBadgesTitle: "🏅 Yutuqlar va Nishonlar", badgeFirst10: "Dastlabki 10 so'z", badgeStreak3: "3 Kunlik Streak",
+          badgeMaster: "Xotira Ustasi", badgeNight: "Tungi Bilimdon", profSettingsTitle: "⚙️ Sozlamalar",
+          profLbTitle: "🏆 Peshqadamlar Jadvali (Top XP)", lblTheme: "Mavzu", lblLang: "Ilova tili",
+          themeLight: "Kunduzgi ☀️", themeDark: "Tungi 🌙"
+        },
+        en: {
+          appTitle: "LexiFlow",
+          statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
+          addBtn: "Add", hint: "When you add a word, translation and an example sentence are generated automatically.",
+          placeholderEnUz: "Type an English word you don't know...", placeholderUzEn: "Type an Uzbek word...",
+          langEnglish: "English", langUzbek: "Uzbek",
+          quizBannerText: "🎉 10 new words memorized! Test your knowledge.", startQuiz: "Start quiz",
+          colLearning: "Learning", colMemorized: "Memorized",
+          emptyLearning: "Empty for now. Add a new word.", emptyMemorized: "Your memorized words will collect here.",
+          loadingText: "translating...", errorText: "Translation failed.", retryLink: "retry",
+          stamp: "memorized", titleSpeak: "Listen to pronunciation", titleMemorize: "Mark as memorized",
+          titleUnmemorize: "Mark as not memorized", titleDelete: "Delete", titleCopy: "Copy",
+          quizNotReadyTitle: "Quiz not ready yet", quizNotReadyText: (n) => `You need at least 10 words marked "memorized" to start a quiz. So far: ${n}/10.`,
+          quizTitle: "Word quiz", quizQuestion: "Question", quizScore: "Score", quizNext: "Next",
+          quizFinished: "Quiz finished", quizCorrect: "correct answers", quizClose: "Close",
+          resultExcellent: "EXCELLENT!", resultGreat: "GREAT!", resultGood: "GOOD", resultRetry: "TRY AGAIN",
+          langModalTitle: "Choose app language", navHome: "Home", navTranslate: "Translate", navProfile: "Profile",
+          transTitle: "Text Translator", ttPlaceholder: "Type or paste your text here...", ttResultPlaceholder: "Translation result will appear here...",
+          ttTranslateBtnText: "Translate", btnListen: "Listen", btnClear: "Clear", btnCopy: "Copy",
+          profTitle: "My Profile", profStatWords: "WORDS", profStatMemorized: "MEMORIZED", profStatStreak: "STREAK DAYS",
+          profBadgesTitle: "🏅 Achievements & Badges", badgeFirst10: "First 10 words", badgeStreak3: "3 Day Streak",
+          badgeMaster: "Memory Master", badgeNight: "Night Scholar", profSettingsTitle: "⚙️ Settings",
+          profLbTitle: "🏆 Leaderboard (Top XP)", lblTheme: "Theme", lblLang: "App language",
+          themeLight: "Light ☀️", themeDark: "Dark 🌙"
+        },
+        ru: {
+          appTitle: "LexiFlow",
+          statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
+          addBtn: "Добавить", hint: "При добавлении слова автоматически создаются перевод и пример предложения.",
+          placeholderEnUz: "Введите незнакомое английское слово...", placeholderUzEn: "Введите узбекское слово...",
+          langEnglish: "Английский", langUzbek: "Узбекский",
+          quizBannerText: "🎉 Выучено 10 новых слов! Проверьте свои знания.", startQuiz: "Начать тест",
+          colLearning: "Изучается", colMemorized: "Выучено",
+          emptyLearning: "Пока пусто. Добавьте новое слово.", emptyMemorized: "Здесь появятся выученные слова.",
+          loadingText: "переводится...", errorText: "Перевод не получен.", retryLink: "повторить",
+          stamp: "выучено", titleSpeak: "Прослушать произношение", titleMemorize: "Отметить как выученное",
+          titleUnmemorize: "Отметить как невыученное", titleDelete: "Удалить", titleCopy: "Копировать",
+          quizNotReadyTitle: "Тест ещё не готов", quizNotReadyText: (n) => `Чтобы начать тест, отметьте минимум 10 слов как «выучено». Сейчас: ${n}/10.`,
+          quizTitle: "Тест слов", quizQuestion: "Вопрос", quizScore: "Балл", quizNext: "Далее",
+          quizFinished: "Тест завершён", quizCorrect: "правильных ответов", quizClose: "Закрыть",
+          resultExcellent: "ОТЛИЧНО!", resultGreat: "ЗДОРОВО!", resultGood: "ХОРОШО", resultRetry: "ПОПРОБУЙТЕ ЕЩЁ",
+          langModalTitle: "Выберите язык приложения", navHome: "Главная", navTranslate: "Перевод", navProfile: "Профиль",
+          transTitle: "Переводчик текста", ttPlaceholder: "Введите или вставьте текст сюда...", ttResultPlaceholder: "Результат перевода появится здесь...",
+          ttTranslateBtnText: "Перевести", btnListen: "Слушать", btnClear: "Очистить", btnCopy: "Копировать",
+          profTitle: "Мой профиль", profStatWords: "СЛОВА", profStatMemorized: "ВЫУЧЕНО", profStatStreak: "СТРИК ДНЕЙ",
+          profBadgesTitle: "🏅 Достижения и значки", badgeFirst10: "Первые 10 слов", badgeStreak3: "3 дня стрика",
+          badgeMaster: "Мастер памяти", badgeNight: "Ночной эрудит", profSettingsTitle: "⚙️ Настройки",
+          profLbTitle: "🏆 Таблица лидеров (Top XP)", lblTheme: "Тема", lblLang: "Язык приложения",
+          themeLight: "Светлая ☀️", themeDark: "Тёмная 🌙"
+        }
+      };
+
+      let currentLang = localStorage.getItem('ui-lang') || 'uz';
+      function t(key, ...args){
+        const dict = I18N[currentLang] || I18N.uz;
+        const val = dict[key] !== undefined ? dict[key] : I18N.uz[key];
+        return typeof val === 'function' ? val(...args) : val;
+      }
+
+      function updateLangSettingText() {
+        const langTextEl = document.getElementById('currentLangText');
+        if (!langTextEl) return;
+        if (currentLang === 'uz') langTextEl.textContent = "🇺🇿 O'zbekcha";
+        else if (currentLang === 'en') langTextEl.textContent = "🇬🇧 English";
+        else if (currentLang === 'ru') langTextEl.textContent = "🇷🇺 Русский";
+      }
+
+      function applyStaticI18n(){
+        document.documentElement.lang = currentLang;
+        document.getElementById('appTitle').textContent = t('appTitle');
+        document.getElementById('statTotalLabel').textContent = t('statTotal');
+        document.getElementById('hintText').textContent = t('hint');
+        document.getElementById('quizBannerText').textContent = t('quizBannerText');
+        document.getElementById('startQuizBtn').textContent = t('startQuiz');
+        document.getElementById('colLearningLabel').textContent = t('colLearning');
+        document.getElementById('colMemorizedLabel').textContent = t('colMemorized');
+        document.getElementById('langModalTitle').textContent = t('langModalTitle');
+
+        document.getElementById('transTitle').textContent = t('transTitle');
+        document.getElementById('ttInput').placeholder = t('ttPlaceholder');
+        document.getElementById('ttTranslateBtn').textContent = t('ttTranslateBtnText');
+
+        document.getElementById('profStatWords').textContent = t('profStatWords');
+        document.getElementById('profStatMemorized').textContent = t('profStatMemorized');
+        document.getElementById('profStatStreak').textContent = t('profStatStreak');
+        document.getElementById('profBadgesTitle').textContent = t('profBadgesTitle');
+        document.getElementById('badgeFirst10').textContent = t('badgeFirst10');
+        document.getElementById('badgeStreak3').textContent = t('badgeStreak3');
+        document.getElementById('badgeMaster').textContent = t('badgeMaster');
+        document.getElementById('badgeNight').textContent = t('badgeNight');
+        document.getElementById('profSettingsTitle').textContent = t('profSettingsTitle');
+        document.getElementById('profLbTitle').textContent = t('profLbTitle');
+        document.getElementById('lblTheme').textContent = t('lblTheme');
+        document.getElementById('lblLang').textContent = t('lblLang');
+
+        updateLangSettingText();
+        updateLangLabels();
+        render();
+      }
+
+      function hasCloudStorage(){
+        return !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage);
+      }
+      function cloudGetItem(key){
+        return new Promise((resolve, reject) => {
+          window.Telegram.WebApp.CloudStorage.getItem(key, (err, value) => {
+            if(err) reject(err); else resolve(value);
+          });
+        });
+      }
+      function cloudSetItem(key, value){
+        return new Promise((resolve, reject) => {
+          window.Telegram.WebApp.CloudStorage.setItem(key, value, (err, success) => {
+            if(err) reject(err); else resolve(success);
+          });
+        });
+      }
+      function cloudGetItems(keys){
+        return new Promise((resolve, reject) => {
+          if(keys.length === 0){ resolve({}); return; }
+          window.Telegram.WebApp.CloudStorage.getItems(keys, (err, values) => {
+            if(err) reject(err); else resolve(values || {});
+          });
+        });
+      }
+      function cloudRemoveItem(key){
+        return new Promise((resolve, reject) => {
+          window.Telegram.WebApp.CloudStorage.removeItem(key, (err, success) => {
+            if(err) reject(err); else resolve(success);
+          });
+        });
+      }
+
+      function getTodayString() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      }
+      function getYesterdayString() {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      }
+
+      async function getStreakData() {
+        let data = { lastVisit: '', streak: 1 };
+        try {
+          let raw = null;
+          if (hasCloudStorage()) { raw = await cloudGetItem('streak_data'); }
+          if (!raw) { raw = localStorage.getItem(STREAK_KEY); }
+          if (raw) data = JSON.parse(raw);
+        } catch(e) {}
+
+        const today = getTodayString();
+        const yesterday = getYesterdayString();
+
+        if (data.lastVisit === today) {
+        } else if (data.lastVisit === yesterday) {
+          data.streak += 1;
+          data.lastVisit = today;
+        } else {
+          data.streak = 1;
+          data.lastVisit = today;
+        }
+
+        try {
+          const jsonStr = JSON.stringify(data);
+          if (hasCloudStorage()) await cloudSetItem('streak_data', jsonStr);
+          localStorage.setItem(STREAK_KEY, jsonStr);
+        } catch(e) {}
+
+        return data;
+      }
+
+      async function updateXPDisplay() {
+        const streakData = await getStreakData();
+        const cachedStreak = streakData.streak || 1;
+        const memorizedCount = words.filter(w => w.memorized).length;
+        const xp = (memorizedCount * 1) + (cachedStreak * 10);
+
+        document.getElementById('xpBadge').textContent = `${xp} XP`;
+        document.getElementById('statStreak').textContent = cachedStreak;
+        document.getElementById('profStreakCount').textContent = `🔥 ${cachedStreak}`;
+
+        syncUserXP(xp, words.length, memorizedCount, cachedStreak);
+      }
+
+      async function syncUserXP(xp, wordsCount, memorizedCount, streak) {
+        const user = getTelegramUser();
+        if(!user) return;
         
-        <!-- PANE 1: ASOSIY -->
-        <div class="view-pane" id="paneHome">
-          <header class="cover">
-            <div class="top-icons">
-              <div class="xp-badge" id="xpBadge">⚡ 0 XP</div>
-            </div>
-            <div class="tape" id="appTitle">Lug'at</div>
-            <div class="stats">
-              <span><span class="stat-dot">●</span> <span id="statTotalLabel">Jami so'z</span>: <b id="statTotal">0</b></span>
-              <span><span class="stat-dot">●</span> <span id="statMemorizedLabel">Yodlangan</span>: <b id="statMemorized">0</b></span>
-              <span><span class="stat-dot">●</span> <span id="statReadyLabel">Testga tayyor</span>: <b id="statReady">0</b></span>
-            </div>
-          </header>
+        const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
+        const payload = {
+          id: user.id,
+          name: fullName || 'Foydalanuvchi',
+          username: user.username || '',
+          photoUrl: user.photo_url || '',
+          xp: xp,
+          wordsCount: wordsCount,
+          memorizedCount: memorizedCount,
+          streak: streak
+        };
 
-          <div class="lang-row">
-            <span id="langFrom">Inglizcha</span>
-            <button id="swapLangBtn" title="Yo'nalishni almashtirish">⇄</button>
-            <span id="langTo">O'zbek</span>
-          </div>
+        if (hasCloudStorage()) {
+          try { await cloudSetItem('user_profile_sync', JSON.stringify(payload)); } catch(e){}
+        }
 
-          <div class="add-row">
-            <input id="wordInput" type="text" placeholder="Bilmagan so'zingizni yozing va Enter bosing..." autocomplete="off">
-            <button id="addBtn">Qo'shish</button>
-          </div>
-          <div class="hint" id="hintText">Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.</div>
+        try {
+          await fetch('/api/leaderboard/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } catch(e){}
+      }
 
-          <div id="quizBanner" class="quiz-banner hidden">
-            <span id="quizBannerText">🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.</span>
-            <button id="startQuizBtn">Testni boshlash</button>
-          </div>
+      async function renderLeaderboard() {
+        const podiumEl = document.getElementById('podiumContainer');
+        const listEl = document.getElementById('lbList');
+        if (!podiumEl || !listEl) return;
 
-          <div class="lists">
-            <section class="col">
-              <h2><span id="colLearningLabel">O'rganilmoqda</span> <span id="learningCount">(0)</span></h2>
-              <div id="learningList" class="cards"></div>
-            </section>
-            <section class="col">
-              <h2><span id="colMemorizedLabel">Yodlangan</span> <span id="memorizedCount">(0)</span></h2>
-              <div id="memorizedList" class="cards"></div>
-            </section>
-          </div>
-        </div>
+        try {
+          const res = await fetch('/api/leaderboard');
+          if (!res.ok) return;
+          const list = await res.json();
+          currentLeaderboardUsers = list || [];
 
-        <!-- PANE 2: TARJIMA -->
-        <div class="view-pane" id="paneTranslate">
-          <header class="cover">
-            <div class="tape" id="transTitle">Matn Tarjimoni</div>
-          </header>
+          if (!list || list.length === 0) {
+            podiumEl.innerHTML = `<div class="text-xs text-muted-foreground w-full text-center py-4">Hozircha foydalanuvchilar yo'q.</div>`;
+            listEl.innerHTML = '';
+            return;
+          }
 
-          <div class="trans-section-card">
-            <div class="lang-row" style="margin-top:0; margin-bottom:14px;">
-              <span id="ttFrom">Inglizcha</span>
-              <button id="ttSwapBtn" title="Yo'nalishni almashtirish">⇄</button>
-              <span id="ttTo">O'zbekcha</span>
-            </div>
+          const top3 = list.slice(0, 3);
+          const ranks = ['rank-1', 'rank-2', 'rank-3'];
+          const crowns = ['👑 1', '🥈 2', '🥉 3'];
 
-            <textarea id="ttInput" class="trans-textarea-big" placeholder="Matn yoki gapni kiriting..."></textarea>
-            
-            <div class="trans-bar-actions">
-              <div class="trans-action-btn-group">
-                <button class="action-pill-btn" id="ttInputSpeak">🔊 <span id="lblBtnListen1">Eshitish</span></button>
-                <button class="action-pill-btn" id="ttInputClear">✕ <span id="lblBtnClear">Tozalash</span></button>
+          let podiumHtml = '';
+          top3.forEach((user, i) => {
+            const avatarHtml = user.photoUrl
+              ? `<img class="w-10 h-10 rounded-full mx-auto my-1 border border-white/20" src="${user.photoUrl}" alt="">`
+              : `<div class="w-10 h-10 rounded-full mx-auto my-1 bg-white/10 flex items-center justify-center font-bold text-gold border border-white/20">${(user.name || 'F')[0].toUpperCase()}</div>`;
+
+            podiumHtml += `
+              <div class="podium-card ${ranks[i]}" onclick="openLeaderboardUserProfile('${user.id}')">
+                <div class="text-[11px] font-bold">${crowns[i]}</div>
+                ${avatarHtml}
+                <div class="text-[11px] font-bold truncate text-foreground">${escapeHtml(user.name)}</div>
+                <div class="text-[10px] font-mono font-bold text-gold mt-0.5">${user.xp} XP</div>
               </div>
-              <button id="ttTranslateBtn" class="btn-submit-big">Tarjima qilish</button>
-            </div>
+            `;
+          });
+          podiumEl.innerHTML = podiumHtml;
 
-            <div id="ttOutput" class="trans-result-big placeholder">Tarjima natijasi shu yerda ko'rinadi...</div>
-
-            <div class="trans-bar-actions">
-              <div class="trans-action-btn-group">
-                <button class="action-pill-btn" id="ttOutputSpeak">🔊 <span id="lblBtnListen2">Eshitish</span></button>
-                <button class="action-pill-btn" id="ttOutputCopy">⧉ <span id="lblBtnCopy">Nusxalash</span></button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PANE 3: PROFIL -->
-        <div class="view-pane" id="paneProfile">
-          <header class="cover">
-            <div class="tape" id="profTitle">Mening Profilim</div>
-          </header>
-
-          <div class="profile-page-card">
-            <div class="profile-level-badge">LEVEL 5 • WORD EXPLORER</div>
-            <div id="profAvatarWrap" class="profile-page-avatar avatar-fallback">👤</div>
-            <div id="profFullName" class="profile-fullname">Foydalanuvchi</div>
-            <div id="profUserHandle" class="profile-user-handle">@username</div>
-
-            <div class="profile-grid-stats">
-              <div class="stat-card-box">
-                <b id="profWordsCount">0</b>
-                <span id="profStatWords">SO'ZLAR</span>
-              </div>
-              <div class="stat-card-box">
-                <b id="profMemorizedCount">0</b>
-                <span id="profStatMemorized">YODLANGAN</span>
-              </div>
-              <div class="stat-card-box">
-                <b id="profStreakCount">🔥 1</b>
-                <span id="profStatStreak">STREAK KUN</span>
-              </div>
-            </div>
-
-            <div class="leaderboard-title" id="profLbTitle">🏆 Peshqadamlar Jadvali (Top XP)</div>
-            <div class="podium-container" id="podiumContainer"></div>
-            <div class="lb-list" id="lbList"></div>
-
-            <div class="badges-title" id="profBadgesTitle">🏅 Yutuqlar va Nishonlar</div>
-            <div class="badges-container">
-              <div class="badge-item">
-                <span class="badge-icon">🎯</span>
-                <span id="badgeFirst10">Dastlabki 10 so'z</span>
-              </div>
-              <div class="badge-item">
-                <span class="badge-icon">🔥</span>
-                <span id="badgeStreak3">3 Kunlik Streak</span>
-              </div>
-              <div class="badge-item">
-                <span class="badge-icon">🧠</span>
-                <span id="badgeMaster">Xotira Ustasi</span>
-              </div>
-              <div class="badge-item">
-                <span class="badge-icon">⚡</span>
-                <span id="badgeNight">Tungi Bilimdon</span>
-              </div>
-            </div>
-
-            <div class="settings-title" id="profSettingsTitle">⚙️ Sozlamalar</div>
-            <div class="settings-list">
-              <div class="setting-item">
-                <div class="setting-label">
-                  <span>🎨</span>
-                  <span id="lblTheme">Mavzu</span>
+          const rest = list.slice(3);
+          let listHtml = '';
+          rest.forEach((user, idx) => {
+            listHtml += `
+              <div class="glass p-2.5 rounded-lg flex items-center justify-between text-xs cursor-pointer hover:bg-white/10" onclick="openLeaderboardUserProfile('${user.id}')">
+                <div class="flex items-center gap-3">
+                  <span class="font-mono font-bold text-muted-foreground">#${idx + 4}</span>
+                  <span class="font-semibold text-foreground">${escapeHtml(user.name)}</span>
                 </div>
-                <button class="setting-btn" id="themeToggleBtn">
-                  <span id="themeBtnText">Tungi rejim 🌙</span>
-                </button>
+                <span class="font-mono font-bold text-gold">${user.xp} XP</span>
               </div>
+            `;
+          });
+          listEl.innerHTML = listHtml;
 
-              <div class="setting-item">
-                <div class="setting-label">
-                  <span>🌐</span>
-                  <span id="lblLang">Ilova tili</span>
-                </div>
-                <button class="setting-btn" id="langSwitchBtn">
-                  <span id="currentLangText">🇺🇿 O'zbekcha</span>
-                </button>
-              </div>
-            </div>
+        } catch(e){}
+      }
 
-          </div>
-        </div>
+      function openLeaderboardUserProfile(userId) {
+        const user = currentLeaderboardUsers.find(u => String(u.id) === String(userId));
+        if (!user) return;
 
-      </div>
-    </div>
-  </main>
-</div>
+        const overlay = document.getElementById('userProfileOverlay');
+        const body = document.getElementById('userProfileBody');
 
-<nav class="bottom-nav">
-  <button class="bn-item active" id="bnHomeBtn" title="Asosiy">
-    <svg class="bn-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.2 12 4l9 7.2"/><path d="M5.5 9.8V20h13V9.8"/><path d="M10 20v-6h4v6"/></svg>
-    <span id="bnHomeLabel">Asosiy</span>
-  </button>
-  <button class="bn-item" id="bnTranslateBtn" title="Tarjima">
-    <span class="bn-icon bn-emoji">🌐</span>
-    <span id="bnTranslateLabel">Tarjima</span>
-  </button>
-  <button class="bn-item" id="bnProfileBtn" title="Profil">
-    <span class="bn-icon bn-avatar" id="bnAvatarWrap"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span>
-    <span id="bnProfileLabel">Profil</span>
-  </button>
-</nav>
+        const avatarHtml = user.photoUrl
+          ? `<img class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-gold" src="${user.photoUrl}" alt="">`
+          : `<div class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-gold flex items-center justify-center text-2xl font-bold text-gold" style="background:var(--muted)">${(user.name || 'F')[0].toUpperCase()}</div>`;
 
-<!-- MODALS -->
-<div id="quizOverlay" class="overlay hidden">
-  <div class="quiz-modal">
-    <button class="quiz-close" id="quizClose">✕</button>
-    <div id="quizBody"></div>
-  </div>
-</div>
+        const tgLinkBtn = user.username
+          ? `<a href="https://t.me/${escapeHtml(user.username)}" target="_blank" class="glass-gold px-4 py-2 rounded-full font-bold text-xs inline-block mt-3">💬 Telegramda yozish</a>`
+          : '';
 
-<div id="userProfileOverlay" class="overlay hidden">
-  <div class="quiz-modal profile-modal">
-    <button class="quiz-close" id="userProfileClose">✕</button>
-    <div id="userProfileBody"></div>
-  </div>
-</div>
-
-<div id="langOverlay" class="overlay hidden">
-  <div class="quiz-modal lang-modal">
-    <button class="quiz-close" id="langClose">✕</button>
-    <h3 id="langModalTitle">Ilova tilini tanlang</h3>
-    <div class="lang-options">
-      <button class="lang-option" data-lang="uz"><span class="flag">🇺🇿</span> O'zbekcha</button>
-      <button class="lang-option" data-lang="en"><span class="flag">🇬🇧</span> English</button>
-      <button class="lang-option" data-lang="ru"><span class="flag">🇷🇺</span> Русский</button>
-    </div>
-  </div>
-</div>
-
-<script>
-setTimeout(() => {
-  const splash = document.getElementById('splashScreen');
-  if (splash) splash.classList.add('fade-out');
-}, 2000);
-
-const STORAGE_KEY = 'vocab-words-v1';
-const STREAK_KEY = 'vocab-streak-data-v1';
-let words = [];
-let quizState = null;
-let currentLeaderboardUsers = [];
-
-let currentDirection = 'en-uz';
-let ttDirection = 'en-uz';
-
-const learningList = document.getElementById('learningList');
-const memorizedList = document.getElementById('memorizedList');
-const wordInput = document.getElementById('wordInput');
-const addBtn = document.getElementById('addBtn');
-const quizBanner = document.getElementById('quizBanner');
-const quizOverlay = document.getElementById('quizOverlay');
-const quizBody = document.getElementById('quizBody');
-
-function getTodayString() {
-  const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-}
-
-function getYesterdayString() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-}
-
-async function getStreakData() {
-  let data = { lastVisit: '', streak: 1 };
-  try {
-    let raw = null;
-    if (hasCloudStorage()) { raw = await cloudGetItem('streak_data'); }
-    if (!raw) { raw = localStorage.getItem(STREAK_KEY); }
-    if (raw) data = JSON.parse(raw);
-  } catch(e) {}
-
-  const today = getTodayString();
-  const yesterday = getYesterdayString();
-
-  if (data.lastVisit === today) {
-  } else if (data.lastVisit === yesterday) {
-    data.streak += 1;
-    data.lastVisit = today;
-  } else {
-    data.streak = 1;
-    data.lastVisit = today;
-  }
-
-  try {
-    const jsonStr = JSON.stringify(data);
-    if (hasCloudStorage()) await cloudSetItem('streak_data', jsonStr);
-    localStorage.setItem(STREAK_KEY, jsonStr);
-  } catch(e) {}
-
-  return data;
-}
-
-let cachedStreak = 1;
-
-async function updateXPDisplay() {
-  const streakData = await getStreakData();
-  cachedStreak = streakData.streak || 1;
-
-  const memorizedCount = words.filter(w => w.memorized).length;
-  const xp = (memorizedCount * 1) + (cachedStreak * 10);
-
-  const badgeEl = document.getElementById('xpBadge');
-  if (badgeEl) badgeEl.textContent = `⚡ ${xp} XP`;
-  
-  const profStreak = document.getElementById('profStreakCount');
-  if (profStreak) profStreak.textContent = `🔥 ${cachedStreak}`;
-
-  syncUserXP(xp, words.length, memorizedCount, cachedStreak);
-}
-
-// BARKAMOL AUTO-SYNC: Bulutli xotiraga va Serverga birdek yuborish
-async function syncUserXP(xp, wordsCount, memorizedCount, streak) {
-  const user = getTelegramUser();
-  if(!user) return;
-  
-  const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
-  const payload = {
-    id: user.id,
-    name: fullName || 'Foydalanuvchi',
-    username: user.username || '',
-    photoUrl: user.photo_url || '',
-    xp: xp,
-    wordsCount: wordsCount,
-    memorizedCount: memorizedCount,
-    streak: streak
-  };
-
-  // 1. Bulutli xotirada o'z ma'lumotlarini saqlaydi
-  if (hasCloudStorage()) {
-    try { await cloudSetItem('user_profile_sync', JSON.stringify(payload)); } catch(e){}
-  }
-
-  // 2. Serverga yuboradi
-  try {
-    await fetch('/api/leaderboard/update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-  } catch(e){}
-}
-
-async function renderLeaderboard() {
-  const podiumEl = document.getElementById('podiumContainer');
-  const listEl = document.getElementById('lbList');
-  if (!podiumEl || !listEl) return;
-
-  try {
-    const res = await fetch('/api/leaderboard');
-    if (!res.ok) return;
-    const list = await res.json();
-    currentLeaderboardUsers = list || [];
-
-    if (!list || list.length === 0) {
-      podiumEl.innerHTML = `<div class="empty" style="width:100%;">Hozircha foydalanuvchilar yo'q. Birinchi bo'ling!</div>`;
-      listEl.innerHTML = '';
-      return;
-    }
-
-    const top3 = list.slice(0, 3);
-    const ranks = ['rank-1', 'rank-2', 'rank-3'];
-    const crowns = ['👑 1', '🥈 2', '🥉 3'];
-
-    let podiumHtml = '';
-    top3.forEach((user, i) => {
-      const avatarHtml = user.photoUrl
-        ? `<img class="podium-avatar" src="${user.photoUrl}" alt="">`
-        : `<div class="podium-avatar">${(user.name || 'F')[0].toUpperCase()}</div>`;
-
-      podiumHtml += `
-        <div class="podium-card ${ranks[i]}" onclick="openLeaderboardUserProfile('${user.id}')">
-          <div class="podium-crown">${crowns[i]}</div>
+        body.innerHTML = `
+          <h3 class="font-bold text-base text-gold mb-2">Foydalanuvchi Profili</h3>
           ${avatarHtml}
-          <div class="podium-name">${escapeHtml(user.name)}</div>
-          <div class="podium-xp">${user.xp} XP</div>
-        </div>
-      `;
-    });
-    podiumEl.innerHTML = podiumHtml;
-
-    const rest = list.slice(3);
-    let listHtml = '';
-    rest.forEach((user, idx) => {
-      const avatarHtml = user.photoUrl
-        ? `<img class="lb-avatar" src="${user.photoUrl}" alt="">`
-        : `<div class="lb-avatar">${(user.name || 'F')[0].toUpperCase()}</div>`;
-
-      listHtml += `
-        <div class="lb-item" onclick="openLeaderboardUserProfile('${user.id}')">
-          <div class="lb-left">
-            <span class="lb-rank">#${idx + 4}</span>
-            ${avatarHtml}
-            <span class="lb-name">${escapeHtml(user.name)}</span>
+          <div class="font-bold text-foreground text-sm">${escapeHtml(user.name)}</div>
+          ${user.username ? `<div class="text-xs text-muted-foreground font-mono mt-0.5">@${escapeHtml(user.username)}</div>` : ''}
+          
+          <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/10">
+            <div class="glass p-2 rounded-lg">
+              <b class="block text-sm font-bold text-foreground">${user.xp}</b>
+              <span class="text-[9px] text-muted-foreground">XP</span>
+            </div>
+            <div class="glass p-2 rounded-lg">
+              <b class="block text-sm font-bold text-foreground">${user.memorizedCount || 0}</b>
+              <span class="text-[9px] text-muted-foreground">YODLANGAN</span>
+            </div>
+            <div class="glass p-2 rounded-lg">
+              <b class="block text-sm font-bold text-gold">🔥 ${user.streak || 1}</b>
+              <span class="text-[9px] text-muted-foreground">STREAK</span>
+            </div>
           </div>
-          <span class="lb-xp">${user.xp} XP</span>
-        </div>
-      `;
-    });
-    listEl.innerHTML = listHtml;
+          ${tgLinkBtn}
+        `;
 
-  } catch(e){}
-}
-
-function openLeaderboardUserProfile(userId) {
-  const user = currentLeaderboardUsers.find(u => String(u.id) === String(userId));
-  if (!user) return;
-
-  const overlay = document.getElementById('userProfileOverlay');
-  const body = document.getElementById('userProfileBody');
-
-  const avatarHtml = user.photoUrl
-    ? `<img class="profile-page-avatar" src="${user.photoUrl}" alt="">`
-    : `<div class="profile-page-avatar avatar-fallback">${(user.name || 'F')[0].toUpperCase()}</div>`;
-
-  const tgLinkBtn = user.username
-    ? `<a href="https://t.me/${escapeHtml(user.username)}" target="_blank" class="btn-submit-big" style="display:inline-block; margin-top:16px; text-decoration:none;">💬 Telegramda yozish</a>`
-    : '';
-
-  body.innerHTML = `
-    <h3>Foydalanuvchi Profili</h3>
-    ${avatarHtml}
-    <div class="profile-fullname">${escapeHtml(user.name)}</div>
-    ${user.username ? `<div class="profile-user-handle">@${escapeHtml(user.username)}</div>` : ''}
-    
-    <div class="profile-grid-stats">
-      <div class="stat-card-box">
-        <b>${user.xp}</b>
-        <span>TAJRIBA (XP)</span>
-      </div>
-      <div class="stat-card-box">
-        <b>${user.memorizedCount || 0}</b>
-        <span>YODLANGAN</span>
-      </div>
-      <div class="stat-card-box">
-        <b>🔥 ${user.streak || 1}</b>
-        <span>STREAK KUN</span>
-      </div>
-    </div>
-    ${tgLinkBtn}
-  `;
-
-  overlay.classList.remove('hidden');
-}
-
-document.getElementById('userProfileClose').addEventListener('click', () => {
-  document.getElementById('userProfileOverlay').classList.add('hidden');
-});
-
-// ---------- I18N DICTIONARY ----------
-const I18N = {
-  uz: {
-    appTitle: "Lug'at",
-    statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
-    addBtn: "Qo'shish",
-    hint: "Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.",
-    placeholderEnUz: "Bilmagan inglizcha so'zingizni yozing va Enter bosing...",
-    placeholderUzEn: "O'zbekcha so'zni yozing, inglizchasini topamiz...",
-    langEnglish: "Inglizcha", langUzbek: "O'zbek",
-    quizBannerText: "🎉 10 ta yangi so'z yodlandi! Bilimingizni sinab ko'ring.",
-    startQuiz: "Testni boshlash",
-    colLearning: "O'rganilmoqda", colMemorized: "Yodlangan",
-    emptyLearning: "Hozircha bo'sh. Yangi so'z qo'shing.",
-    emptyMemorized: "Yodlagan so'zlaringiz shu yerda to'planadi.",
-    loadingText: "tarjima qilinmoqda...",
-    errorText: "Tarjima olinmadi.", retryLink: "qayta urinish",
-    stamp: "yodlandi",
-    titleSpeak: "Talaffuzni eshitish",
-    titleMemorize: "Yodladim deb belgilash", titleUnmemorize: "Yodlanmagan deb belgilash",
-    titleDelete: "O'chirish", titleCopy: "Nusxalash",
-    quizNotReadyTitle: "Test hali tayyor emas",
-    quizNotReadyText: (n) => `Test boshlash uchun kamida 10 ta so'zni "yodladim" deb belgilashingiz kerak. Hozircha: ${n}/10.`,
-    quizTitle: "So'z testi", quizQuestion: "Savol", quizScore: "Ball", quizNext: "Keyingisi",
-    quizFinished: "Test yakunlandi", quizCorrect: "to'g'ri javob", quizClose: "Yopish",
-    resultExcellent: "A'LO!", resultGreat: "ZO'R!", resultGood: "YAXSHI", resultRetry: "YANA URINING",
-    langModalTitle: "Ilova tilini tanlang",
-    navHome: "Asosiy", navTranslate: "Tarjima", navProfile: "Profil",
-    transTitle: "Matn Tarjimoni",
-    ttPlaceholder: "Matn yoki gapni kiriting...",
-    ttResultPlaceholder: "Tarjima natijasi shu yerda ko'rinadi...",
-    ttTranslateBtnText: "Tarjima qilish",
-    btnListen: "Eshitish", btnClear: "Tozalash", btnCopy: "Nusxalash",
-    profTitle: "Mening Profilim",
-    profStatWords: "SO'ZLAR", profStatMemorized: "YODLANGAN", profStatStreak: "STREAK KUN",
-    profBadgesTitle: "🏅 Yutuqlar va Nishonlar",
-    badgeFirst10: "Dastlabki 10 so'z", badgeStreak3: "3 Kunlik Streak", badgeMaster: "Xotira Ustasi", badgeNight: "Tungi Bilimdon",
-    profSettingsTitle: "⚙️ Sozlamalar",
-    profLbTitle: "🏆 Peshqadamlar Jadvali (Top XP)",
-    lblTheme: "Mavzu", lblLang: "Ilova tili",
-    themeLight: "Kunduzgi ☀️", themeDark: "Tungi 🌙"
-  },
-  en: {
-    appTitle: "Dictionary",
-    statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
-    addBtn: "Add",
-    hint: "When you add a word, translation and an example sentence are generated automatically.",
-    placeholderEnUz: "Type an English word you don't know and press Enter...",
-    placeholderUzEn: "Type an Uzbek word, we'll find the English one...",
-    langEnglish: "English", langUzbek: "Uzbek",
-    quizBannerText: "🎉 10 new words memorized! Test your knowledge.",
-    startQuiz: "Start quiz",
-    colLearning: "Learning", colMemorized: "Memorized",
-    emptyLearning: "Empty for now. Add a new word.",
-    emptyMemorized: "Your memorized words will collect here.",
-    loadingText: "translating...",
-    errorText: "Translation failed.", retryLink: "retry",
-    stamp: "memorized",
-    titleSpeak: "Listen to pronunciation",
-    titleMemorize: "Mark as memorized", titleUnmemorize: "Mark as not memorized",
-    titleDelete: "Delete", titleCopy: "Copy",
-    quizNotReadyTitle: "Quiz not ready yet",
-    quizNotReadyText: (n) => `You need at least 10 words marked "memorized" to start a quiz. So far: ${n}/10.`,
-    quizTitle: "Word quiz", quizQuestion: "Question", quizScore: "Score", quizNext: "Next",
-    quizFinished: "Quiz finished", quizCorrect: "correct answers", quizClose: "Close",
-    resultExcellent: "EXCELLENT!", resultGreat: "GREAT!", resultGood: "GOOD", resultRetry: "TRY AGAIN",
-    langModalTitle: "Choose app language",
-    navHome: "Home", navTranslate: "Translate", navProfile: "Profile",
-    transTitle: "Text Translator",
-    ttPlaceholder: "Type or paste your text here...",
-    ttResultPlaceholder: "Translation result will appear here...",
-    ttTranslateBtnText: "Translate",
-    btnListen: "Listen", btnClear: "Clear", btnCopy: "Copy",
-    profTitle: "My Profile",
-    profStatWords: "WORDS", profStatMemorized: "MEMORIZED", profStatStreak: "STREAK DAYS",
-    profBadgesTitle: "🏅 Achievements & Badges",
-    badgeFirst10: "First 10 words", badgeStreak3: "3 Day Streak", badgeMaster: "Memory Master", badgeNight: "Night Scholar",
-    profSettingsTitle: "⚙️ Settings",
-    profLbTitle: "🏆 Leaderboard (Top XP)",
-    lblTheme: "Theme", lblLang: "App language",
-    themeLight: "Light ☀️", themeDark: "Dark 🌙"
-  },
-  ru: {
-    appTitle: "Словарь",
-    statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
-    addBtn: "Добавить",
-    hint: "При добавлении слова автоматически создаются перевод и пример предложения.",
-    placeholderEnUz: "Введите незнакомое английское слово и нажмите Enter...",
-    placeholderUzEn: "Введите узбекское слово, найдём английское...",
-    langEnglish: "Английский", langUzbek: "Узбекский",
-    quizBannerText: "🎉 Выучено 10 новых слов! Проверьте свои знания.",
-    startQuiz: "Начать тест",
-    colLearning: "Изучается", colMemorized: "Выучено",
-    emptyLearning: "Пока пусто. Добавьте новое слово.",
-    emptyMemorized: "Здесь появятся выученные слова.",
-    loadingText: "переводится...",
-    errorText: "Перевод не получен.", retryLink: "повторить",
-    stamp: "выучено",
-    titleSpeak: "Прослушать произношение",
-    titleMemorize: "Отметить как выученное", titleUnmemorize: "Отметить как невыученное",
-    titleDelete: "Удалить", titleCopy: "Копировать",
-    quizNotReadyTitle: "Тест ещё не готов",
-    quizNotReadyText: (n) => `Чтобы начать тест, отметьте минимум 10 слов как «выучено». Сейчас: ${n}/10.`,
-    quizTitle: "Тест слов", quizQuestion: "Вопрос", quizScore: "Балл", quizNext: "Далее",
-    quizFinished: "Тест завершён", quizCorrect: "правильных ответов", quizClose: "Закрыть",
-    resultExcellent: "ОТЛИЧНО!", resultGreat: "ЗДОРОВО!", resultGood: "ХОРОШО", resultRetry: "ПОПРОБУЙТЕ ЕЩЁ",
-    langModalTitle: "Выберите язык приложения",
-    navHome: "Главная", navTranslate: "Перевод", navProfile: "Профиль",
-    transTitle: "Переводчик текста",
-    ttPlaceholder: "Введите или вставьте текст сюда...",
-    ttResultPlaceholder: "Результат перевода появится здесь...",
-    ttTranslateBtnText: "Перевести",
-    btnListen: "Слушать", btnClear: "Очистить", btnCopy: "Копировать",
-    profTitle: "Мой профиль",
-    profStatWords: "СЛОВА", profStatMemorized: "ВЫУЧЕНО", profStatStreak: "СТРИК ДНЕЙ",
-    profBadgesTitle: "🏅 Достижения и значки",
-    badgeFirst10: "Первые 10 слов", badgeStreak3: "3 дня стрика", badgeMaster: "Мастер памяти", badgeNight: "Ночной эрудит",
-    profSettingsTitle: "⚙️ Настройки",
-    profLbTitle: "🏆 Таблица лидеров (Top XP)",
-    lblTheme: "Тема", lblLang: "Язык приложения",
-    themeLight: "Светлая ☀️", themeDark: "Тёмная 🌙"
-  }
-};
-
-let currentLang = localStorage.getItem('ui-lang') || 'uz';
-
-function t(key, ...args){
-  const dict = I18N[currentLang] || I18N.uz;
-  const val = dict[key] !== undefined ? dict[key] : I18N.uz[key];
-  return typeof val === 'function' ? val(...args) : val;
-}
-
-function updateLangSettingText() {
-  const langTextEl = document.getElementById('currentLangText');
-  if (!langTextEl) return;
-  if (currentLang === 'uz') langTextEl.textContent = "🇺🇿 O'zbekcha";
-  else if (currentLang === 'en') langTextEl.textContent = "🇬🇧 English";
-  else if (currentLang === 'ru') langTextEl.textContent = "🇷🇺 Русский";
-}
-
-function applyStaticI18n(){
-  document.documentElement.lang = currentLang;
-  
-  document.getElementById('appTitle').textContent = t('appTitle');
-  document.getElementById('statTotalLabel').textContent = t('statTotal');
-  document.getElementById('statMemorizedLabel').textContent = t('statMemorized');
-  document.getElementById('statReadyLabel').textContent = t('statReady');
-  addBtn.textContent = t('addBtn');
-  document.getElementById('hintText').textContent = t('hint');
-  document.getElementById('quizBannerText').textContent = t('quizBannerText');
-  document.getElementById('startQuizBtn').textContent = t('startQuiz');
-  document.getElementById('colLearningLabel').textContent = t('colLearning');
-  document.getElementById('colMemorizedLabel').textContent = t('colMemorized');
-  document.getElementById('langModalTitle').textContent = t('langModalTitle');
-  
-  document.getElementById('bnHomeLabel').textContent = t('navHome');
-  document.getElementById('bnTranslateLabel').textContent = t('navTranslate');
-  document.getElementById('bnProfileLabel').textContent = t('navProfile');
-  
-  document.getElementById('transTitle').textContent = t('transTitle');
-  document.getElementById('ttInput').placeholder = t('ttPlaceholder');
-  document.getElementById('ttTranslateBtn').textContent = t('ttTranslateBtnText');
-  document.getElementById('lblBtnListen1').textContent = t('btnListen');
-  document.getElementById('lblBtnListen2').textContent = t('btnListen');
-  document.getElementById('lblBtnClear').textContent = t('btnClear');
-  document.getElementById('lblBtnCopy').textContent = t('btnCopy');
-  const ttOut = document.getElementById('ttOutput');
-  if(ttOut.classList.contains('placeholder')){
-    ttOut.textContent = t('ttResultPlaceholder');
-  }
-
-  document.getElementById('profTitle').textContent = t('profTitle');
-  document.getElementById('profStatWords').textContent = t('profStatWords');
-  document.getElementById('profStatMemorized').textContent = t('profStatMemorized');
-  document.getElementById('profStatStreak').textContent = t('profStatStreak');
-  document.getElementById('profBadgesTitle').textContent = t('profBadgesTitle');
-  document.getElementById('badgeFirst10').textContent = t('badgeFirst10');
-  document.getElementById('badgeStreak3').textContent = t('badgeStreak3');
-  document.getElementById('badgeMaster').textContent = t('badgeMaster');
-  document.getElementById('badgeNight').textContent = t('badgeNight');
-  document.getElementById('profSettingsTitle').textContent = t('profSettingsTitle');
-  document.getElementById('profLbTitle').textContent = t('profLbTitle');
-  document.getElementById('lblTheme').textContent = t('lblTheme');
-  document.getElementById('lblLang').textContent = t('lblLang');
-
-  updateLangSettingText();
-  applyTheme(localStorage.getItem('ui-theme') || 'light');
-
-  document.querySelectorAll('.lang-option').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === currentLang);
-  });
-  updateLangLabels();
-  render();
-}
-
-function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
-
-function hasCloudStorage(){
-  return !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage);
-}
-function cloudGetItem(key){
-  return new Promise((resolve, reject) => {
-    window.Telegram.WebApp.CloudStorage.getItem(key, (err, value) => {
-      if(err) reject(err); else resolve(value);
-    });
-  });
-}
-function cloudSetItem(key, value){
-  return new Promise((resolve, reject) => {
-    window.Telegram.WebApp.CloudStorage.setItem(key, value, (err, success) => {
-      if(err) reject(err); else resolve(success);
-    });
-  });
-}
-function cloudGetItems(keys){
-  return new Promise((resolve, reject) => {
-    if(keys.length === 0){ resolve({}); return; }
-    window.Telegram.WebApp.CloudStorage.getItems(keys, (err, values) => {
-      if(err) reject(err); else resolve(values || {});
-    });
-  });
-}
-function cloudRemoveItem(key){
-  return new Promise((resolve, reject) => {
-    window.Telegram.WebApp.CloudStorage.removeItem(key, (err, success) => {
-      if(err) reject(err); else resolve(success);
-    });
-  });
-}
-
-async function loadWords(){
-  if(hasCloudStorage()){
-    try{
-      const idsRaw = await cloudGetItem('word_index');
-      const ids = idsRaw ? JSON.parse(idsRaw) : [];
-      if(ids.length === 0){ words = []; render(); return; }
-      const items = await cloudGetItems(ids.map(id => 'word_' + id));
-      words = ids
-        .map(id => items['word_' + id] ? JSON.parse(items['word_' + id]) : null)
-        .filter(Boolean);
-    }catch(e){
-      console.error('CloudStorage o\'qishda xato', e);
-      words = [];
-    }
-  } else {
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      words = raw ? JSON.parse(raw) : [];
-    }catch(e){
-      words = [];
-    }
-  }
-  render();
-  updateProfilePane();
-}
-
-async function saveWords(){
-  if(hasCloudStorage()){
-    try{
-      await cloudSetItem('word_index', JSON.stringify(words.map(w => w.id)));
-      for(const w of words){
-        await cloudSetItem('word_' + w.id, JSON.stringify(w));
+        overlay.classList.remove('hidden');
       }
-    }catch(e){
-      console.error('CloudStorage yozishda xato', e);
-    }
-  } else {
-    try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
-    }catch(e){
-      console.error('Saqlashda xatolik', e);
-    }
-  }
-  updateProfilePane();
-}
 
-async function fetchTranslation(word, direction){
-  const response = await fetch("/api/translate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ word, direction: direction || currentDirection })
-  });
-  if(!response.ok){ throw new Error('So\'rov muvaffaqiyatsiz'); }
-  const data = await response.json();
-  if(!data.en || !data.uzbek || !data.example) throw new Error('Noto\'g\'ri format');
-  return data;
-}
+      document.getElementById('userProfileClose').addEventListener('click', () => {
+        document.getElementById('userProfileOverlay').classList.add('hidden');
+      });
 
-async function addWord(rawInput){
-  const inputWord = rawInput.trim();
-  if(!inputWord) return;
-  const w = {
-    id: uid(),
-    dir: currentDirection,
-    en: currentDirection === 'en-uz' ? inputWord : '',
-    uz: currentDirection === 'uz-en' ? inputWord : '',
-    example: '', transcription: '', partOfSpeech: '', status: 'loading', memorized: false, quizzed: false
-  };
-  words.unshift(w);
-  render();
-  saveWords();
-
-  try{
-    const result = await fetchTranslation(inputWord, currentDirection);
-    const dupe = words.find(x => x.id !== w.id && x.en.toLowerCase() === result.en.toLowerCase());
-    if(dupe){
-      words = words.filter(x => x.id !== w.id);
-      render();
-      saveWords();
-      return;
-    }
-    w.en = result.en;
-    w.uz = result.uzbek;
-    w.example = result.example;
-    w.transcription = result.transcription;
-    w.partOfSpeech = result.partOfSpeech;
-    w.status = 'ready';
-  }catch(e){
-    w.status = 'error';
-  }
-  render();
-  saveWords();
-}
-
-function toggleMemorized(id){
-  const w = words.find(x => x.id === id);
-  if(!w) return;
-  w.memorized = !w.memorized;
-  render();
-  saveWords();
-  checkQuizReady();
-}
-
-function deleteWord(id){
-  words = words.filter(x => x.id !== id);
-  render();
-  saveWords();
-  if(hasCloudStorage()){
-    cloudRemoveItem('word_' + id).catch(e => console.error('CloudStorage\'dan o\'chirishda xato', e));
-  }
-}
-
-function retryWord(id){
-  const w = words.find(x => x.id === id);
-  if(!w) return;
-  w.status = 'loading';
-  render();
-  fetchTranslation(w.en || w.uz, w.dir || 'en-uz').then(result => {
-    w.en = result.en;
-    w.uz = result.uzbek;
-    w.example = result.example;
-    w.transcription = result.transcription;
-    w.partOfSpeech = result.partOfSpeech;
-    w.status = 'ready';
-    render();
-    saveWords();
-  }).catch(() => {
-    w.status = 'error';
-    render();
-  });
-}
-
-let currentAudio = null;
-function speakWord(text){
-  if(currentAudio){
-    currentAudio.pause();
-    currentAudio = null;
-  }
-  const audio = new Audio(`/api/speak?text=${encodeURIComponent(text)}&lang=en`);
-  currentAudio = audio;
-  audio.play().catch(() => {
-    if('speechSynthesis' in window){
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'en-US';
-      utter.rate = 0.9;
-      window.speechSynthesis.speak(utter);
-    }
-  });
-}
-
-function copyText(text, btn){
-  const done = () => {
-    if(!btn) return;
-    btn.classList.add('copied');
-    btn.textContent = '✓';
-    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '⧉'; }, 1200);
-  };
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(done).catch(() => {});
-  } else {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    try{ document.execCommand('copy'); done(); }catch(e){}
-    document.body.removeChild(ta);
-  }
-}
-
-function checkQuizReady(){
-  const ready = words.filter(w => w.memorized && !w.quizzed);
-  quizBanner.classList.toggle('hidden', ready.length < 10);
-}
-
-function cardHtml(w){
-  const isUzEn = w.dir === 'uz-en';
-  const mainTitle = isUzEn ? w.uz : w.en;
-  const subTitle = isUzEn ? w.en : w.uz;
-  const headwordFallback = mainTitle || w.en || w.uz;
-
-  if(w.status === 'loading'){
-    return `<div class="card pending">
-      <div class="card-top">
-        <div class="en-word">${escapeHtml(headwordFallback)}</div>
-        <div class="card-actions">
-          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
-        </div>
-      </div>
-      <div class="loading-text">${t('loadingText')}</div>
-    </div>`;
-  }
-  if(w.status === 'error'){
-    return `<div class="card">
-      <div class="card-top">
-        <div class="en-word">${escapeHtml(headwordFallback)}</div>
-        <div class="card-actions">
-          <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
-        </div>
-      </div>
-      <div class="error-text">${t('errorText')} <span class="retry-link" onclick="retryWord('${w.id}')">${t('retryLink')}</span></div>
-    </div>`;
-  }
-  return `<div class="card">
-    <div class="card-top">
-      <div class="en-word">${escapeHtml(mainTitle)}</div>
-      <div class="card-actions">
-        <button class="icon-btn speak-btn" onclick="speakWord('${escapeJs(w.en)}')" title="${t('titleSpeak')}">🔊</button>
-        <button class="icon-btn memorize" onclick="toggleMemorized('${w.id}')" title="${w.memorized ? t('titleUnmemorize') : t('titleMemorize')}">${w.memorized ? '↺' : '✓'}</button>
-        <button class="icon-btn del" onclick="deleteWord('${w.id}')" title="${t('titleDelete')}">✕</button>
-      </div>
-    </div>
-    <div class="word-meta">
-      ${w.transcription ? `<span class="transcription">${escapeHtml(w.transcription)}</span>` : ''}
-      ${w.partOfSpeech ? `<span class="pos-tag">${escapeHtml(w.partOfSpeech)}</span>` : ''}
-      ${w.memorized ? `<span class="memorized-tag">✓ ${t('stamp')}</span>` : ''}
-    </div>
-    <div class="uz-word">
-      ${escapeHtml(subTitle)}
-      <button class="copy-btn" onclick="copyText('${escapeJs(subTitle)}', this)" title="${t('titleCopy')}">⧉</button>
-    </div>
-    <div class="example">${escapeHtml(w.example)}</div>
-  </div>`;
-}
-
-function escapeJs(s){
-  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-}
-
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-function render(){
-  const learning = words.filter(w => !w.memorized);
-  const memorized = words.filter(w => w.memorized);
-
-  learningList.innerHTML = learning.length
-    ? learning.map(cardHtml).join('')
-    : `<div class="empty">${t('emptyLearning')}</div>`;
-
-  memorizedList.innerHTML = memorized.length
-    ? memorized.map(cardHtml).join('')
-    : `<div class="empty">${t('emptyMemorized')}</div>`;
-
-  document.getElementById('learningCount').textContent = `(${learning.length})`;
-  document.getElementById('memorizedCount').textContent = `(${memorized.length})`;
-  document.getElementById('statTotal').textContent = words.length;
-  document.getElementById('statMemorized').textContent = memorized.length;
-  document.getElementById('statReady').textContent = words.filter(w => w.memorized && !w.quizzed).length;
-
-  checkQuizReady();
-  updateXPDisplay();
-}
-
-addBtn.addEventListener('click', () => {
-  const v = wordInput.value;
-  wordInput.value = '';
-  addWord(v);
-});
-
-const langFromEl = document.getElementById('langFrom');
-const langToEl = document.getElementById('langTo');
-const swapLangBtn = document.getElementById('swapLangBtn');
-
-function updateLangLabels(){
-  if(currentDirection === 'en-uz'){
-    langFromEl.textContent = t('langEnglish');
-    langToEl.textContent = t('langUzbek');
-    wordInput.placeholder = t('placeholderEnUz');
-  } else {
-    langFromEl.textContent = t('langUzbek');
-    langToEl.textContent = t('langEnglish');
-    wordInput.placeholder = t('placeholderUzEn');
-  }
-}
-
-swapLangBtn.addEventListener('click', () => {
-  currentDirection = currentDirection === 'en-uz' ? 'uz-en' : 'en-uz';
-  updateLangLabels();
-  swapLangBtn.classList.add('spin');
-  setTimeout(() => swapLangBtn.classList.remove('spin'), 200);
-  wordInput.focus();
-});
-
-const ttFromEl = document.getElementById('ttFrom');
-const ttToEl = document.getElementById('ttTo');
-const ttSwapBtn = document.getElementById('ttSwapBtn');
-
-function updateTtLabels(){
-  if(ttDirection === 'en-uz'){
-    ttFromEl.textContent = t('langEnglish');
-    ttToEl.textContent = t('langUzbek');
-  } else {
-    ttFromEl.textContent = t('langUzbek');
-    ttToEl.textContent = t('langEnglish');
-  }
-}
-
-ttSwapBtn.addEventListener('click', () => {
-  ttDirection = ttDirection === 'en-uz' ? 'uz-en' : 'en-uz';
-  updateTtLabels();
-  ttSwapBtn.classList.add('spin');
-  setTimeout(() => ttSwapBtn.classList.remove('spin'), 200);
-  const oldInput = ttInput.value;
-  ttInput.value = ttOutput.textContent && !ttOutput.classList.contains('placeholder') ? ttOutput.textContent : oldInput;
-  ttOutput.textContent = t('ttResultPlaceholder');
-  ttOutput.classList.add('placeholder');
-});
-
-wordInput.addEventListener('keydown', (e) => {
-  if(e.key === 'Enter'){
-    const v = wordInput.value;
-    wordInput.value = '';
-    addWord(v);
-  }
-});
-
-// SAHIFALARNI SURISH
-const viewsSlider = document.getElementById('viewsSlider');
-const bnHomeBtn = document.getElementById('bnHomeBtn');
-const bnTranslateBtn = document.getElementById('bnTranslateBtn');
-const bnProfileBtn = document.getElementById('bnProfileBtn');
-
-function switchToPane(index, btnEl){
-  viewsSlider.style.transform = `translateX(-${index * 33.33333}%)`;
-  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-  if(btnEl) btnEl.classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
-  if(index === 2) updateProfilePane();
-}
-
-bnHomeBtn.addEventListener('click', () => switchToPane(0, bnHomeBtn));
-bnTranslateBtn.addEventListener('click', () => switchToPane(1, bnTranslateBtn));
-bnProfileBtn.addEventListener('click', () => switchToPane(2, bnProfileBtn));
-
-document.getElementById('startQuizBtn').addEventListener('click', openQuizIfPossible);
-document.getElementById('quizClose').addEventListener('click', closeQuiz);
-
-const FALLBACK_DISTRACTORS = ["kitob","stol","osmon","daryo","tog'","gul","quyosh","uy","yo'l","olma","non","suv","daraxt","yulduz","shahar","qishloq","mashina","oyna","eshik","bola"];
-
-function buildQuizQuestions(){
-  const pool = words.filter(w => w.memorized && !w.quizzed && w.status === 'ready').slice(0, 10);
-  const allUz = words.filter(w => w.status === 'ready').map(w => w.uz);
-  return pool.map(w => {
-    let distractorPool = allUz.filter(u => u !== w.uz);
-    let distractors = [];
-    while(distractors.length < 3){
-      if(distractorPool.length){
-        const idx = Math.floor(Math.random() * distractorPool.length);
-        const pick = distractorPool.splice(idx,1)[0];
-        if(!distractors.includes(pick)) distractors.push(pick);
-      } else {
-        const idx = Math.floor(Math.random() * FALLBACK_DISTRACTORS.length);
-        const pick = FALLBACK_DISTRACTORS[idx];
-        if(!distractors.includes(pick) && pick !== w.uz) distractors.push(pick);
+      async function loadWords(){
+        if(hasCloudStorage()){
+          try{
+            const idsRaw = await cloudGetItem('word_index');
+            const ids = idsRaw ? JSON.parse(idsRaw) : [];
+            if(ids.length === 0){ words = []; render(); return; }
+            const items = await cloudGetItems(ids.map(id => 'word_' + id));
+            words = ids
+              .map(id => items['word_' + id] ? JSON.parse(items['word_' + id]) : null)
+              .filter(Boolean);
+          }catch(e){
+            words = [];
+          }
+        } else {
+          try{
+            const raw = localStorage.getItem(STORAGE_KEY);
+            words = raw ? JSON.parse(raw) : [];
+          }catch(e){
+            words = [];
+          }
+        }
+        render();
+        updateProfilePane();
       }
-    }
-    const options = [...distractors, w.uz].sort(() => Math.random() - 0.5);
-    return { id: w.id, en: w.en, correct: w.uz, options };
-  });
-}
 
-function openQuizIfPossible(){
-  const eligible = words.filter(w => w.memorized && !w.quizzed && w.status === 'ready');
-  if(eligible.length < 10){
-    quizBody.innerHTML = `<h3>${t('quizNotReadyTitle')}</h3>
-      <p style="color:var(--ink-soft); font-size:14px; line-height:1.5;">
-      ${t('quizNotReadyText', eligible.length)}
-      </p>`;
-    quizOverlay.classList.remove('hidden');
-    return;
-  }
-  quizState = {
-    questions: buildQuizQuestions(),
-    index: 0,
-    score: 0,
-    answered: false
-  };
-  quizOverlay.classList.remove('hidden');
-  renderQuizQuestion();
-}
+      async function saveWords(){
+        if(hasCloudStorage()){
+          try{
+            await cloudSetItem('word_index', JSON.stringify(words.map(w => w.id)));
+            for(const w of words){
+              await cloudSetItem('word_' + w.id, JSON.stringify(w));
+            }
+          }catch(e){}
+        } else {
+          try{
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+          }catch(e){}
+        }
+        updateProfilePane();
+      }
 
-function closeQuiz(){
-  quizOverlay.classList.add('hidden');
-  quizState = null;
-}
+      async function fetchTranslation(word, direction){
+        const response = await fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word, direction: direction || currentDirection })
+        });
+        if(!response.ok){ throw new Error('So\'rov muvaffaqiyatsiz'); }
+        const data = await response.json();
+        if(!data.en || !data.uzbek || !data.example) throw new Error('Noto\'g\'ri format');
+        return data;
+      }
 
-function renderQuizQuestion(){
-  const q = quizState.questions[quizState.index];
-  quizState.answered = false;
-  quizBody.innerHTML = `
-    <h3>${t('quizTitle')}</h3>
-    <div class="quiz-progress">${t('quizQuestion')} ${quizState.index + 1} / ${quizState.questions.length} &nbsp;•&nbsp; ${t('quizScore')}: ${quizState.score}</div>
-    <div class="quiz-word">${escapeHtml(q.en)}</div>
-    <div class="quiz-options" id="quizOptions">
-      ${q.options.map((opt) => `<button type="button" class="quiz-option">${escapeHtml(opt)}</button>`).join('')}
-    </div>
-    <div class="quiz-footer">
-      <button class="next-btn" id="nextBtn" disabled>${t('quizNext')}</button>
-    </div>
-  `;
-  const optionButtons = Array.from(document.querySelectorAll('#quizOptions .quiz-option'));
-  optionButtons.forEach((btn, i) => {
-    const opt = q.options[i];
-    btn.addEventListener('click', () => answerQuiz(btn, opt, q.correct, optionButtons, q.options));
-  });
-  document.getElementById('nextBtn').addEventListener('click', nextQuestion);
-}
+      async function addWord(rawInput){
+        const inputWord = rawInput.trim();
+        if(!inputWord) return;
+        const w = {
+          id: uid(),
+          dir: currentDirection,
+          en: currentDirection === 'en-uz' ? inputWord : '',
+          uz: currentDirection === 'uz-en' ? inputWord : '',
+          example: '', transcription: '', partOfSpeech: '', status: 'loading', memorized: false, quizzed: false
+        };
+        words.unshift(w);
+        render();
+        saveWords();
 
-function answerQuiz(btn, chosen, correct, optionButtons, options){
-  if(quizState.answered) return;
-  quizState.answered = true;
-  optionButtons.forEach((b, i) => {
-    b.disabled = true;
-    if(options[i] === correct) b.classList.add('correct');
-    else if(b === btn) b.classList.add('wrong');
-  });
-  if(chosen === correct) quizState.score++;
-  document.getElementById('nextBtn').disabled = false;
-}
+        try{
+          const result = await fetchTranslation(inputWord, currentDirection);
+          const dupe = words.find(x => x.id !== w.id && x.en.toLowerCase() === result.en.toLowerCase());
+          if(dupe){
+            words = words.filter(x => x.id !== w.id);
+            render();
+            saveWords();
+            return;
+          }
+          w.en = result.en;
+          w.uz = result.uzbek;
+          w.example = result.example;
+          w.transcription = result.transcription;
+          w.partOfSpeech = result.partOfSpeech;
+          w.status = 'ready';
+        }catch(e){
+          w.status = 'error';
+        }
+        render();
+        saveWords();
+      }
 
-function nextQuestion(){
-  quizState.index++;
-  if(quizState.index >= quizState.questions.length){
-    finishQuiz();
-  } else {
-    renderQuizQuestion();
-  }
-}
+      function toggleMemorized(id){
+        const w = words.find(x => x.id === id);
+        if(!w) return;
+        w.memorized = !w.memorized;
+        render();
+        saveWords();
+        checkQuizReady();
+      }
 
-function finishQuiz(){
-  quizState.questions.forEach(q => {
-    const w = words.find(x => x.id === q.id);
-    if(w) w.quizzed = true;
-  });
-  render();
-  saveWords();
-  const score = quizState.score;
-  const total = quizState.questions.length;
-  const pct = Math.round((score/total)*100);
-  const label = pct === 100 ? t('resultExcellent') : pct >= 70 ? t('resultGreat') : pct >= 40 ? t('resultGood') : t('resultRetry');
-  quizBody.innerHTML = `
-    <div class="quiz-result">
-      <h3>${t('quizFinished')}</h3>
-      <div class="big-stamp">${label}</div>
-      <div class="quiz-score">${score} / ${total} ${t('quizCorrect')} (${pct}%)</div>
-      <div class="quiz-footer" style="justify-content:center; margin-top:22px;">
-        <button class="next-btn" onclick="closeQuiz()">${t('quizClose')}</button>
-      </div>
-    </div>
-  `;
-}
+      function deleteWord(id){
+        words = words.filter(x => x.id !== id);
+        render();
+        saveWords();
+        if(hasCloudStorage()){
+          cloudRemoveItem('word_' + id).catch(e => {});
+        }
+      }
 
-// Theme (dark/light)
-const themeToggleBtn = document.getElementById('themeToggleBtn');
+      function retryWord(id){
+        const w = words.find(x => x.id === id);
+        if(!w) return;
+        w.status = 'loading';
+        render();
+        fetchTranslation(w.en || w.uz, w.dir || 'en-uz').then(result => {
+          w.en = result.en;
+          w.uz = result.uzbek;
+          w.example = result.example;
+          w.transcription = result.transcription;
+          w.partOfSpeech = result.partOfSpeech;
+          w.status = 'ready';
+          render();
+          saveWords();
+        }).catch(() => {
+          w.status = 'error';
+          render();
+        });
+      }
 
-function applyTheme(theme){
-  document.documentElement.setAttribute('data-theme', theme);
-  const btnText = document.getElementById('themeBtnText');
-  if(btnText){
-    btnText.textContent = theme === 'dark' ? t('themeLight') : t('themeDark');
-  }
-  localStorage.setItem('ui-theme', theme);
-}
+      let currentAudio = null;
+      function speakWord(text){
+        if(currentAudio){
+          currentAudio.pause();
+          currentAudio = null;
+        }
+        const audio = new Audio(`/api/speak?text=${encodeURIComponent(text)}&lang=en`);
+        currentAudio = audio;
+        audio.play().catch(() => {
+          if('speechSynthesis' in window){
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            utter.rate = 0.9;
+            window.speechSynthesis.speak(utter);
+          }
+        });
+      }
 
-themeToggleBtn.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-  applyTheme(current === 'dark' ? 'light' : 'dark');
-});
+      function copyText(text, btn){
+        const done = () => {
+          if(!btn) return;
+          btn.classList.add('copied');
+          btn.textContent = '✓';
+          setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '⧉'; }, 1200);
+        };
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done).catch(() => {});
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          try{ document.execCommand('copy'); done(); }catch(e){}
+          document.body.removeChild(ta);
+        }
+      }
 
-// Language switcher modal
-const langOverlay = document.getElementById('langOverlay');
-const langSwitchBtn = document.getElementById('langSwitchBtn');
-const langClose = document.getElementById('langClose');
+      function checkQuizReady(){
+        const ready = words.filter(w => w.memorized && !w.quizzed);
+        quizBanner.classList.toggle('hidden', ready.length < 10);
+      }
 
-langSwitchBtn.addEventListener('click', () => langOverlay.classList.remove('hidden'));
-langClose.addEventListener('click', () => langOverlay.classList.add('hidden'));
-langOverlay.addEventListener('click', (e) => { if(e.target === langOverlay) langOverlay.classList.add('hidden'); });
+      function cardHtml(w){
+        const isUzEn = w.dir === 'uz-en';
+        const mainTitle = isUzEn ? w.uz : w.en;
+        const subTitle = isUzEn ? w.en : w.uz;
+        const headwordFallback = mainTitle || w.en || w.uz;
 
-document.querySelectorAll('.lang-option').forEach(btn => {
-  btn.addEventListener('click', () => {
-    currentLang = btn.dataset.lang;
-    localStorage.setItem('ui-lang', currentLang);
-    applyStaticI18n();
-    langOverlay.classList.add('hidden');
-  });
-});
+        if(w.status === 'loading'){
+          return `<article class="glass flex items-center justify-between rounded-lg p-3 opacity-60 text-xs">
+            <span>${escapeHtml(headwordFallback)} — ${t('loadingText')}</span>
+            <button onclick="deleteWord('${w.id}')" class="text-rose-400 font-bold">✕</button>
+          </article>`;
+        }
+        if(w.status === 'error'){
+          return `<article class="glass flex items-center justify-between rounded-lg p-3 text-xs border-rose-500/50">
+            <span class="text-rose-400">${t('errorText')}</span>
+            <span onclick="retryWord('${w.id}')" class="underline cursor-pointer font-bold text-gold">${t('retryLink')}</span>
+            <button onclick="deleteWord('${w.id}')" class="text-rose-400 font-bold">✕</button>
+          </article>`;
+        }
+        return `
+          <article class="glass flex items-center gap-3 rounded-lg p-3">
+            <button type="button" onclick="speakWord('${escapeJs(w.en)}')"
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-foreground transition-transform active:scale-90"
+              style="background:var(--muted)">
+              <svg class="icon" style="width:1rem;height:1rem" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg>
+            </button>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <h3 class="truncate text-base font-bold text-foreground">${escapeHtml(mainTitle)}</h3>
+                <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold" style="background:var(--muted)">${escapeHtml(w.partOfSpeech || 'so\'z')}</span>
+              </div>
+              <p class="truncate text-sm text-rose-300 font-semibold">${escapeHtml(subTitle)} · <span class="italic text-muted-foreground">${escapeHtml(w.transcription || '')}</span></p>
+              ${w.example ? `<p class="text-xs text-muted-foreground italic border-l-2 border-gold pl-2 mt-1">${escapeHtml(w.example)}</p>` : ''}
+            </div>
+            <div class="flex gap-1.5 shrink-0">
+              <button onclick="toggleMemorized('${w.id}')" class="p-1 text-gold">
+                ${w.memorized ? '<svg class="icon" style="color:var(--gold)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>' : '↺'}
+              </button>
+              <button onclick="deleteWord('${w.id}')" class="p-1 text-rose-400 font-bold">✕</button>
+            </div>
+          </article>`;
+      }
 
-// MATN TARJIMONI (PANE 2)
-const ttInput = document.getElementById('ttInput');
-const ttOutput = document.getElementById('ttOutput');
-const ttTranslateBtn = document.getElementById('ttTranslateBtn');
+      function render(){
+        const learning = words.filter(w => !w.memorized);
+        const memorized = words.filter(w => w.memorized);
 
-async function runTranslateText(){
-  const text = ttInput.value.trim();
-  if(!text) return;
-  ttTranslateBtn.disabled = true;
-  ttOutput.classList.remove('placeholder');
-  ttOutput.textContent = t('loadingText');
-  try{
-    const response = await fetch('/api/translate-text', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, direction: ttDirection })
-    });
-    if(!response.ok) throw new Error('fail');
-    const data = await response.json();
-    if(!data.translation) throw new Error('empty');
-    ttOutput.textContent = data.translation;
-  }catch(e){
-    ttOutput.textContent = t('errorText');
-  }
-  ttTranslateBtn.disabled = false;
-}
+        learningList.innerHTML = learning.length
+          ? learning.map(cardHtml).join('')
+          : `<div class="p-4 text-center text-xs text-muted-foreground glass rounded-lg">${t('emptyLearning')}</div>`;
 
-ttTranslateBtn.addEventListener('click', runTranslateText);
-document.getElementById('ttInputClear').addEventListener('click', () => {
-  ttInput.value = '';
-  ttOutput.textContent = t('ttResultPlaceholder');
-  ttOutput.classList.add('placeholder');
-  ttInput.focus();
-});
+        memorizedList.innerHTML = memorized.length
+          ? memorized.map(cardHtml).join('')
+          : `<div class="p-4 text-center text-xs text-muted-foreground glass rounded-lg">${t('emptyMemorized')}</div>`;
 
-document.getElementById('ttInputSpeak').addEventListener('click', () => {
-  if(ttInput.value.trim()) speakWord(ttInput.value.trim());
-});
-document.getElementById('ttOutputSpeak').addEventListener('click', () => {
-  const text = ttOutput.textContent.trim();
-  if(text && !ttOutput.classList.contains('placeholder')) speakWord(text);
-});
-document.getElementById('ttOutputCopy').addEventListener('click', (e) => {
-  const text = ttOutput.textContent.trim();
-  if(text && !ttOutput.classList.contains('placeholder')) copyText(text, e.currentTarget);
-});
+        document.getElementById('learningCount').textContent = learning.length;
+        document.getElementById('memorizedCount').textContent = memorized.length;
+        document.getElementById('statTotal').textContent = words.length;
 
-// PROFIL (PANE 3)
-function getTelegramUser(){
-  if(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe){
-    return window.Telegram.WebApp.initDataUnsafe.user || null;
-  }
-  return null;
-}
+        checkQuizReady();
+        updateXPDisplay();
+      }
 
-function updateProfilePane(){
-  const user = getTelegramUser();
-  const avatarWrap = document.getElementById('profAvatarWrap');
-  const bnAvatarWrap = document.getElementById('bnAvatarWrap');
-  const profName = document.getElementById('profFullName');
-  const profHandle = document.getElementById('profUserHandle');
+      addBtn.addEventListener('click', () => {
+        const v = wordInput.value;
+        wordInput.value = '';
+        addWord(v);
+      });
 
-  document.getElementById('profWordsCount').textContent = words.length;
-  document.getElementById('profMemorizedCount').textContent = words.filter(w => w.memorized).length;
+      const langFromEl = document.getElementById('langFrom');
+      const langToEl = document.getElementById('langTo');
+      const swapLangBtn = document.getElementById('swapLangBtn');
 
-  updateXPDisplay();
-  renderLeaderboard();
+      function updateLangLabels(){
+        if(currentDirection === 'en-uz'){
+          langFromEl.textContent = t('langEnglish');
+          langToEl.textContent = t('langUzbek');
+          wordInput.placeholder = t('placeholderEnUz');
+        } else {
+          langFromEl.textContent = t('langUzbek');
+          langToEl.textContent = t('langEnglish');
+          wordInput.placeholder = t('placeholderUzEn');
+        }
+      }
 
-  if(!user) return;
+      swapLangBtn.addEventListener('click', () => {
+        currentDirection = currentDirection === 'en-uz' ? 'uz-en' : 'en-uz';
+        updateLangLabels();
+        wordInput.focus();
+      });
 
-  const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
-  profName.textContent = fullName || 'Foydalanuvchi';
-  profHandle.textContent = user.username ? `@${user.username}` : '';
+      const ttFromEl = document.getElementById('ttFrom');
+      const ttToEl = document.getElementById('ttTo');
+      const ttSwapBtn = document.getElementById('ttSwapBtn');
 
-  if(user.photo_url){
-    avatarWrap.outerHTML = `<img id="profAvatarWrap" class="profile-page-avatar" src="${user.photo_url}" alt="">`;
-    bnAvatarWrap.innerHTML = `<img src="${user.photo_url}" alt="">`;
-  } else {
-    const init = ((user.first_name || '')[0] + (user.last_name || '')[0]).toUpperCase() || '👤';
-    avatarWrap.textContent = init;
-    bnAvatarWrap.textContent = init;
-  }
-}
+      function updateTtLabels(){
+        if(ttDirection === 'en-uz'){
+          ttFromEl.textContent = t('langEnglish');
+          ttToEl.textContent = t('langUzbek');
+        } else {
+          ttFromEl.textContent = t('langUzbek');
+          ttToEl.textContent = t('langEnglish');
+        }
+      }
 
-// Init
-if(window.Telegram && window.Telegram.WebApp){
-  const tg = window.Telegram.WebApp;
-  tg.ready();
-  tg.expand();
-}
+      ttSwapBtn.addEventListener('click', () => {
+        ttDirection = ttDirection === 'en-uz' ? 'uz-en' : 'en-uz';
+        updateTtLabels();
+        const oldInput = ttInput.value;
+        ttInput.value = ttOutput.textContent && !ttOutput.classList.contains('placeholder') ? ttOutput.textContent : oldInput;
+        ttOutput.textContent = t('ttResultPlaceholder');
+        ttOutput.classList.add('placeholder');
+      });
 
-applyStaticI18n();
-loadWords();
-</script>
-</body>
+      wordInput.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter'){
+          const v = wordInput.value;
+          wordInput.value = '';
+          addWord(v);
+        }
+      });
+
+      // NAVIGATSIYA SWITCHER
+      const viewsSlider = document.getElementById('viewsSlider');
+      const navBtns = document.querySelectorAll('.nav-btn');
+
+      function switchToPane(index, btn) {
+        viewsSlider.style.transform = `translateX(-${index * 33.33333}%)`;
+        navBtns.forEach((b) => {
+          const active = b === btn;
+          b.style.background = active ? "var(--muted)" : "transparent";
+          b.style.color = active ? "var(--foreground)" : "var(--muted-foreground)";
+        });
+        if(index === 2) updateProfilePane();
+      }
+
+      document.getElementById('bnHomeBtn').addEventListener('click', function() { switchToPane(0, this); });
+      document.getElementById('bnTranslateBtn').addEventListener('click', function() { switchToPane(1, this); });
+      document.getElementById('bnProfileBtn').addEventListener('click', function() { switchToPane(2, this); });
+
+      document.getElementById('startQuizBtn').addEventListener('click', openQuizIfPossible);
+      document.getElementById('quizClose').addEventListener('click', closeQuiz);
+
+      const FALLBACK_DISTRACTORS = ["kitob","stol","osmon","daryo","tog'","gul","quyosh","uy","yo'l","olma","non","suv","daraxt","yulduz","shahar","qishloq","mashina","oyna","eshik","bola"];
+
+      function buildQuizQuestions(){
+        const pool = words.filter(w => w.memorized && !w.quizzed && w.status === 'ready').slice(0, 10);
+        const allUz = words.filter(w => w.status === 'ready').map(w => w.uz);
+        return pool.map(w => {
+          let distractorPool = allUz.filter(u => u !== w.uz);
+          let distractors = [];
+          while(distractors.length < 3){
+            if(distractorPool.length){
+              const idx = Math.floor(Math.random() * distractorPool.length);
+              const pick = distractorPool.splice(idx,1)[0];
+              if(!distractors.includes(pick)) distractors.push(pick);
+            } else {
+              const idx = Math.floor(Math.random() * FALLBACK_DISTRACTORS.length);
+              const pick = FALLBACK_DISTRACTORS[idx];
+              if(!distractors.includes(pick) && pick !== w.uz) distractors.push(pick);
+            }
+          }
+          const options = [...distractors, w.uz].sort(() => Math.random() - 0.5);
+          return { id: w.id, en: w.en, correct: w.uz, options };
+        });
+      }
+
+      function openQuizIfPossible(){
+        const eligible = words.filter(w => w.memorized && !w.quizzed && w.status === 'ready');
+        if(eligible.length < 10){
+          quizBody.innerHTML = `<h3 class="font-bold text-gold text-sm mb-2">${t('quizNotReadyTitle')}</h3>
+            <p class="text-xs text-muted-foreground">${t('quizNotReadyText', eligible.length)}</p>`;
+          quizOverlay.classList.remove('hidden');
+          return;
+        }
+        quizState = { questions: buildQuizQuestions(), index: 0, score: 0, answered: false };
+        quizOverlay.classList.remove('hidden');
+        renderQuizQuestion();
+      }
+
+      function closeQuiz(){
+        quizOverlay.classList.add('hidden');
+        quizState = null;
+      }
+
+      function renderQuizQuestion(){
+        const q = quizState.questions[quizState.index];
+        quizState.answered = false;
+        quizBody.innerHTML = `
+          <h3 class="font-bold text-gold text-base mb-1">${t('quizTitle')}</h3>
+          <div class="text-xs text-muted-foreground mb-3">${t('quizQuestion')} ${quizState.index + 1} / ${quizState.questions.length} • ${t('quizScore')}: ${quizState.score}</div>
+          <div class="glass p-3 rounded-lg text-center font-bold text-foreground text-lg mb-3">${escapeHtml(q.en)}</div>
+          <div class="flex flex-col gap-2" id="quizOptions">
+            ${q.options.map((opt) => `<button type="button" class="quiz-option glass p-2.5 rounded-lg text-left text-xs font-semibold">${escapeHtml(opt)}</button>`).join('')}
+          </div>
+          <div class="flex justify-end mt-4">
+            <button class="glass-gold px-4 py-1.5 rounded-full text-xs font-bold" id="nextBtn" disabled>${t('quizNext')}</button>
+          </div>
+        `;
+        const optionButtons = Array.from(document.querySelectorAll('#quizOptions .quiz-option'));
+        optionButtons.forEach((btn, i) => {
+          const opt = q.options[i];
+          btn.addEventListener('click', () => answerQuiz(btn, opt, q.correct, optionButtons, q.options));
+        });
+        document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+      }
+
+      function answerQuiz(btn, chosen, correct, optionButtons, options){
+        if(quizState.answered) return;
+        quizState.answered = true;
+        optionButtons.forEach((b, i) => {
+          b.disabled = true;
+          if(options[i] === correct) { b.style.borderColor = 'var(--green)'; b.style.background = 'rgba(52, 211, 153, 0.2)'; }
+          else if(b === btn) { b.style.borderColor = 'var(--red)'; b.style.background = 'rgba(248, 113, 113, 0.2)'; }
+        });
+        if(chosen === correct) quizState.score++;
+        document.getElementById('nextBtn').disabled = false;
+      }
+
+      function nextQuestion(){
+        quizState.index++;
+        if(quizState.index >= quizState.questions.length){
+          finishQuiz();
+        } else {
+          renderQuizQuestion();
+        }
+      }
+
+      function finishQuiz(){
+        quizState.questions.forEach(q => {
+          const w = words.find(x => x.id === q.id);
+          if(w) w.quizzed = true;
+        });
+        render();
+        saveWords();
+        const score = quizState.score;
+        const total = quizState.questions.length;
+        const pct = Math.round((score/total)*100);
+        const label = pct === 100 ? t('resultExcellent') : pct >= 70 ? t('resultGreat') : pct >= 40 ? t('resultGood') : t('resultRetry');
+        quizBody.innerHTML = `
+          <div class="text-center">
+            <h3 class="font-bold text-gold text-base">${t('quizFinished')}</h3>
+            <div class="text-2xl font-extrabold text-foreground my-3">${label}</div>
+            <div class="text-xs text-muted-foreground">${score} / ${total} ${t('quizCorrect')} (${pct}%)</div>
+            <button class="glass-gold px-4 py-2 rounded-full font-bold text-xs mt-4" onclick="closeQuiz()">${t('quizClose')}</button>
+          </div>
+        `;
+      }
+
+      // Theme toggle
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      function applyTheme(theme){
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        const btnText = document.getElementById('themeBtnText');
+        if(btnText){
+          btnText.textContent = theme === 'dark' ? t('themeLight') : t('themeDark');
+        }
+        localStorage.setItem('ui-theme', theme);
+      }
+      themeToggleBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        applyTheme(isDark ? 'light' : 'dark');
+      });
+
+      // Language switcher
+      const langOverlay = document.getElementById('langOverlay');
+      document.getElementById('langSwitchBtn').addEventListener('click', () => langOverlay.classList.remove('hidden'));
+      document.getElementById('langClose').addEventListener('click', () => langOverlay.classList.add('hidden'));
+
+      document.querySelectorAll('.lang-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentLang = btn.dataset.lang;
+          localStorage.setItem('ui-lang', currentLang);
+          applyStaticI18n();
+          langOverlay.classList.add('hidden');
+        });
+      });
+
+      // MATN TARJIMONI
+      const ttInput = document.getElementById('ttInput');
+      const ttOutput = document.getElementById('ttOutput');
+      const ttTranslateBtn = document.getElementById('ttTranslateBtn');
+
+      async function runTranslateText(){
+        const text = ttInput.value.trim();
+        if(!text) return;
+        ttTranslateBtn.disabled = true;
+        ttOutput.classList.remove('placeholder');
+        ttOutput.textContent = t('loadingText');
+        try{
+          const response = await fetch('/api/translate-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, direction: ttDirection })
+          });
+          if(!response.ok) throw new Error('fail');
+          const data = await response.json();
+          if(!data.translation) throw new Error('empty');
+          ttOutput.textContent = data.translation;
+        }catch(e){
+          ttOutput.textContent = t('errorText');
+        }
+        ttTranslateBtn.disabled = false;
+      }
+
+      ttTranslateBtn.addEventListener('click', runTranslateText);
+      document.getElementById('ttInputClear').addEventListener('click', () => {
+        ttInput.value = '';
+        ttOutput.textContent = t('ttResultPlaceholder');
+        ttOutput.classList.add('placeholder');
+        ttInput.focus();
+      });
+
+      document.getElementById('ttInputSpeak').addEventListener('click', () => {
+        if(ttInput.value.trim()) speakWord(ttInput.value.trim());
+      });
+      document.getElementById('ttOutputSpeak').addEventListener('click', () => {
+        const text = ttOutput.textContent.trim();
+        if(text && !ttOutput.classList.contains('placeholder')) speakWord(text);
+      });
+      document.getElementById('ttOutputCopy').addEventListener('click', (e) => {
+        const text = ttOutput.textContent.trim();
+        if(text && !ttOutput.classList.contains('placeholder')) copyText(text, e.currentTarget);
+      });
+
+      // PROFIL
+      function getTelegramUser(){
+        if(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe){
+          return window.Telegram.WebApp.initDataUnsafe.user || null;
+        }
+        return null;
+      }
+
+      function updateProfilePane(){
+        const user = getTelegramUser();
+        const avatarWrap = document.getElementById('profAvatarWrap');
+        const profName = document.getElementById('profFullName');
+        const profHandle = document.getElementById('profUserHandle');
+
+        document.getElementById('profWordsCount').textContent = words.length;
+        document.getElementById('profMemorizedCount').textContent = words.filter(w => w.memorized).length;
+
+        updateXPDisplay();
+        renderLeaderboard();
+
+        if(!user) return;
+
+        const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
+        profName.textContent = fullName || 'Foydalanuvchi';
+        if(profHandle) profHandle.textContent = user.username ? `@${user.username}` : '';
+
+        if(user.photo_url){
+          avatarWrap.outerHTML = `<img id="profAvatarWrap" class="w-20 h-20 rounded-full mx-auto border-2 border-gold object-cover" src="${user.photo_url}" alt="">`;
+        } else {
+          const init = ((user.first_name || '')[0] + (user.last_name || '')[0]).toUpperCase() || '👤';
+          avatarWrap.textContent = init;
+        }
+      }
+
+      function escapeJs(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+      function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+      function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+      if(window.Telegram && window.Telegram.WebApp){
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+      }
+
+      applyStaticI18n();
+      loadWords();
+    </script>
+  </body>
 </html>
