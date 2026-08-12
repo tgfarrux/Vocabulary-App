@@ -46,7 +46,6 @@
     <style>
       :root {
         color-scheme: light;
-        /* YUMSHOQ VA SARG'AYMAYDIGAN AMBIENT BACKGROUND RANGI */
         --amb-1: #e9d5ff;
         --amb-2: #a7f3d0;
         --amb-3: #fef3c7;
@@ -146,7 +145,7 @@
         fill: none;
       }
 
-      /* TO'G'RILANGAN DUMALOQ SWITCH STILI */
+      /* SWITCH DUMALOQ TOGGLE */
       .switch {
         font-size: 14px;
         position: relative;
@@ -210,39 +209,43 @@
         box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
       }
 
-      /* DOIMIY AYLANIB YONIB TURUVCHI GLOWING QIDIRUV PANELLARI */
-      .glowing-search-box {
+      /* PURPLE, YELLOW, TEAL, SKY BLUE MULTI-COLOR RAINBOW GLOW */
+      .rainbow-glow-box {
         position: relative;
         width: 100%;
         border-radius: 9999px;
         padding: 2.5px;
-        background: linear-gradient(var(--glow-angle, 0deg), #f59e0b, #d97706, #fbbf24, #f59e0b);
-        animation: rotateGlow 3s linear infinite;
-        box-shadow: 0 0 18px rgba(245, 158, 11, 0.45);
+        background: linear-gradient(var(--rainbow-angle, 0deg), #8b5cf6, #f59e0b, #14b8a6, #38bdf8, #8b5cf6);
+        animation: rotateRainbowGlow 4s linear infinite;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.35), 0 0 15px rgba(56, 189, 248, 0.25);
       }
 
-      @property --glow-angle {
+      @property --rainbow-angle {
         syntax: '<angle>';
         initial-value: 0deg;
         inherits: false;
       }
 
-      @keyframes rotateGlow {
-        0% { --glow-angle: 0deg; }
-        100% { --glow-angle: 360deg; }
+      @keyframes rotateRainbowGlow {
+        0% { --rainbow-angle: 0deg; }
+        100% { --rainbow-angle: 360deg; }
       }
 
-      .search-inner-content {
+      .search-inner-clean {
         position: relative;
         display: flex;
         align-items: center;
         width: 100%;
-        background: var(--glass-strong);
+        background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-radius: 9999px;
         padding: 4px 6px 4px 16px;
         z-index: 2;
+      }
+
+      .dark .search-inner-clean {
+        background: rgba(15, 23, 42, 0.85);
       }
 
       .input-glow {
@@ -258,9 +261,51 @@
       .search-icon-svg {
         width: 20px;
         height: 20px;
-        color: var(--gold);
+        color: #8b5cf6;
         margin-right: 10px;
         flex-shrink: 0;
+      }
+
+      /* 3D TACTILE GENERATE/ADD BUTTON STILI */
+      .button-wrap {
+        position: relative;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      .btn-3d {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 18px;
+        border-radius: 9999px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+        color: #334155;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 -2px 0 rgba(0, 0, 0, 0.06);
+        transition: all 0.15s ease-in-out;
+        z-index: 2;
+      }
+
+      .btn-3d:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
+        color: #0f172a;
+      }
+
+      .btn-3d:active {
+        transform: translateY(1.5px);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.08);
+      }
+
+      .dark .btn-3d {
+        background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+        color: #0f172a;
+        border-color: rgba(255, 255, 255, 0.9);
       }
 
       /* UIVERSE BOOK LOADER ANIMATSIYASI */
@@ -441,9 +486,9 @@
                 </div>
               </div>
 
-              <!-- DOIMIY AYLANIB YONIB TURUVCHI GLOWING QIDIRUV PANELLARI -->
-              <div class="glowing-search-box">
-                <div class="search-inner-content">
+              <!-- PURPLE, YELLOW, TEAL, SKY BLUE RAINBOW GLOW WITH CLEAN WHITE INPUT & 3D BUTTON -->
+              <div class="rainbow-glow-box">
+                <div class="search-inner-clean">
                   <svg class="search-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <circle cx="11" cy="11" r="8" stroke-width="2"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line>
@@ -453,10 +498,16 @@
                     id="wordInput"
                     placeholder="Bilmagan inglizcha so'zingizni yozing..."
                     aria-label="Word to translate"
-                    class="input-glow"
+                    class="input-glow text-slate-800 dark:text-slate-100 placeholder:text-slate-400"
                     autocomplete="off"
                   />
-                  <button type="button" id="addBtn" class="glass-gold px-4 py-2 rounded-full text-xs font-bold shrink-0">Qo'shish</button>
+                  
+                  <!-- 3D TAKTIL QO'SHISH TUGMASI -->
+                  <div class="button-wrap">
+                    <button type="button" id="addBtn" class="btn-3d">
+                      <span>Qo'shish</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
