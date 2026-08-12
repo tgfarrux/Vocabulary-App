@@ -54,7 +54,6 @@
         --background: #f8fafc;
         --foreground: #0f172a;
 
-        /* LIQUID GLASS SHAFFOF QIYMATLAR (LIGHT MODE) */
         --glass: rgba(255, 255, 255, 0.25);
         --glass-strong: rgba(255, 255, 255, 0.35);
         --glass-border: rgba(255, 255, 255, 0.45);
@@ -79,7 +78,6 @@
         --background: #0d1520;
         --foreground: #f8fafc;
 
-        /* LIQUID GLASS SHAFFOF QIYMATLAR (DARK MODE) */
         --glass: rgba(255, 255, 255, 0.07);
         --glass-strong: rgba(255, 255, 255, 0.12);
         --glass-border: rgba(255, 255, 255, 0.18);
@@ -115,7 +113,6 @@
         filter: saturate(1.1);
       }
 
-      /* LIQUID GLASS CORE CLASSES (ORQASI BEUYTIB KO'RINADIGAN) */
       .glass {
         background: var(--glass) !important;
         backdrop-filter: blur(20px) saturate(190%) !important;
@@ -146,6 +143,67 @@
         stroke-linecap: round;
         stroke-linejoin: round;
         fill: none;
+      }
+
+      /* CUSTOM GLASS & GOLD SWITCH STILI */
+      .switch {
+        font-size: 14px;
+        position: relative;
+        display: inline-block;
+        width: 3.2em;
+        height: 1.8em;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        transition: .3s;
+        border-radius: 30px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "☀️";
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        height: 1.35em;
+        width: 1.35em;
+        border-radius: 20px;
+        left: 0.22em;
+        bottom: 0.18em;
+        background: #ffffff;
+        color: #d97706;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      input:checked + .slider {
+        background: rgba(245, 158, 11, 0.25);
+        border-color: rgba(245, 158, 11, 0.5);
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(1.35em);
+        content: "🌙";
+        background: #f59e0b;
+        color: #1e293b;
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
       }
 
       /* DOIMIY AYLANIB YONIB TURUVCHI GLOWING QIDIRUV PANELLARI */
@@ -321,17 +379,14 @@
                   <p class="text-xs font-mono text-muted-foreground" id="headerUserHandle">@username</p>
                   <h1 class="text-2xl font-extrabold tracking-tight text-gold" id="appTitle">Lug'at</h1>
                 </div>
-                <button
-                  type="button"
-                  id="topThemeToggle"
-                  aria-label="Toggle theme"
-                  class="glass-strong flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-transform active:scale-90"
-                >
-                  🌙
-                </button>
+                
+                <!-- TEPA O'NG BURCHAKDAGI YANGILANGAN SWITCH TOGGLE TUGMASI -->
+                <label class="switch">
+                  <input type="checkbox" id="topThemeToggleCheck">
+                  <span class="slider"></span>
+                </label>
               </div>
 
-              <!-- SHAFFOF GLASS HEADER PANEL -->
               <div class="glass flex items-stretch rounded-xl p-2">
                 <div class="flex flex-1 flex-col items-center gap-1 px-2 py-1">
                   <div class="flex items-center gap-1.5 text-foreground">
@@ -359,7 +414,7 @@
               </div>
             </header>
 
-            <!-- Language Switcher Panel (SHAFFOF LIQUID GLASS) -->
+            <!-- Language Switcher Panel -->
             <section class="glass-strong flex flex-col gap-4 rounded-xl p-4">
               <div class="flex items-center justify-between gap-2">
                 <div class="flex flex-1 flex-col items-center rounded-lg py-2 glass">
@@ -512,7 +567,13 @@
               <div class="flex flex-col gap-2 text-left text-xs">
                 <div class="glass p-3 rounded-lg flex justify-between items-center">
                   <span>🎨 <span id="lblTheme">Mavzu</span></span>
-                  <button id="themeToggleBtn" class="glass-gold px-3 py-1 rounded-full font-bold text-[11px]"><span id="themeBtnText">Tungi rejim 🌙</span></button>
+                  
+                  <!-- SOZLAMALARDAGI SWITCH TOGGLE TUGMASI -->
+                  <label class="switch">
+                    <input type="checkbox" id="settingsThemeToggleCheck">
+                    <span class="slider"></span>
+                  </label>
+
                 </div>
                 <div class="glass p-3 rounded-lg flex justify-between items-center">
                   <span>🌐 <span id="lblLang">Ilova tili</span></span>
@@ -525,7 +586,7 @@
         </div>
       </div>
 
-      <!-- Bottom Nav (PASTKI SHAFFOF GLASS PANEL) -->
+      <!-- Bottom Nav -->
       <nav
         class="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center"
         style="padding-bottom:max(1rem, env(safe-area-inset-bottom))"
@@ -1365,26 +1426,27 @@
       }
 
       // MAVZU (YORUGLIK/TUNGI) ALMASHTIRISH TOGGLE
-      function toggleTheme() {
-        const isDark = document.documentElement.classList.contains('dark');
-        const newTheme = isDark ? 'light' : 'dark';
-        applyTheme(newTheme);
-      }
-
       function applyTheme(theme){
-        document.documentElement.classList.toggle('dark', theme === 'dark');
+        const isDark = theme === 'dark';
+        document.documentElement.classList.toggle('dark', isDark);
         
-        const topBtn = document.getElementById('topThemeToggle');
-        const btnText = document.getElementById('themeBtnText');
+        // Ikkala Switch check'larini moslash
+        const topCheck = document.getElementById('topThemeToggleCheck');
+        const settingsCheck = document.getElementById('settingsThemeToggleCheck');
         
-        if (topBtn) topBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
-        if (btnText) btnText.textContent = theme === 'dark' ? t('themeLight') : t('themeDark');
+        if (topCheck) topCheck.checked = isDark;
+        if (settingsCheck) settingsCheck.checked = isDark;
         
         localStorage.setItem('ui-theme', theme);
       }
 
-      document.getElementById('topThemeToggle').addEventListener('click', toggleTheme);
-      document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+      function handleThemeSwitchChange(e) {
+        const newTheme = e.target.checked ? 'dark' : 'light';
+        applyTheme(newTheme);
+      }
+
+      document.getElementById('topThemeToggleCheck').addEventListener('change', handleThemeSwitchChange);
+      document.getElementById('settingsThemeToggleCheck').addEventListener('change', handleThemeSwitchChange);
 
       // Language switcher
       const langOverlay = document.getElementById('langOverlay');
