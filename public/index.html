@@ -209,15 +209,15 @@
         box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
       }
 
-      /* PURPLE, YELLOW, TEAL, SKY BLUE MULTI-COLOR RAINBOW GLOW */
+      /* TEAL VA SKY BLUE RAINBOW GLOW */
       .rainbow-glow-box {
         position: relative;
         width: 100%;
         border-radius: 9999px;
         padding: 2.5px;
-        background: linear-gradient(var(--rainbow-angle, 0deg), #8b5cf6, #f59e0b, #14b8a6, #38bdf8, #8b5cf6);
-        animation: rotateRainbowGlow 4s linear infinite;
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.35), 0 0 15px rgba(56, 189, 248, 0.25);
+        background: linear-gradient(var(--rainbow-angle, 0deg), #14b8a6, #38bdf8, #0ea5e9, #0d9488, #14b8a6);
+        animation: rotateRainbowGlow 3.5s linear infinite;
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.35), 0 0 12px rgba(20, 184, 166, 0.25);
       }
 
       @property --rainbow-angle {
@@ -261,12 +261,12 @@
       .search-icon-svg {
         width: 20px;
         height: 20px;
-        color: #8b5cf6;
+        color: #38bdf8;
         margin-right: 10px;
         flex-shrink: 0;
       }
 
-      /* 3D TACTILE GENERATE/ADD BUTTON STILI */
+      /* SHAFFOFROQ FROSTED GLASS 3D QO'SHISH TUGMASI */
       .button-wrap {
         position: relative;
         display: inline-block;
@@ -280,32 +280,34 @@
         justify-content: center;
         padding: 8px 18px;
         border-radius: 9999px;
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
-        color: #334155;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        color: #0f172a;
         font-weight: 700;
         font-size: 13px;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 -2px 0 rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8);
         transition: all 0.15s ease-in-out;
         z-index: 2;
       }
 
       .btn-3d:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
-        color: #0f172a;
+        background: rgba(255, 255, 255, 0.35);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
       }
 
       .btn-3d:active {
         transform: translateY(1.5px);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(0, 0, 0, 0.06);
       }
 
       .dark .btn-3d {
-        background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
-        color: #0f172a;
-        border-color: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.12);
+        color: #f8fafc;
+        border-color: rgba(255, 255, 255, 0.3);
       }
 
       /* UIVERSE BOOK LOADER ANIMATSIYASI */
@@ -429,7 +431,6 @@
                   <h1 class="text-2xl font-extrabold tracking-tight text-gold" id="appTitle">Lug'at</h1>
                 </div>
                 
-                <!-- TEPA O'NG BURCHAKDAGI SWITCH TOGGLE TUGMASI -->
                 <label class="switch">
                   <input type="checkbox" id="topThemeToggleCheck">
                   <span class="slider"></span>
@@ -486,7 +487,7 @@
                 </div>
               </div>
 
-              <!-- PURPLE, YELLOW, TEAL, SKY BLUE RAINBOW GLOW WITH CLEAN WHITE INPUT & 3D BUTTON -->
+              <!-- TEAL VA SKY BLUE RAINBOW GLOW WITH CLEAN WHITE INPUT & FROSTED GLASS 3D BUTTON -->
               <div class="rainbow-glow-box">
                 <div class="search-inner-clean">
                   <svg class="search-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -502,7 +503,7 @@
                     autocomplete="off"
                   />
                   
-                  <!-- 3D TAKTIL QO'SHISH TUGMASI -->
+                  <!-- SHAFFOF FROSTED GLASS 3D QO'SHISH TUGMASI -->
                   <div class="button-wrap">
                     <button type="button" id="addBtn" class="btn-3d">
                       <span>Qo'shish</span>
