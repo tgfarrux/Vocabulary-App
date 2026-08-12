@@ -46,22 +46,23 @@
     <style>
       :root {
         color-scheme: light;
-        --amb-1: #d8b4f8;
+        --amb-1: #e9d5ff;
         --amb-2: #a7f3d0;
-        --amb-3: #fde9c8;
-        --amb-4: #b7d8c4;
+        --amb-3: #fde68a;
+        --amb-4: #bae6fd;
 
-        --background: #eef1f4;
-        --foreground: #1e293b;
+        --background: #f8fafc;
+        --foreground: #0f172a;
 
-        --glass: rgba(255, 255, 255, 0.45);
-        --glass-strong: rgba(255, 255, 255, 0.65);
-        --glass-border: rgba(255, 255, 255, 0.6);
-        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+        /* LIQUID GLASS SHAFFOF QIYMATLAR (LIGHT MODE) */
+        --glass: rgba(255, 255, 255, 0.25);
+        --glass-strong: rgba(255, 255, 255, 0.35);
+        --glass-border: rgba(255, 255, 255, 0.45);
+        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
 
-        --card: rgba(255, 255, 255, 0.5);
-        --muted: rgba(30, 41, 59, 0.08);
-        --muted-foreground: #52617a;
+        --card: rgba(255, 255, 255, 0.3);
+        --muted: rgba(15, 23, 42, 0.06);
+        --muted-foreground: #475569;
 
         --gold: #d97706;
         --gold-strong: #b45309;
@@ -78,13 +79,14 @@
         --background: #0d1520;
         --foreground: #f8fafc;
 
-        --glass: rgba(255, 255, 255, 0.08);
-        --glass-strong: rgba(255, 255, 255, 0.14);
-        --glass-border: rgba(255, 255, 255, 0.16);
-        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+        /* LIQUID GLASS SHAFFOF QIYMATLAR (DARK MODE) */
+        --glass: rgba(255, 255, 255, 0.07);
+        --glass-strong: rgba(255, 255, 255, 0.12);
+        --glass-border: rgba(255, 255, 255, 0.18);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 
-        --card: rgba(255, 255, 255, 0.07);
-        --muted: rgba(255, 255, 255, 0.06);
+        --card: rgba(255, 255, 255, 0.06);
+        --muted: rgba(255, 255, 255, 0.08);
         --muted-foreground: #a7b4c4;
 
         --gold: #fbbf24;
@@ -110,23 +112,24 @@
           radial-gradient(55% 50% at 92% 12%, var(--amb-3) 0%, transparent 55%),
           radial-gradient(70% 65% at 82% 88%, var(--amb-2) 0%, transparent 60%),
           radial-gradient(60% 55% at 8% 92%, var(--amb-4) 0%, transparent 60%);
-        filter: saturate(1.05);
+        filter: saturate(1.1);
       }
 
+      /* LIQUID GLASS CORE CLASSES (ORQASI BEUYTIB KO'RINADIGAN) */
       .glass {
-        background: var(--glass);
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
-        border: 1px solid var(--glass-border);
-        box-shadow: var(--glass-shadow);
+        background: var(--glass) !important;
+        backdrop-filter: blur(20px) saturate(190%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+        border: 1px solid var(--glass-border) !important;
+        box-shadow: var(--glass-shadow) !important;
       }
 
       .glass-strong {
-        background: var(--glass-strong);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-        border: 1px solid var(--glass-border);
-        box-shadow: var(--glass-shadow);
+        background: var(--glass-strong) !important;
+        backdrop-filter: blur(24px) saturate(200%) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+        border: 1px solid var(--glass-border) !important;
+        box-shadow: var(--glass-shadow) !important;
       }
 
       .glass-gold {
@@ -145,7 +148,7 @@
         fill: none;
       }
 
-      /* UIVERSE TINY-PUMA GLOWING SEARCH STILI (DOIMIY AYLANIB YONIB TURUVCHI NEON RAMKA) */
+      /* DOIMIY AYLANIB YONIB TURUVCHI GLOWING QIDIRUV PANELLARI */
       .glowing-search-box {
         position: relative;
         width: 100%;
@@ -153,7 +156,7 @@
         padding: 2.5px;
         background: linear-gradient(var(--glow-angle, 0deg), #f59e0b, #d97706, #fbbf24, #f59e0b);
         animation: rotateGlow 3s linear infinite;
-        box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
+        box-shadow: 0 0 18px rgba(245, 158, 11, 0.45);
       }
 
       @property --glow-angle {
@@ -172,8 +175,9 @@
         display: flex;
         align-items: center;
         width: 100%;
-        background: var(--background);
+        background: var(--glass-strong);
         backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border-radius: 9999px;
         padding: 4px 6px 4px 16px;
         z-index: 2;
@@ -285,17 +289,17 @@
   </head>
 
   <body>
-    <!-- SPLASH SCREEN ANIMATSIYASI (O'RTADA 3D KITOB VA LUG'AT YOZUV) -->
+    <!-- SPLASH SCREEN ANIMATSIYASI -->
     <div id="splashScreen" class="splash-screen">
       <div class="loader">
         <div>
           <ul>
             <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
-            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
-            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
-            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
-            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
-            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
+            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
+            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
+            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
+            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
+            <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
           </ul>
         </div>
         <span>Lug'at</span>
@@ -327,6 +331,7 @@
                 </button>
               </div>
 
+              <!-- SHAFFOF GLASS HEADER PANEL -->
               <div class="glass flex items-stretch rounded-xl p-2">
                 <div class="flex flex-1 flex-col items-center gap-1 px-2 py-1">
                   <div class="flex items-center gap-1.5 text-foreground">
@@ -354,10 +359,10 @@
               </div>
             </header>
 
-            <!-- Language Switcher Panel -->
+            <!-- Language Switcher Panel (SHAFFOF LIQUID GLASS) -->
             <section class="glass-strong flex flex-col gap-4 rounded-xl p-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
+                <div class="flex flex-1 flex-col items-center rounded-lg py-2 glass">
                   <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">MANBA</span>
                   <span id="langFrom" class="text-base font-bold">Inglizcha</span>
                 </div>
@@ -371,7 +376,7 @@
                   <svg class="icon" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></svg>
                 </button>
 
-                <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
+                <div class="flex flex-1 flex-col items-center rounded-lg py-2 glass">
                   <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">NISHON</span>
                   <span id="langTo" class="text-base font-bold">O'zbekcha</span>
                 </div>
@@ -411,7 +416,7 @@
                 <div class="flex items-center gap-2 px-1">
                   <svg class="icon" style="color:var(--gold)" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
                   <h2 class="text-base font-bold" id="colLearningLabel">O'rganilmoqda</h2>
-                  <span class="rounded-full px-2 py-0.5 text-xs font-semibold text-muted-foreground" style="background:var(--muted)" id="learningCount">0</span>
+                  <span class="rounded-full px-2 py-0.5 text-xs font-semibold text-muted-foreground glass" id="learningCount">0</span>
                 </div>
                 <div id="learningList" class="flex flex-col gap-2.5"></div>
               </section>
@@ -420,7 +425,7 @@
                 <div class="flex items-center gap-2 px-1">
                   <svg class="icon" style="color:var(--gold)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
                   <h2 class="text-base font-bold" id="colMemorizedLabel">Yodlangan</h2>
-                  <span class="rounded-full px-2 py-0.5 text-xs font-semibold text-muted-foreground" style="background:var(--muted)" id="memorizedCount">0</span>
+                  <span class="rounded-full px-2 py-0.5 text-xs font-semibold text-muted-foreground glass" id="memorizedCount">0</span>
                 </div>
                 <div id="memorizedList" class="flex flex-col gap-2.5"></div>
               </section>
@@ -432,14 +437,14 @@
             <section class="glass-strong flex flex-col gap-4 rounded-xl p-4">
               <h2 class="text-base font-bold text-gold" id="transTitle">Matn Tarjimoni</h2>
               <div class="flex items-center justify-between gap-2">
-                <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
+                <div class="flex flex-1 flex-col items-center rounded-lg py-2 glass">
                   <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">MANBA</span>
                   <span id="ttFrom" class="text-base font-bold">Inglizcha</span>
                 </div>
                 <button type="button" id="ttSwapBtn" class="glass-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
                   <svg class="icon" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></svg>
                 </button>
-                <div class="flex flex-1 flex-col items-center rounded-lg py-2" style="background:var(--muted)">
+                <div class="flex flex-1 flex-col items-center rounded-lg py-2 glass">
                   <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">NISHON</span>
                   <span id="ttTo" class="text-base font-bold">O'zbekcha</span>
                 </div>
@@ -467,10 +472,10 @@
           <!-- PANE 3: PROFIL & LEADERBOARD -->
           <div class="view-pane px-4 flex flex-col gap-6">
             <section class="glass-strong rounded-xl p-5 text-center flex flex-col gap-4">
-              <div class="inline-block self-center px-3 py-1 rounded-full text-[10px] font-bold text-gold border border-gold/30" style="background:var(--muted)">
+              <div class="inline-block self-center px-3 py-1 rounded-full text-[10px] font-bold text-gold border border-gold/30 glass">
                 LEVEL 5 • WORD EXPLORER
               </div>
-              <div id="profAvatarWrap" class="w-20 h-20 rounded-full mx-auto border-2 border-gold flex items-center justify-center text-3xl font-bold text-gold" style="background:var(--muted)">👤</div>
+              <div id="profAvatarWrap" class="w-20 h-20 rounded-full mx-auto border-2 border-gold flex items-center justify-center text-3xl font-bold text-gold glass">👤</div>
               
               <div>
                 <h2 class="text-xl font-bold text-foreground" id="profFullName">Foydalanuvchi Ismi</h2>
@@ -520,7 +525,7 @@
         </div>
       </div>
 
-      <!-- Bottom Nav -->
+      <!-- Bottom Nav (PASTKI SHAFFOF GLASS PANEL) -->
       <nav
         class="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center"
         style="padding-bottom:max(1rem, env(safe-area-inset-bottom))"
@@ -1471,7 +1476,7 @@
         if(headerHandle) headerHandle.textContent = user.username ? `@${user.username}` : '';
 
         if(user.photo_url){
-          avatarWrap.outerHTML = `<img id="profAvatarWrap" class="w-20 h-20 rounded-full mx-auto border-2 border-gold object-cover" src="${user.photo_url}" alt="">`;
+          avatarWrap.outerHTML = `<img id="profAvatarWrap" class="w-20 h-20 rounded-full mx-auto border-2 border-gold object-cover glass" src="${user.photo_url}" alt="">`;
         } else {
           const init = ((user.first_name || '')[0] + (user.last_name || '')[0]).toUpperCase() || '👤';
           avatarWrap.textContent = init;
@@ -1496,4 +1501,3 @@
     </script>
   </body>
 </html>
-          
