@@ -48,7 +48,7 @@
         color-scheme: light;
         --amb-1: #e9d5ff;
         --amb-2: #a7f3d0;
-        --amb-3: #fef3c7;
+        --amb-3: #e0f2fe;
         --amb-4: #bae6fd;
 
         --background: #f8fafc;
@@ -63,17 +63,18 @@
         --muted: rgba(15, 23, 42, 0.06);
         --muted-foreground: #475569;
 
-        --gold: #d97706;
-        --gold-strong: #b45309;
+        /* TEAL-SKY BLUE ELEKTRON RANGLAR */
+        --gold: #0284c7;
+        --gold-strong: #0d9488;
         --gold-foreground: #ffffff;
       }
 
       .dark {
         color-scheme: dark;
-        --amb-1: #2e4036;
-        --amb-2: #1e293b;
-        --amb-3: #3b2f52;
-        --amb-4: #10352c;
+        --amb-1: #1e293b;
+        --amb-2: #0f172a;
+        --amb-3: #134e4a;
+        --amb-4: #0c4a6e;
 
         --background: #0d1520;
         --foreground: #f8fafc;
@@ -87,9 +88,10 @@
         --muted: rgba(255, 255, 255, 0.08);
         --muted-foreground: #a7b4c4;
 
-        --gold: #fbbf24;
-        --gold-strong: #f59e0b;
-        --gold-foreground: #2a1c04;
+        /* TEAL-SKY BLUE MOVIY NEON RANGLAR */
+        --gold: #38bdf8;
+        --gold-strong: #14b8a6;
+        --gold-foreground: #0f172a;
       }
 
       * { border-color: var(--glass-border); }
@@ -107,10 +109,10 @@
         z-index: -1;
         background-color: var(--background);
         background-image: radial-gradient(50% 45% at 10% 10%, var(--amb-1) 0%, transparent 60%),
-          radial-gradient(40% 35% at 90% 10%, rgba(253, 230, 138, 0.3) 0%, transparent 50%),
+          radial-gradient(40% 35% at 90% 10%, rgba(56, 189, 248, 0.25) 0%, transparent 50%),
           radial-gradient(60% 55% at 80% 90%, var(--amb-2) 0%, transparent 60%),
           radial-gradient(50% 45% at 10% 90%, var(--amb-4) 0%, transparent 60%);
-        filter: saturate(1.05);
+        filter: saturate(1.1);
       }
 
       .glass {
@@ -132,7 +134,7 @@
       .glass-gold {
         background: linear-gradient(135deg, var(--gold), var(--gold-strong));
         color: var(--gold-foreground);
-        box-shadow: 0 6px 20px -4px color-mix(in srgb, var(--gold) 60%, transparent);
+        box-shadow: 0 6px 20px -4px rgba(56, 189, 248, 0.4);
       }
 
       .icon {
@@ -145,6 +147,7 @@
         fill: none;
       }
 
+      /* MOVIY/TEAL RANGLI SWITCH DUMALOQ TOGGLE */
       .switch {
         font-size: 14px;
         position: relative;
@@ -190,24 +193,25 @@
         top: 50%;
         transform: translateY(-50%);
         background: #ffffff;
-        color: #d97706;
+        color: #0284c7;
         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       input:checked + .slider {
-        background: rgba(245, 158, 11, 0.25);
-        border-color: rgba(245, 158, 11, 0.5);
+        background: rgba(56, 189, 248, 0.25);
+        border-color: rgba(56, 189, 248, 0.5);
       }
 
       input:checked + .slider:before {
         transform: translate(1.35em, -50%);
         content: "🌙";
-        background: #f59e0b;
-        color: #1e293b;
-        box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+        background: #38bdf8;
+        color: #0f172a;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
       }
 
+      /* TEAL VA SKY BLUE RAINBOW GLOW */
       .rainbow-glow-box {
         position: relative;
         width: 100%;
@@ -309,8 +313,8 @@
 
       .loader {
         --background: #0d1520;
-        --color: #fbbf24;
-        --page: #f59e0b;
+        --color: #38bdf8;
+        --page: #14b8a6;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -384,9 +388,9 @@
       .view-pane { width: 33.33333%; flex-shrink: 0; box-sizing: border-box; min-height: 100vh; }
 
       .podium-card { flex: 1; border-radius: 16px; padding: 12px 6px; text-align: center; position: relative; cursor: pointer; }
-      .podium-card.rank-1 { order: 2; background: rgba(245, 158, 11, 0.2); border: 1.5px solid var(--gold); transform: translateY(-6px); }
+      .podium-card.rank-1 { order: 2; background: rgba(56, 189, 248, 0.2); border: 1.5px solid var(--gold); transform: translateY(-6px); }
       .podium-card.rank-2 { order: 1; background: rgba(255, 255, 255, 0.05); border: 1.5px solid #94a3b8; }
-      .podium-card.rank-3 { order: 3; background: rgba(255, 255, 255, 0.05); border: 1.5px solid #d97706; }
+      .podium-card.rank-3 { order: 3; background: rgba(255, 255, 255, 0.05); border: 1.5px solid #0d9488; }
 
       .overlay{ position:fixed; inset:0; background:rgba(13, 21, 32, 0.85); backdrop-filter: blur(8px); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px; }
       .overlay.hidden{display:none;}
