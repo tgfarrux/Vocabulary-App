@@ -307,54 +307,68 @@
         border-color: rgba(255, 255, 255, 0.3);
       }
 
+      /* TO'G'RILANGAN MARKAZIY SPLASH LOADER */
       .loader {
-  --background: #0d1520;
-  --color: #38bdf8;
-  --page: #14b8a6;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
+        --background: #0d1520;
+        --color: #38bdf8;
+        --page: #14b8a6;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
 
-.loader div {
-  width: 70px;
-  height: 95px;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* Kitob varag'i aylanish o'qini roppa-rosa markazga tekislaymiz */
-  margin-left: 35px; 
-}
+      .loader div {
+        width: 70px;
+        height: 95px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 35px; /* Kitob markazga tushishi uchun */
+      }
 
-.loader div ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  position: absolute;
-  inset: 0;
-}
+      .loader div ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        position: absolute;
+        inset: 0;
+      }
 
-.loader div ul li {
-  position: absolute;
-  inset: 0;
-  transform-origin: 0% 50%; /* O'qni markaziy chiziqqa to'g'irlaymiz */
-  color: var(--page);
-  animation: flip 1.2s ease infinite;
-}
+      .loader div ul li {
+        position: absolute;
+        inset: 0;
+        transform-origin: 0% 50%;
+        color: var(--page);
+        animation: flip 1.2s ease infinite;
+      }
 
-.loader span {
-  margin-top: 28px;
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--color);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-align: center;
-  animation: textGlow 1.2s ease-in-out infinite alternate;
-}
+      .loader div ul li:nth-child(1) { animation-delay: 0s; }
+      .loader div ul li:nth-child(2) { animation-delay: 0.15s; }
+      .loader div ul li:nth-child(3) { animation-delay: 0.3s; }
+      .loader div ul li:nth-child(4) { animation-delay: 0.45s; }
+      .loader div ul li:nth-child(5) { animation-delay: 0.6s; }
+      .loader div ul li:nth-child(6) { animation-delay: 0.75s; }
+
+      .loader div ul li svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .loader span {
+        margin-top: 28px;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--color);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-align: center;
+        animation: textGlow 1.2s ease-in-out infinite alternate;
+      }
+
       @keyframes flip {
         0% { transform: rotateY(0deg); opacity: 1; }
         80%, 100% { transform: rotateY(-180deg); opacity: 0; }
