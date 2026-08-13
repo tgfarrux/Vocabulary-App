@@ -604,15 +604,6 @@
               <div class="flex items-end justify-center gap-2" id="podiumContainer"></div>
               <div class="flex flex-col gap-2 text-left" id="lbList"></div>
 
-              <!-- YUTUQLAR -->
-              <h3 class="text-base font-bold text-left text-gold mt-4" id="profBadgesTitle">🏅 Yutuqlar va Nishonlar</h3>
-              <div class="grid grid-cols-2 gap-2 text-left text-xs">
-                <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>🎯</span> <span id="badgeFirst10">Dastlabki 10 so'z</span></div>
-                <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>🔥</span> <span id="badgeStreak3">3 Kunlik Streak</span></div>
-                <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>🧠</span> <span id="badgeMaster">Xotira Ustasi</span></div>
-                <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>⚡</span> <span id="badgeNight">Tungi Bilimdon</span></div>
-              </div>
-
               <!-- SOZLAMALAR -->
               <h3 class="text-base font-bold text-left text-gold mt-4" id="profSettingsTitle">⚙️ Sozlamalar</h3>
               <div class="flex flex-col gap-2 text-left text-xs">
@@ -652,7 +643,8 @@
             <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/><path d="M2 12h20"/></svg>
           </button>
 
-          <button type="button" aria-label="Add a new word" onclick="document.getElementById('wordInput').focus()"
+          <!-- PLUS TUGMASI (QIDIRUV PANELIGA O'TKAZADI) -->
+          <button type="button" id="bnAddPlusBtn" aria-label="Add a new word"
             class="glass-gold mx-1 flex h-12 w-12 items-center justify-center rounded-full transition-transform active:scale-90">
             <svg class="icon" style="width:1.5rem;height:1.5rem" viewBox="0 0 24 24"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
           </button>
@@ -735,8 +727,7 @@
           transTitle: "Matn Tarjimoni", ttPlaceholder: "Matn yoki gapni kiriting...", ttResultPlaceholder: "Tarjima natijasi shu yerda ko'rinadi...",
           ttTranslateBtnText: "Tarjima qilish", btnListen: "Eshitish", btnClear: "Tozalash", btnCopy: "Nusxalash",
           profTitle: "Mening Profilim", profStatWords: "SO'ZLAR", profStatMemorized: "YODLANGAN", profStatStreak: "STREAK KUN",
-          profBadgesTitle: "🏅 Yutuqlar va Nishonlar", badgeFirst10: "Dastlabki 10 so'z", badgeStreak3: "3 Kunlik Streak",
-          badgeMaster: "Xotira Ustasi", badgeNight: "Tungi Bilimdon", profSettingsTitle: "⚙️ Sozlamalar",
+          profSettingsTitle: "⚙️ Sozlamalar",
           profLbTitle: "🏆 Peshqadamlar Jadvali (Top XP)", lblTheme: "Mavzu", lblLang: "Ilova tili",
           themeLight: "Kunduzgi ☀️", themeDark: "Tungi 🌙"
         },
@@ -760,8 +751,7 @@
           transTitle: "Text Translator", ttPlaceholder: "Type or paste your text here...", ttResultPlaceholder: "Translation result will appear here...",
           ttTranslateBtnText: "Translate", btnListen: "Listen", btnClear: "Clear", btnCopy: "Copy",
           profTitle: "My Profile", profStatWords: "WORDS", profStatMemorized: "MEMORIZED", profStatStreak: "STREAK DAYS",
-          profBadgesTitle: "🏅 Achievements & Badges", badgeFirst10: "First 10 words", badgeStreak3: "3 Day Streak",
-          badgeMaster: "Memory Master", badgeNight: "Night Scholar", profSettingsTitle: "⚙️ Settings",
+          profSettingsTitle: "⚙️ Settings",
           profLbTitle: "🏆 Leaderboard (Top XP)", lblTheme: "Theme", lblLang: "App language",
           themeLight: "Light ☀️", themeDark: "Dark 🌙"
         },
@@ -785,8 +775,7 @@
           transTitle: "Переводчик текста", ttPlaceholder: "Введите или вставьте текст сюда...", ttResultPlaceholder: "Результат перевода появится здесь...",
           ttTranslateBtnText: "Перевести", btnListen: "Слушать", btnClear: "Очистить", btnCopy: "Копировать",
           profTitle: "Мой профиль", profStatWords: "СЛОВА", profStatMemorized: "ВЫУЧЕНО", profStatStreak: "СТРИК ДНЕЙ",
-          profBadgesTitle: "🏅 Достижения и значки", badgeFirst10: "Первые 10 слов", badgeStreak3: "3 дня стрика",
-          badgeMaster: "Мастер памяти", badgeNight: "Ночной эрудит", profSettingsTitle: "⚙️ Настройки",
+          profSettingsTitle: "⚙️ Настройки",
           profLbTitle: "🏆 Таблица лидеров (Top XP)", lblTheme: "Тема", lblLang: "Язык приложения",
           themeLight: "Светлая ☀️", themeDark: "Тёмная 🌙"
         }
@@ -825,11 +814,6 @@
         document.getElementById('profStatWords').textContent = t('profStatWords');
         document.getElementById('profStatMemorized').textContent = t('profStatMemorized');
         document.getElementById('profStatStreak').textContent = t('profStatStreak');
-        document.getElementById('profBadgesTitle').textContent = t('profBadgesTitle');
-        document.getElementById('badgeFirst10').textContent = t('badgeFirst10');
-        document.getElementById('badgeStreak3').textContent = t('badgeStreak3');
-        document.getElementById('badgeMaster').textContent = t('badgeMaster');
-        document.getElementById('badgeNight').textContent = t('badgeNight');
         document.getElementById('profSettingsTitle').textContent = t('profSettingsTitle');
         document.getElementById('profLbTitle').textContent = t('profLbTitle');
         document.getElementById('lblTheme').textContent = t('lblTheme');
@@ -921,7 +905,6 @@
 
         document.getElementById('xpBadge').textContent = `${xp} XP`;
         document.getElementById('statStreak').textContent = cachedStreak;
-        document.getElementById('profStreakCount').textContent = `🔥 ${cachedStreak}`;
 
         syncUserXP(xp, words.length, memorizedCount, cachedStreak);
       }
@@ -979,7 +962,7 @@
           let podiumHtml = '';
           top3.forEach((user, i) => {
             const avatarHtml = user.photoUrl
-              ? `<img class="w-10 h-10 rounded-full mx-auto my-1 border border-white/20" src="${user.photoUrl}" alt="">`
+              ? `<img class="w-10 h-10 rounded-full mx-auto my-1 border border-white/20 object-cover" src="${user.photoUrl}" alt="">`
               : `<div class="w-10 h-10 rounded-full mx-auto my-1 bg-white/10 flex items-center justify-center font-bold text-gold border border-white/20">${(user.name || 'F')[0].toUpperCase()}</div>`;
 
             podiumHtml += `
@@ -1019,7 +1002,7 @@
         const body = document.getElementById('userProfileBody');
 
         const avatarHtml = user.photoUrl
-          ? `<img class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-gold" src="${user.photoUrl}" alt="">`
+          ? `<img class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-gold object-cover" src="${user.photoUrl}" alt="">`
           : `<div class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-gold flex items-center justify-center text-2xl font-bold text-gold" style="background:var(--muted)">${(user.name || 'F')[0].toUpperCase()}</div>`;
 
         const tgLinkBtn = user.username
@@ -1365,6 +1348,15 @@
       document.getElementById('bnHomeBtn').addEventListener('click', function() { switchToPane(0, this); });
       document.getElementById('bnTranslateBtn').addEventListener('click', function() { switchToPane(1, this); });
       document.getElementById('bnProfileBtn').addEventListener('click', function() { switchToPane(2, this); });
+
+      // PLUS TUGMASI BOSILGANDA ASOSIY SAHIFA VA INPUTGA FOKUS QILISH
+      document.getElementById('bnAddPlusBtn').addEventListener('click', () => {
+        switchToPane(0, document.getElementById('bnHomeBtn'));
+        setTimeout(() => {
+          wordInput.focus();
+          wordInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      });
 
       document.getElementById('startQuizBtn').addEventListener('click', openQuizIfPossible);
       document.getElementById('quizClose').addEventListener('click', closeQuiz);
