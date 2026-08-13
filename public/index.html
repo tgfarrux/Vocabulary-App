@@ -613,13 +613,6 @@
                 <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>⚡</span> <span id="badgeNight">Tungi Bilimdon</span></div>
               </div>
 
-              <!-- SO'ZLARNI KO'CHIRISH (EXPORT/IMPORT) -->
-              <h3 class="text-base font-bold text-left text-gold mt-4">📦 Botlar o'rtasida ko'chirish</h3>
-              <div class="flex gap-2">
-                <button id="exportDataBtn" class="flex-1 glass p-2.5 rounded-lg text-xs font-bold text-emerald-400">📤 Nusxalash (Export)</button>
-                <button id="importDataBtn" class="flex-1 glass p-2.5 rounded-lg text-xs font-bold text-sky-400">📥 Joylash (Import)</button>
-              </div>
-
               <!-- SOZLAMALAR -->
               <h3 class="text-base font-bold text-left text-gold mt-4" id="profSettingsTitle">⚙️ Sozlamalar</h3>
               <div class="flex flex-col gap-2 text-left text-xs">
@@ -1300,37 +1293,6 @@
         const v = wordInput.value;
         wordInput.value = '';
         addWord(v);
-      });
-
-      // EXPORT & IMPORT FUNKSIYALARI (KO'CHIRISH UCHUN)
-      document.getElementById('exportDataBtn').addEventListener('click', () => {
-        if(words.length === 0){ alert("Nusxalash uchun so'zlar mavjud emas."); return; }
-        const jsonStr = JSON.stringify(words);
-        if(navigator.clipboard && navigator.clipboard.writeText){
-          navigator.clipboard.writeText(jsonStr).then(() => {
-            alert("✅ Barcha " + words.length + " ta so'zingiz nusxalandi! Yangi WordTech botiga o'tib, 'Joylash (Import)' tugmasini bosing.");
-          });
-        } else {
-          prompt("Ushbu kohni nusxalab oling va yangi botga joylang:", jsonStr);
-        }
-      });
-
-      document.getElementById('importDataBtn').addEventListener('click', async () => {
-        const inputData = prompt("Eski botdan nusxalangan ma'lumotni shu yerga joylang:");
-        if(!inputData) return;
-        try {
-          const parsed = JSON.parse(inputData.trim());
-          if(Array.isArray(parsed) && parsed.length > 0){
-            words = parsed;
-            await saveWords();
-            render();
-            alert("🎉 Muvaffaqiyatli tiklandi! " + words.length + " ta so'z yangi WordTech botingizga ko'chirildi.");
-          } else {
-            alert("❌ Noto'g'ri ma'lumot formati.");
-          }
-        } catch(e) {
-          alert("❌ Kodni o'qishda xatolik yuz berdi.");
-        }
       });
 
       const langFromEl = document.getElementById('langFrom');
