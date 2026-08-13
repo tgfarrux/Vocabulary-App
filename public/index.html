@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0d1520" />
-    <title>Lug'at Mini App</title>
+    <title>WordTech</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -63,7 +63,6 @@
         --muted: rgba(15, 23, 42, 0.06);
         --muted-foreground: #475569;
 
-        /* TEAL-SKY BLUE ELEKTRON RANGLAR */
         --gold: #0284c7;
         --gold-strong: #0d9488;
         --gold-foreground: #ffffff;
@@ -88,7 +87,6 @@
         --muted: rgba(255, 255, 255, 0.08);
         --muted-foreground: #a7b4c4;
 
-        /* TEAL-SKY BLUE MOVIY NEON RANGLAR */
         --gold: #38bdf8;
         --gold-strong: #14b8a6;
         --gold-foreground: #0f172a;
@@ -147,7 +145,6 @@
         fill: none;
       }
 
-      /* MOVIY/TEAL RANGLI SWITCH DUMALOQ TOGGLE */
       .switch {
         font-size: 14px;
         position: relative;
@@ -211,7 +208,6 @@
         box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
       }
 
-      /* TEAL VA SKY BLUE RAINBOW GLOW */
       .rainbow-glow-box {
         position: relative;
         width: 100%;
@@ -411,7 +407,7 @@
             <li><svg fill="currentColor" viewBox="0 0 90 120"><path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0053177 L71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path></svg></li>
           </ul>
         </div>
-        <span>Lug'at</span>
+        <span>WordTech</span>
       </div>
     </div>
 
@@ -428,7 +424,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-xs font-mono text-muted-foreground" id="headerUserHandle">@WordTechBot</p>
-                  <h1 class="text-2xl font-extrabold tracking-tight text-gold" id="appTitle">Lug'at</h1>
+                  <h1 class="text-2xl font-extrabold tracking-tight text-gold" id="appTitle">WordTech</h1>
                 </div>
                 
                 <label class="switch">
@@ -503,7 +499,6 @@
                     autocomplete="off"
                   />
                   
-                  <!-- SHAFFOF FROSTED GLASS 3D QO'SHISH TUGMASI -->
                   <div class="button-wrap">
                     <button type="button" id="addBtn" class="btn-3d">
                       <span>Qo'shish</span>
@@ -590,7 +585,7 @@
               
               <div>
                 <h2 class="text-xl font-bold text-foreground" id="profFullName">Foydalanuvchi Ismi</h2>
-                <p class="text-xs text-muted-foreground font-mono mt-0.5" id="profUserHandle">@username</p>
+                <p class="text-xs text-muted-foreground font-mono mt-0.5" id="profUserHandle">@WordTechBot</p>
               </div>
 
               <div class="grid grid-cols-2 gap-2 mt-2">
@@ -616,6 +611,13 @@
                 <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>🔥</span> <span id="badgeStreak3">3 Kunlik Streak</span></div>
                 <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>🧠</span> <span id="badgeMaster">Xotira Ustasi</span></div>
                 <div class="glass p-2.5 rounded-lg flex items-center gap-2"><span>⚡</span> <span id="badgeNight">Tungi Bilimdon</span></div>
+              </div>
+
+              <!-- SO'ZLARNI KO'CHIRISH (EXPORT/IMPORT) -->
+              <h3 class="text-base font-bold text-left text-gold mt-4">📦 Botlar o'rtasida ko'chirish</h3>
+              <div class="flex gap-2">
+                <button id="exportDataBtn" class="flex-1 glass p-2.5 rounded-lg text-xs font-bold text-emerald-400">📤 Nusxalash (Export)</button>
+                <button id="importDataBtn" class="flex-1 glass p-2.5 rounded-lg text-xs font-bold text-sky-400">📥 Joylash (Import)</button>
               </div>
 
               <!-- SOZLAMALAR -->
@@ -654,7 +656,7 @@
           
           <button type="button" id="bnTranslateBtn" data-nav="library" aria-label="Translate"
             class="nav-btn flex h-11 w-11 items-center justify-center rounded-full transition-colors" style="color:var(--muted-foreground)">
-            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/><path d="M2 12h20"/></svg>
           </button>
 
           <button type="button" aria-label="Add a new word" onclick="document.getElementById('wordInput').focus()"
@@ -721,7 +723,7 @@
       // I18N DICTIONARY
       const I18N = {
         uz: {
-          appTitle: "Lug'at",
+          appTitle: "WordTech",
           statTotal: "Jami so'z", statMemorized: "Yodlangan", statReady: "Testga tayyor",
           addBtn: "Qo'shish", hint: "Har bir so'z qo'shilganda tarjima va namunali gap avtomatik yasaladi.",
           placeholderEnUz: "So'z kiriting...", placeholderUzEn: "So'z kiriting...",
@@ -746,7 +748,7 @@
           themeLight: "Kunduzgi ☀️", themeDark: "Tungi 🌙"
         },
         en: {
-          appTitle: "Dictionary",
+          appTitle: "WordTech",
           statTotal: "Total words", statMemorized: "Memorized", statReady: "Ready for quiz",
           addBtn: "Add", hint: "When you add a word, translation and an example sentence are generated automatically.",
           placeholderEnUz: "Type a word...", placeholderUzEn: "Type a word...",
@@ -771,7 +773,7 @@
           themeLight: "Light ☀️", themeDark: "Dark 🌙"
         },
         ru: {
-          appTitle: "Словарь",
+          appTitle: "WordTech",
           statTotal: "Всего слов", statMemorized: "Выучено", statReady: "Готово к тесту",
           addBtn: "Добавить", hint: "При добавлении слова автоматически создаются перевод и пример предложения.",
           placeholderEnUz: "Введите слово...", placeholderUzEn: "Введите слово...",
@@ -1298,6 +1300,37 @@
         const v = wordInput.value;
         wordInput.value = '';
         addWord(v);
+      });
+
+      // EXPORT & IMPORT FUNKSIYALARI (KO'CHIRISH UCHUN)
+      document.getElementById('exportDataBtn').addEventListener('click', () => {
+        if(words.length === 0){ alert("Nusxalash uchun so'zlar mavjud emas."); return; }
+        const jsonStr = JSON.stringify(words);
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(jsonStr).then(() => {
+            alert("✅ Barcha " + words.length + " ta so'zingiz nusxalandi! Yangi WordTech botiga o'tib, 'Joylash (Import)' tugmasini bosing.");
+          });
+        } else {
+          prompt("Ushbu kohni nusxalab oling va yangi botga joylang:", jsonStr);
+        }
+      });
+
+      document.getElementById('importDataBtn').addEventListener('click', async () => {
+        const inputData = prompt("Eski botdan nusxalangan ma'lumotni shu yerga joylang:");
+        if(!inputData) return;
+        try {
+          const parsed = JSON.parse(inputData.trim());
+          if(Array.isArray(parsed) && parsed.length > 0){
+            words = parsed;
+            await saveWords();
+            render();
+            alert("🎉 Muvaffaqiyatli tiklandi! " + words.length + " ta so'z yangi WordTech botingizga ko'chirildi.");
+          } else {
+            alert("❌ Noto'g'ri ma'lumot formati.");
+          }
+        } catch(e) {
+          alert("❌ Kodni o'qishda xatolik yuz berdi.");
+        }
       });
 
       const langFromEl = document.getElementById('langFrom');
